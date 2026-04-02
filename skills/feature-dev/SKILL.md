@@ -12,6 +12,48 @@ Full workflow from design to PR. Standalone — no external plugin dependencies.
 Use when starting any feature, bug fix, or enhancement across the three-component
 system (etcd-druid, etcd-backup-restore, etcd-wrapper).
 
+## Workflow Overview
+
+```dot
+digraph feature_dev {
+    rankdir=TB;
+    "Issue received" [shape=doublecircle];
+    "Phase 1: Design" [shape=box];
+    "Phase 2: Plan" [shape=box];
+    "GATE 1: Plan Approval" [shape=diamond style=filled fillcolor=red fontcolor=white];
+    "Changes requested?" [shape=diamond];
+    "Phase 3: Worktree Setup" [shape=box];
+    "Phase 4: Implement Task" [shape=box];
+    "Spec review ✅?" [shape=diamond];
+    "Code review ✅?" [shape=diamond];
+    "More tasks?" [shape=diamond];
+    "Phase 5: Verify" [shape=box];
+    "All checks pass?" [shape=diamond];
+    "GATE 2: PR Approval" [shape=diamond style=filled fillcolor=red fontcolor=white];
+    "Phase 6: PR Creation" [shape=box];
+
+    "Issue received" -> "Phase 1: Design";
+    "Phase 1: Design" -> "Phase 2: Plan";
+    "Phase 2: Plan" -> "GATE 1: Plan Approval";
+    "GATE 1: Plan Approval" -> "Changes requested?" [label="user responds"];
+    "Changes requested?" -> "Phase 2: Plan" [label="yes"];
+    "Changes requested?" -> "Phase 3: Worktree Setup" [label="no - approved"];
+    "Phase 3: Worktree Setup" -> "Phase 4: Implement Task";
+    "Phase 4: Implement Task" -> "Spec review ✅?";
+    "Spec review ✅?" -> "Phase 4: Implement Task" [label="no - fix"];
+    "Spec review ✅?" -> "Code review ✅?" [label="yes"];
+    "Code review ✅?" -> "Phase 4: Implement Task" [label="no - fix"];
+    "Code review ✅?" -> "More tasks?" [label="yes"];
+    "More tasks?" -> "Phase 4: Implement Task" [label="yes"];
+    "More tasks?" -> "Phase 5: Verify" [label="no"];
+    "Phase 5: Verify" -> "All checks pass?" ;
+    "All checks pass?" -> "Phase 5: Verify" [label="no - dispatch fix"];
+    "All checks pass?" -> "GATE 2: PR Approval" [label="yes"];
+    "GATE 2: PR Approval" -> "Phase 6: PR Creation" [label="approved"];
+    "GATE 2: PR Approval" -> "Phase 5: Verify" [label="changes requested"];
+}
+```
+
 ## Hard Rules
 
 - NEVER write code in the fork or worktree before Gate 1 (plan approval)
@@ -94,6 +136,14 @@ Branch: `ai/TASK-{id}/claude/{short-description}`
 
 ### Phase 4: Per-Task Implementation
 
+**Model selection for implementer subagent:**
+
+| Task type | Model |
+|-----------|-------|
+| Adding/fixing tests in existing package, single-file change | Fast (haiku) |
+| Implementing new component method, 2–3 files | Standard (sonnet) |
+| New component across multiple files, API changes, debugging reconciliation failures | Most capable (opus) |
+
 Repeat for each task in the plan:
 
 **a.** Mark task in_progress with TaskUpdate
@@ -142,9 +192,17 @@ Present to the user:
 - `git diff --stat upstream/master...HEAD` output
 - Full commit list with messages
 
-Say: "Reply 'approved' to push and create the PR, or tell me what to change."
+Say: "Ready to create PR. Choose one:
+  A) **Create PR** — I push the branch and open the PR now
+  B) **Push branch only** — I push; you write the PR description yourself
+  C) **Make changes** — tell me what to fix first
+  D) **Discard** — abandon this branch (I will confirm before deleting)"
 
-Wait for explicit approval. If changes requested: fix → re-verify → present Gate 2 again.
+Wait for explicit choice. Handle:
+- **A**: proceed to Phase 6 as written
+- **B**: `git push origin <branch>` only; print the compare URL; stop
+- **C**: fix → re-verify → present Gate 2 again
+- **D**: confirm "Are you sure? This will delete the worktree and branch." — then `git worktree remove` + `git branch -d` only after second confirmation
 
 ---
 

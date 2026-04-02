@@ -80,6 +80,20 @@ Agent tool (general-purpose):
       Fix TLS secret rotation in configmap component (#1350)
       Add unit tests for memberlease operator (#1350)
 
+    ## When You're in Over Your Head
+
+    STOP and report BLOCKED or NEEDS_CONTEXT (do not keep trying) if:
+
+    1. You can't find the function/type you need after grepping the codebase
+    2. The task requires changing more files than listed — stop and ask
+    3. Tests fail after 2 fix attempts and you don't understand why
+    4. The plan step conflicts with what you see in the actual code
+    5. You're about to make a guess about an API you haven't verified
+
+    Report NEEDS_CONTEXT when you need information only the human has.
+    Report BLOCKED when the task itself appears impossible as specified.
+    Never hallucinate an API or pattern you haven't confirmed exists.
+
     ## Your Job
 
     1. Implement exactly what the task specifies — nothing more, nothing less
