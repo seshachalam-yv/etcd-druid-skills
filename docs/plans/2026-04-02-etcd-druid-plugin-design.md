@@ -91,7 +91,7 @@ etcd-druid-skills/
   "description": "Expert skills for etcd-druid development: feature workflow, TDD, debugging, and domain reference",
   "version": "1.0.0",
   "author": { "name": "Seshachalam Yerasala Venkata" },
-  "keywords": ["etcd-druid", "gardener", "kubernetes", "operator", "go"]
+  "keywords": ["etcd-druid", "etcd-backup-restore", "etcd-wrapper", "gardener", "kubernetes", "operator", "go"]
 }
 ```
 
