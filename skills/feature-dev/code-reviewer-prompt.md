@@ -40,8 +40,9 @@ Agent tool (general-purpose):
     RBAC:
     - [ ] +kubebuilder:rbac markers added for any new resource verbs
 
-    Error handling:
-    - [ ] fmt.Errorf("failed to X: %w", err) pattern used
+    Error handling (internal/component/ code):
+    - [ ] druiderr.WrapError() used (NOT fmt.Errorf) — import druiderr "github.com/gardener/etcd-druid/internal/errors"
+    - [ ] Error vars are package-level: var ErrGetFoo = errors.New("ErrGetFoo")
     - [ ] No silent error swallowing (no _ = err, no empty catch)
 
     Status updates:
@@ -53,6 +54,8 @@ Agent tool (general-purpose):
     Tests:
     - [ ] Go native testing.T (no Ginkgo in etcd-druid)
     - [ ] Gomega assertions used (import . "github.com/onsi/gomega")
+    - [ ] No gomock — fake client used: testutils.CreateTestFakeClientForObjects() or testutils.NewTestClientBuilder()
+    - [ ] OperatorContext constructed with: component.NewOperatorContext(ctx, logr.Discard(), uuid.NewString())
     - [ ] No time.Sleep() — Eventually/Consistently used for async
     - [ ] Table-driven tests for multiple scenarios
 

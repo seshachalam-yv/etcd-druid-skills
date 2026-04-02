@@ -42,17 +42,33 @@ Agent tool (general-purpose):
     - Run make generate after changes
     - Update charts/ CRD YAML
 
-    **Error handling:**
-    fmt.Errorf("failed to X: %w", err) — never swallow errors silently
+    **Error handling (internal/component/ code):**
+    Use druiderr.WrapError — NOT fmt.Errorf:
+      import druiderr "github.com/gardener/etcd-druid/internal/errors"
+      return druiderr.WrapError(err, ErrGetFoo, component.OperationPreSync,
+          "failed to get foo for etcd %s", druidv1alpha1.GetNamespaceName(etcd.ObjectMeta))
+    Error vars are package-level: var ErrGetFoo = errors.New("ErrGetFoo")
+    Never swallow errors silently.
 
     **Logging (etcd-druid):**
     log.FromContext(ctx).WithValues("etcd", req.NamespacedName)
+
+    **OperatorContext construction (in tests):**
+      import "github.com/gardener/etcd-druid/internal/component"
+      import "github.com/google/uuid"
+      import "github.com/go-logr/logr"
+      opCtx := component.NewOperatorContext(context.Background(), logr.Discard(), uuid.NewString())
 
     **Tests:**
     - Use Go native testing.T (not Ginkgo) with Gomega assertions
     - Import: . "github.com/onsi/gomega"
     - Use table-driven struct slices for multiple scenarios
-    - Use go.uber.org/mock/gomock for interface mocks
+    - DO NOT use gomock — use testutils fake client instead:
+        import "github.com/gardener/etcd-druid/test/utils"
+        // Single object with error injection:
+        cl := testutils.CreateTestFakeClientForObjects(getErr, nil, nil, nil, existingObjects, objKey)
+        // Or builder pattern:
+        cl := testutils.NewTestClientBuilder().WithObjects(objs...).Build()
     - Never use time.Sleep() — use gomega.Eventually/Consistently
     - Check existing tests in the same package before writing new ones
     - Helpers live in test/utils/ — use before creating new ones
