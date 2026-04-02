@@ -1,0 +1,10 @@
+{
+  "name": "etcd-druid",
+  "description": "Expert skills for etcd-druid development: feature workflow, TDD, debugging, and domain reference",
+  "version": "1.0.0",
+  "author": { "name": "Seshachalam Yerasala Venkata" },
+  "homepage": "https://github.com/seshachalam-yv/etcd-druid-skills",
+  "repository": "https://github.com/seshachalam-yv/etcd-druid-skills",
+  "license": "Apache-2.0",
+  "keywords": ["etcd-druid", "etcd-backup-restore", "etcd-wrapper", "gardener", "kubernetes", "operator", "go"]
+}
