@@ -14,7 +14,7 @@ system (etcd-druid, etcd-backup-restore, etcd-wrapper).
 
 ## Hard Rules
 
-- NEVER write code before Gate 1 (plan approval)
+- NEVER write code in the fork or worktree before Gate 1 (plan approval)
 - NEVER git push or create a PR before Gate 2 (PR approval)
 - NEVER skip spec-review or code-review after each implementation task
 - NEVER commit to upstream (/Users/I568019/go/src/github.com/gardener/etcd-druid)
@@ -36,7 +36,10 @@ system (etcd-druid, etcd-backup-restore, etcd-wrapper).
 ### Phase 2: Plan
 
 Write plan to fork (not worktree — worktree does not exist yet):
-  `/Users/I568019/go/src/github.com/seshachalam-yv/etcd-druid/docs/plans/YYYY-MM-DD-issue-{id}-{short-description}.md`
+```bash
+mkdir -p /Users/I568019/go/src/github.com/seshachalam-yv/etcd-druid/docs/plans
+```
+Path: `/Users/I568019/go/src/github.com/seshachalam-yv/etcd-druid/docs/plans/YYYY-MM-DD-issue-{id}-{short-description}.md`
 
 Plan format:
 ```
@@ -82,10 +85,12 @@ After Gate 1 approval:
 ```bash
 cd /Users/I568019/go/src/github.com/seshachalam-yv/etcd-druid
 git fetch upstream
-git worktree add ../etcd-druid-ai-TASK-{id} -b ai/TASK-{id}/{short-description}
+git worktree add ../etcd-druid-ai-TASK-{id} -b ai/TASK-{id}/claude/{short-description} upstream/master
 ```
 
 Pass worktree path to all subagents: `/Users/I568019/go/src/github.com/seshachalam-yv/etcd-druid-ai-TASK-{id}`
+
+Branch: `ai/TASK-{id}/claude/{short-description}`
 
 ### Phase 4: Per-Task Implementation
 
@@ -149,9 +154,9 @@ After Gate 2 approval:
 
 ```bash
 cd /Users/I568019/go/src/github.com/seshachalam-yv/etcd-druid-ai-TASK-{id}
-git push origin ai/TASK-{id}/{short-description}
+git push origin ai/TASK-{id}/claude/{short-description}
 gh pr create \
-  --repo gardener/etcd-druid \
+  --base master \
   --title "<approved title>" \
   --body "<approved description>"
 ```
