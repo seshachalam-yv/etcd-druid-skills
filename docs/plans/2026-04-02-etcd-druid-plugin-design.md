@@ -188,7 +188,7 @@ Phase 2: Plan
       ## Tasks (numbered, with checkboxes, acceptance criteria, files affected)
       ## Testing Strategy
       ## Rollback Notes
-  - Create TaskWrite entries for all tasks
+  - Create TaskCreate entries for all tasks
 
 ⛔ GATE 1: Plan approval
   - STOP. Present plan summary (tasks list, files affected, test strategy)
@@ -202,7 +202,7 @@ Phase 3: Worktree setup
   - Pass worktree path to all subagents
 
 Phase 4: Per-task implementation (repeat for each task)
-  a. Mark task in_progress in TaskWrite
+  a. Mark task in_progress in TaskUpdate
   b. Dispatch implementer subagent (./implementer-prompt.md)
      - provide: full task text, worktree path, plan context, files affected
      - subagent: reads only what it needs, implements, tests, commits, reports back
@@ -321,8 +321,8 @@ NEVER use time.Sleep() — use Eventually/Consistently with a timeout.
 - Reconciliation loop is stuck or erroring
 - etcd cluster member issues (AllMembersReady False, ClusterIDMismatch True)
 - Restore not triggering after data loss
-- Test failures related to etcd-druid domain (after superpowers:systematic-debugging
-  has already been tried for general Go/K8s issues)
+- Test failures that are clearly etcd-druid domain failures (not Go compilation
+  errors, import issues, or general Kubernetes problems — handle those directly)
 
 **NOT for:** Go compilation errors, import issues, unrelated Kubernetes problems.
 
@@ -540,8 +540,8 @@ Tasks use markdown checkboxes. Resuming a session: read plan file, check git log
 | Decision | Choice | Reason |
 |---|---|---|
 | Plugin name | `etcd-druid` | Matches repo name, clean invocation prefix |
-| Skill structure | Option B: skill + prompt templates | Focused subagent prompts, proven superpowers pattern |
-| Workflow | Option A: fully standalone | No superpowers runtime dependency |
+| Skill structure | Skill folders + prompt templates | Focused subagent prompts per role |
+| Workflow | Fully standalone, no external plugin deps | No superpowers runtime dependency |
 | Session-start | Medium (~40 lines) | Expert developer, no hand-holding |
 | Subagent model | Subagents only, no named multi-agents | Single developer, no coordination overhead |
 | Commit style | etcd-druid sentence case with issue # | Matches actual repo commit history |
