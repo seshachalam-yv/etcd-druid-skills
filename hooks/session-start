@@ -1,0 +1,78 @@
+#!/usr/bin/env bash
+# SessionStart hook for etcd-druid plugin
+# Injects medium orientation block into every Claude session.
+
+set -euo pipefail
+
+escape_for_json() {
+    local s="$1"
+    s="${s//\\/\\\\}"
+    s="${s//\"/\\\"}"
+    s="${s//$'\n'/\\n}"
+    s="${s//$'\r'/\\r}"
+    s="${s//$'\t'/\\t}"
+    printf '%s' "$s"
+}
+
+orientation=$(cat <<'ORIENTATION'
+You are working on etcd-druid, a Kubernetes operator managing etcd clusters for Gardener.
+
+## Three-Component System
+
+etcd-druid (this repo)
+  Kubernetes operator — owns the Etcd CRD, reconciles all cluster resources.
+  Components implement the Operator interface: PreSync, Sync, TriggerDelete, GetExistingResourceNames.
+  Controllers: etcd, compaction, etcdcopybackupstask, etcdopstask, secret.
+  Logging: logr via log.FromContext(ctx).WithValues("etcd", req.NamespacedName).
+
+etcd-backup-restore (sidecar)
+  Manages snapshots, restore, and etcd initialization.
+  HTTP API: /initialization/start, /initialization/status, /snapshot/full,
+            /snapshot/delta, /snapshot/latest, /config, /healthz, /metrics
+  Logging: logrus, field-based, level=info/error.
+
+etcd-wrapper (sidecar)
+  Calls backup-restore HTTP API to initialize etcd, then starts embedded etcd
+  via go.etcd.io/etcd/server/v3/embed.
+  Logging: zap, structured JSON.
+
+## Working Directories
+Fork (implementation):  /Users/I568019/go/src/github.com/seshachalam-yv/etcd-druid
+Upstream (read-only):   /Users/I568019/go/src/github.com/gardener/etcd-druid
+
+NEVER commit to upstream.
+NEVER push or create a PR without explicit human approval.
+
+## Key Invariants
+- New components must implement the Operator interface (all four methods)
+- API changes in api/core/v1alpha1/ require CEL validation annotations (+kubebuilder:validation:XValidation)
+- etcd-druid tests: Go native testing.T + Gomega assertions — no Ginkgo
+- etcd-wrapper tests: Go native testing.T + Gomega assertions
+- etcd-backup-restore tests: Ginkgo v2 suite + Gomega assertions
+- Always follow the testing pattern of the repo you are working in
+- Errors: fmt.Errorf("failed to X: %w", err) — never swallow silently
+- Commits: imperative sentence case, issue number at end: "Fix X (#1350)"
+- Branch naming: ai/TASK-{issue-id}/{short-description} in fork
+- Before committing: make test-unit && make test-integration && make check
+
+## Available Skills
+etcd-druid:feature-dev   Use when starting any feature or bug fix — design to PR
+etcd-druid:tdd           Use when writing or fixing tests in any of the three repos
+etcd-druid:debug         Use when etcd pod not ready, snapshots failing, reconciliation
+                         stuck, restore not triggering, or member health issues
+etcd-druid:review        Use before submitting work — safety invariants checklist
+etcd-druid:reference     Use for deep lookup: backup-restore API, CRD spec, TLS,
+                         component authoring, controller flow, store providers
+ORIENTATION
+)
+
+escaped=$(escape_for_json "$orientation")
+session_context="<IMPORTANT>\\nYou are an expert etcd-druid developer assistant. Below is your orientation for this session:\\n\\n${escaped}\\n</IMPORTANT>"
+
+if [ -n "${CLAUDE_PLUGIN_ROOT:-}" ] && [ -z "${COPILOT_CLI:-}" ]; then
+    printf '{\n  "hookSpecificOutput": {\n    "hookEventName": "SessionStart",\n    "additionalContext": "%s"\n  }\n}\n' "$session_context"
+else
+    printf '{\n  "additionalContext": "%s"\n}\n' "$session_context"
+fi
+
+exit 0
