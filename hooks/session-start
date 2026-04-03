@@ -37,8 +37,8 @@ etcd-wrapper (sidecar)
   Logging: zap, structured JSON.
 
 ## Working Directories
-Fork (implementation):  /Users/I568019/go/src/github.com/seshachalam-yv/etcd-druid
-Upstream (read-only):   /Users/I568019/go/src/github.com/gardener/etcd-druid
+Fork (implementation):  your local fork of github.com/<your-github-user>/etcd-druid
+Upstream (read-only):   github.com/gardener/etcd-druid (check git remotes if unsure)
 
 NEVER commit to upstream.
 NEVER push or create a PR without explicit human approval.

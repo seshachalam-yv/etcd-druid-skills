@@ -9,12 +9,12 @@ description: Quick reference for etcd-druid, etcd-backup-restore, and etcd-wrapp
 
 ```
 Upstream (read-only):
-  /Users/I568019/go/src/github.com/gardener/etcd-druid/
-  /Users/I568019/go/src/github.com/gardener/etcd-backup-restore/
-  /Users/I568019/go/src/github.com/gardener/etcd-wrapper/
+  github.com/gardener/etcd-druid
+  github.com/gardener/etcd-backup-restore
+  github.com/gardener/etcd-wrapper
 
 Fork (write here):
-  /Users/I568019/go/src/github.com/seshachalam-yv/etcd-druid/
+  github.com/<your-github-user>/etcd-druid  (check `git remote -v` for local path)
 
 Worktree (active development):
   ../etcd-druid-ai-TASK-{id}/   (relative to fork)

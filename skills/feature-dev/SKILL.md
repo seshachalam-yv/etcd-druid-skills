@@ -59,7 +59,7 @@ digraph feature_dev {
 - NEVER write code in the fork or worktree before Gate 1 (plan approval)
 - NEVER git push or create a PR before Gate 2 (PR approval)
 - NEVER skip spec-review or code-review after each implementation task
-- NEVER commit to upstream (/Users/I568019/go/src/github.com/gardener/etcd-druid)
+- NEVER commit to upstream (github.com/gardener/etcd-druid)
 - ALL implementation work happens inside the git worktree
 
 ## Workflow
@@ -79,9 +79,9 @@ digraph feature_dev {
 
 Write plan to fork (not worktree — worktree does not exist yet):
 ```bash
-mkdir -p /Users/I568019/go/src/github.com/seshachalam-yv/etcd-druid/docs/plans
+mkdir -p <fork-root>/docs/plans
 ```
-Path: `/Users/I568019/go/src/github.com/seshachalam-yv/etcd-druid/docs/plans/YYYY-MM-DD-issue-{id}-{short-description}.md`
+Path: `<fork-root>/docs/plans/YYYY-MM-DD-issue-{id}-{short-description}.md`
 
 Plan format:
 ```
@@ -125,12 +125,12 @@ Wait for explicit approval. If changes requested: update plan, present again.
 After Gate 1 approval:
 
 ```bash
-cd /Users/I568019/go/src/github.com/seshachalam-yv/etcd-druid
+cd <fork-root>
 git fetch upstream
 git worktree add ../etcd-druid-ai-TASK-{id} -b ai/TASK-{id}/claude/{short-description} upstream/master
 ```
 
-Pass worktree path to all subagents: `/Users/I568019/go/src/github.com/seshachalam-yv/etcd-druid-ai-TASK-{id}`
+Pass worktree path to all subagents: `<fork-root>/../etcd-druid-ai-TASK-{id}`
 
 Branch: `ai/TASK-{id}/claude/{short-description}`
 
@@ -173,7 +173,7 @@ Repeat for each task in the plan:
 Run in worktree:
 
 ```bash
-cd /Users/I568019/go/src/github.com/seshachalam-yv/etcd-druid-ai-TASK-{id}
+cd <worktree-path>
 make test-unit && make test-integration && make check
 ```
 
@@ -211,7 +211,7 @@ Wait for explicit choice. Handle:
 After Gate 2 approval:
 
 ```bash
-cd /Users/I568019/go/src/github.com/seshachalam-yv/etcd-druid-ai-TASK-{id}
+cd <worktree-path>
 git push origin ai/TASK-{id}/claude/{short-description}
 gh pr create \
   --base master \

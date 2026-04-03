@@ -16,8 +16,8 @@ Agent tool (general-purpose):
 
     - Issue: #[issue-id]
     - Worktree path (your working directory): [worktree-path]
-    - Fork: /Users/I568019/go/src/github.com/seshachalam-yv/etcd-druid
-    - Upstream (read-only reference): /Users/I568019/go/src/github.com/gardener/etcd-druid
+    - Fork: <fork-root> (your local fork of github.com/<your-github-user>/etcd-druid)
+    - Upstream (read-only reference): github.com/gardener/etcd-druid (check git remotes)
     - Branch: ai/TASK-[issue-id]/claude/[short-description]
     - Files affected: [list from plan]
 
