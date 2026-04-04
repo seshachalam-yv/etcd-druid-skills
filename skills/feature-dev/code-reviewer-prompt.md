@@ -33,9 +33,16 @@ Agent tool (general-purpose):
     - [ ] GetExistingResourceNames implemented with correct signature
     - [ ] Registered in createAndInitializeOperatorRegistry()
 
+    Generated code (CRITICAL — check every diff):
+    - [ ] No file with "// Code generated" header was manually edited
+          (grep the diff: git diff [base-sha]..[head-sha] | grep "^+" | grep -v "^+++" | grep "Code generated")
+          If any such file was hand-edited: mark as Critical, instruct implementer to revert and run make generate
+    - [ ] If api/core/v1alpha1/ was touched: make generate was run and zz_generated.deepcopy.go is present in the diff
+    - [ ] Generated files are in a SEPARATE commit from the hand-written API change
+          (not mixed: API types commit and "Run make generate" commit must be distinct)
+
     API changes (if api/core/v1alpha1/ touched):
     - [ ] CEL validation annotation present (+kubebuilder:validation:XValidation)
-    - [ ] make generate was run (zz_generated.deepcopy.go updated)
 
     RBAC:
     - [ ] +kubebuilder:rbac markers added for any new resource verbs

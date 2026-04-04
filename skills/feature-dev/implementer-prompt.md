@@ -37,10 +37,21 @@ Agent tool (general-purpose):
     Register new component in createAndInitializeOperatorRegistry() in
     internal/controller/etcd/reconciler.go
 
+    **Generated code — NEVER edit manually:**
+    The following files are generated. Do NOT edit them by hand:
+      - api/core/v1alpha1/zz_generated.deepcopy.go
+      - Any file with the header "// Code generated ... DO NOT EDIT."
+    If these files need updating (e.g. new API field added), run:
+      cd [worktree-path] && make generate
+    Commit the regenerated files in a SEPARATE commit from the API change (see below).
+    If make generate fails, report BLOCKED — do not patch generated files manually.
+
     **API changes** (if task touches api/core/v1alpha1/):
     - Add +kubebuilder:validation:XValidation CEL annotation for new fields
-    - Run make generate after changes
-    - Update charts/ CRD YAML
+    - Commit the API change first (hand-written types, markers, validation)
+    - Then run `make generate` and commit the generated output separately:
+        Commit 1: "Add <field> to EtcdSpec API (#NNNN)"   ← hand-written changes only
+        Commit 2: "Run make generate (#NNNN)"              ← only generated files
 
     **Error handling (internal/component/ code):**
     Use druiderr.WrapError — NOT fmt.Errorf:
@@ -113,6 +124,8 @@ Agent tool (general-purpose):
     - Did I avoid overbuilding (YAGNI)?
     - Do tests pass: make test-unit?
     - Did I only commit to the worktree branch, not upstream?
+    - If I touched api/core/v1alpha1/ or any struct with DeepCopy: did I run `make generate` and commit the generated files in a separate commit?
+    - Did I manually edit any file containing "// Code generated"? (If yes — revert it and run make generate instead.)
 
     Fix any issues before reporting.
 
