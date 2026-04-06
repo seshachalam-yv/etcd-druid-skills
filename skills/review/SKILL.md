@@ -31,7 +31,7 @@ Standalone checklist for reviewing etcd-druid, etcd-backup-restore, and etcd-wra
 
 ---
 
-## Step 1: Read the Diff and the Docs
+## Step 1: Read the Diff, the Docs, and Similar Merged PRs
 
 ```bash
 git diff upstream/master...HEAD
@@ -42,6 +42,14 @@ Read every changed file. Note each category: API, component logic, tests, docs.
 Then read `docs/development/` in the repo. Verify the diff matches documented conventions.
 Any convention found in the code but missing from the docs is a **documentation gap** —
 note it in the verdict and open a follow-up to document it.
+
+**Find a comparable merged PR** for this change type and read it:
+```bash
+gh pr list --state merged --repo gardener/<repo> --limit 10
+gh pr view <number>     # body: area/kind labels, release note, checklist
+gh pr diff <number>     # structure: commit layout, file scope, test coverage
+```
+Use it to calibrate: does this PR follow the same commit structure, `/area`+`/kind` labelling, docs scope, and release note category that a real merged PR of this type used? Divergences from prior merged PRs are worth flagging.
 
 ## Step 2: Operator Interface Completeness
 
@@ -89,10 +97,13 @@ Core rules that apply regardless of repo:
 - `Add PreSync method to configmap component (#1350)` ✅
 - `Fixed the bug.` ❌
 
-## Step 9: Docs
+## Step 9: Docs and PR Body
 
-New feature → update `docs/`. New component → mention in operator registry comment.
+**Docs:** New feature → update `docs/`. New component → mention in operator registry comment.
 Any pattern found in code but absent from `docs/development/` → add it.
+If new docs files are added or structure changes: `mkdocs.yml` and `docs/README.md` must also be updated.
+
+**PR body:** Read `.github/pull_request_template.md` and verify the draft body covers every section. Then check: do the `/area` and `/kind` labels, release note category, and checklist ticks match what a comparable merged PR used? Run `gh pr view <similar-merged-pr>` if unsure.
 
 ## Step 10: Known Footguns
 

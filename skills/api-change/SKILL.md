@@ -282,60 +282,23 @@ func TestValidateAdditionalAdvertisePeerUrls(t *testing.T) {
 
 ## Step 7: PR Requirements
 
-The PR template lives in `.github/pull_request_template.md`. Fill it in exactly — Prow bots read the `/area` and `/kind` lines.
+**Read the template first.** The PR template lives in `.github/pull_request_template.md` in the repo — read it directly and fill every section. Prow bots parse `/area` and `/kind`; wrong values or missing lines stall the review.
 
-**Categories for API changes:**
-
+**Look at a merged API-change PR for reference:**
+```bash
+gh pr list --state merged --repo gardener/etcd-druid --label kind/api-change --limit 5
+gh pr view <number>   # read the body of a comparable PR
 ```
-/area control-plane
-/kind api-change
-/kind enhancement        ← add if the field is a new user-facing feature
-```
+Mirror the `/area` choice, description style (include a YAML snippet of the new field if user-facing), release note category, and checklist tick pattern from a real merged PR — not a generic template.
 
-`/kind` values: `api-change|bug|cleanup|discussion|enhancement|epic|flake|impediment|poc|post-mortem|question|regression|task|technical-debt|test`
+**API-change-specific notes for "Special notes for your reviewer":**
+- State that the two-commit rule was followed (commit 1 = hand-written API changes, commit 2 = `make generate` output)
+- List each CEL rule added and what invariant it enforces
 
-`/area` values: `audit-logging|auto-scaling|backup|compliance|control-plane-migration|control-plane|cost|delivery|dev-productivity|disaster-recovery|documentation|high-availability|logging|metering|monitoring|networking|open-source|ops-productivity|os|performance|quality|robustness|scalability|security|storage|testing|usability|user-management`
-
-**PR body template (copy from `.github/pull_request_template.md`):**
-
-```
-/area control-plane
-/kind api-change
-
-**What this PR does / why we need it**:
-<description — include a YAML snippet showing the new field if it's user-facing>
-
-**Which issue(s) this PR fixes**:
-Fixes #<issue-number>
-
-**Checklist**:
-- [ ] Update documentation in the `/docs` folder (if applicable)
-    - If new files added to docs, or docs structure modified:
-        - [ ] Update mkdocs.yml
-        - [ ] Update docs/README.md (Table of Contents)
-- [ ] Add tests that cover your changes (if applicable)
-    - [x] Unit tests
-    - [x] Integration tests
-    - [ ] E2E tests
-
-**Special notes for your reviewer**:
-Two-commit rule followed: commit 1 = hand-written API changes, commit 2 = `make generate` output.
-CEL validations added: <list each rule and what it enforces>
-
-**Release note**:
-```feature operator
-<one-line summary of the new field and what it enables>
-```
-```
-
-Release note categories: `breaking|noteworthy|feature|bugfix|doc|other`
-Release note target groups: `user|operator|developer|dependency`
-
-**Before pushing:** squash commits to a minimal number, rebase against `upstream/master`:
-
+**Before pushing:** squash to a minimal number of commits, rebase against `upstream/master`:
 ```bash
 git rebase upstream/master
-# then squash to: 1 commit (hand-written API changes) + 1 commit (make generate output)
+# result: 1 commit (hand-written API changes) + 1 commit (make generate output)
 ```
 
 **Reviewer checklist — API changes:**

@@ -71,6 +71,7 @@ digraph feature_dev {
    - Which controller, component, or API is affected?
    - Change type: API (`api/core/v1alpha1/`) | component (`internal/component/`) | controller (`internal/controller/`) | test only
    - Test scope required: unit (`make test-unit`) | integration (`make test-integration`) | both
+   - **Look at previously merged PRs** for similar change types (`gh pr list --state merged --repo gardener/etcd-druid`). Find 1–2 comparable PRs and read their diffs to understand how the team structures commits, names things, and what reviewers flag. This shapes your plan before the human sees it.
 3. Ask clarifying questions one at a time — domain-focused
 4. Propose 2–3 approaches with trade-offs
 5. Confirm approach before writing plan
@@ -243,44 +244,15 @@ Present:
 - `git diff --stat upstream/master...HEAD`
 - Full commit list
 
-**PR body format** (copy from `.github/pull_request_template.md` — Prow bots read `/area` and `/kind`):
+**PR body:** Read `.github/pull_request_template.md` in the repo and fill it in exactly — Prow bots read the `/area` and `/kind` lines. Do not invent the section names or format from memory.
 
+Before drafting the body, run:
+```bash
+gh pr list --state merged --repo gardener/etcd-druid --limit 5
 ```
-/area <area>
-/kind <kind>
+Find 1–2 merged PRs of the same kind (api-change, bug, enhancement) and read their bodies with `gh pr view <number>`. Mirror the tone, `/area` choice, release note category, and level of detail that the team uses — not a generic template.
 
-**What this PR does / why we need it**:
-<description>
-
-**Which issue(s) this PR fixes**:
-Fixes #<issue-number>
-
-**Checklist**:
-- [ ] Update documentation in the `/docs` folder (if applicable)
-    - If new files added to docs, or docs structure modified:
-        - [ ] Update mkdocs.yml
-        - [ ] Update docs/README.md (Table of Contents)
-- [ ] Add tests that cover your changes (if applicable)
-    - [ ] Unit tests
-    - [ ] Integration tests
-    - [ ] E2E tests
-
-**Special notes for your reviewer**:
-<any reviewer context>
-
-**Release note**:
-```<category> <target_group>
-<one-line summary>
-```
-```
-
-`/area` values: `audit-logging|auto-scaling|backup|compliance|control-plane-migration|control-plane|cost|delivery|dev-productivity|disaster-recovery|documentation|high-availability|logging|metering|monitoring|networking|open-source|ops-productivity|os|performance|quality|robustness|scalability|security|storage|testing|usability|user-management`
-
-`/kind` values: `api-change|bug|cleanup|discussion|enhancement|epic|flake|impediment|poc|post-mortem|question|regression|task|technical-debt|test`
-
-Release note categories: `breaking|noteworthy|feature|bugfix|doc|other` — target groups: `user|operator|developer|dependency`
-
-**Before pushing:** rebase against `upstream/master` and squash to a minimal number of commits.
+**Before pushing:** rebase against `upstream/master` and squash to a minimal number of commits (`git rebase upstream/master`).
 
 Say: **"Ready to create PR. Choose one:
   A) Create PR — I push and open it now
