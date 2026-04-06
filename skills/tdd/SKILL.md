@@ -1,6 +1,6 @@
 ---
 name: tdd
-description: Use when writing or modifying tests in etcd-druid, etcd-backup-restore, or etcd-wrapper — includes framework selection, fake client patterns, and TDD cycle for all three repos
+description: Use when the goal is to write tests that don't exist yet or learn the correct testing pattern — starting a TDD cycle, choosing between Ginkgo and native testing.T, setting up a Ginkgo suite, writing async assertions without time.Sleep, adding unit tests for a new method, or designing table-driven tests for better coverage. Applies across etcd-druid, etcd-backup-restore, and etcd-wrapper. Do not apply when debugging a panic in an already-written test, fixing flaky tests, or diagnosing CI failures.
 user-invocable: true
 ---
 
@@ -16,130 +16,26 @@ Three repos, two test frameworks. Follow Red-Green-Refactor strictly.
 | etcd-wrapper | Go native `testing.T` + Gomega | `go test ./...` |
 | etcd-backup-restore | Ginkgo v2 + Gomega | `make test` |
 
+Before writing any tests, read `docs/development/` in the repo you are working in.
+The testing guide there is authoritative for patterns, helpers, and conventions.
+If you discover a pattern not documented there, add it.
+
 ## The TDD Cycle
 
 ### Step 1 — Red: Write the failing test
 
-**etcd-druid / etcd-wrapper** (Go native + Gomega):
-
-```go
-package statefulset_test  // use _test suffix for black-box testing
-
-import (
-    "context"
-    "testing"
-
-    . "github.com/onsi/gomega"
-    "github.com/go-logr/logr"
-    "github.com/google/uuid"
-    "github.com/gardener/etcd-druid/internal/component"
-    testutils "github.com/gardener/etcd-druid/test/utils"
-)
-
-func TestMyFeature(t *testing.T) {
-    testCases := []struct {
-        name        string
-        input       string
-        expectErr   bool
-        expectedVal string
-    }{
-        {name: "returns value on success", input: "valid", expectedVal: "ok"},
-        {name: "returns error on bad input", input: "", expectErr: true},
-    }
-
-    t.Parallel()
-    for _, tc := range testCases {
-        t.Run(tc.name, func(t *testing.T) {
-            t.Parallel()
-            g := NewWithT(t)
-
-            // Build operator context (required for all component operations)
-            opCtx := component.NewOperatorContext(context.Background(), logr.Discard(), uuid.NewString())
-
-            // Build fake client — inject errors by position: (getErr, listErr, createErr, updateErr, objects, objKey)
-            etcd := testutils.EtcdBuilderWithDefaults(testutils.TestEtcdName, testutils.TestNamespace).Build()
-            cl := testutils.CreateTestFakeClientForObjects(nil, nil, nil, nil, nil, nil)
-
-            result, err := MyFeature(opCtx, cl, etcd)
-
-            if tc.expectErr {
-                g.Expect(err).To(HaveOccurred())
-            } else {
-                g.Expect(err).ToNot(HaveOccurred())
-                g.Expect(result).To(Equal(tc.expectedVal))
-            }
-        })
-    }
-}
-```
-
-Run and confirm it **fails** (not a compile error — the test must compile and then fail):
-```bash
-make test-unit 2>&1 | grep -A 5 "FAIL\|--- FAIL"
-```
-
-**etcd-backup-restore** (Ginkgo v2):
-
-```go
-var _ = Describe("MyFeature", func() {
-    var (
-        ctx context.Context
-    )
-
-    BeforeEach(func() {
-        ctx = context.Background()
-    })
-
-    AfterEach(func() {
-        // clean up resources
-    })
-
-    Context("when input is valid", func() {
-        It("should return expected value", func() {
-            result, err := MyFeature(ctx, "valid")
-            Expect(err).ToNot(HaveOccurred())
-            Expect(result).To(Equal("ok"))
-        })
-    })
-
-    Context("when input is empty", func() {
-        It("should return an error", func() {
-            _, err := MyFeature(ctx, "")
-            Expect(err).To(HaveOccurred())
-        })
-    })
-})
-```
+Write the test first. It must compile and then fail — not just fail to compile.
 
 Run and confirm failure:
 ```bash
-make test 2>&1 | grep -A 5 "FAIL\|Failure"
+make test-unit 2>&1 | grep -A 5 "FAIL\|--- FAIL"   # etcd-druid
+make test 2>&1 | grep -A 5 "FAIL\|Failure"          # etcd-backup-restore
+go test ./... 2>&1 | grep -A 5 "FAIL\|--- FAIL"     # etcd-wrapper
 ```
 
 ### Step 2 — Green: Write minimal code to pass
 
 Implement only what the test requires. No extra logic.
-
-For component errors in etcd-druid, use `druiderr` (not `fmt.Errorf`):
-
-```go
-import (
-    druidapicommon "github.com/gardener/etcd-druid/api/common"
-    druidv1alpha1 "github.com/gardener/etcd-druid/api/core/v1alpha1"
-    druiderr "github.com/gardener/etcd-druid/internal/errors"
-)
-
-// Error codes are typed string constants — NOT errors.New():
-const ErrGetMyResource druidapicommon.ErrorCode = "ERR_GET_MY_RESOURCE"
-
-func getMyResource(ctx component.OperatorContext, cl client.Client, etcd *druidv1alpha1.Etcd) error {
-    if err := cl.Get(ctx, client.ObjectKey{...}, obj); err != nil {
-        return druiderr.WrapError(err, ErrGetMyResource, component.OperationPreSync,
-            fmt.Sprintf("failed to get my resource for etcd %s", druidv1alpha1.GetNamespaceName(etcd.ObjectMeta)))
-    }
-    return nil
-}
-```
 
 Run and confirm green:
 ```bash
@@ -155,31 +51,15 @@ make test-unit  # or go test ./... or make test
 
 ### Step 4 — Commit: One commit per passing test group
 
-```bash
-git add <files>
-git commit -m "Add unit tests for foo component (#1350)"
-```
-
 Commit message style: `Add unit tests for <component> (#<issue>)` — no trailing period.
-
-## Fake Client Patterns
-
-```go
-// Inject a GET error for a specific object key:
-cl := testutils.CreateTestFakeClientForObjects(testutils.TestAPIInternalErr, nil, nil, nil, existingObjs, objKey)
-
-// Builder pattern for multiple pre-existing objects:
-cl := testutils.NewTestClientBuilder().WithObjects(obj1, obj2).Build()
-
-// Check a DruidError returned from component code:
-testutils.CheckDruidError(g, expectedErr, actualErr)
-```
 
 ## Rules
 
 - NEVER use `time.Sleep()` — use `Eventually` / `Consistently` for async assertions
-- NEVER use gomock for component tests — use the testutils fake client
+- NEVER use gomock for component tests — use the fake client (see docs/development/)
 - NEVER use Ginkgo in etcd-druid or etcd-wrapper test files
 - ALWAYS run the test before writing implementation to confirm it fails
 - ALWAYS use `t.Parallel()` in table-driven tests unless the test mutates shared state
-- If API types in `api/core/v1alpha1/` change, run `cd api && make generate` — commit the hand-written API change first, then commit the `make generate` output (zz_generated.deepcopy.go, api/core/v1alpha1/crds/*.yaml, charts/crds/*.yaml, client/) separately. NEVER manually edit generated files.
+- If API types in `api/core/v1alpha1/` change, run `cd api && make generate` and commit
+  the hand-written API change first, then the generated output separately. NEVER manually
+  edit generated files.

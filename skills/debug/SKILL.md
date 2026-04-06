@@ -1,6 +1,6 @@
 ---
 name: debug
-description: Use when hitting test failures, build errors, reconciliation loops, backup/restore failures, or unexpected behavior in etcd-druid, etcd-backup-restore, or etcd-wrapper
+description: Use whenever something is failing, broken, stuck, or not behaving as expected in etcd-druid, etcd-backup-restore, or etcd-wrapper — make or go test command failures with error output, controller reconciliation loops, Kubernetes resources not appearing, backup or restore failures, or any situation where actual behavior diverges from expected. Do not use for questions about how things work, how to implement a feature, or environment setup.
 user-invocable: true
 ---
 
@@ -40,48 +40,26 @@ If flaky: run 3× to confirm. Do not form a hypothesis until you can reproduce i
 
 ## Phase 3: Locate in Source
 
+Check `docs/development/` in the relevant repo for documented patterns before
+assuming something is a bug. If the code diverges from what the docs describe,
+that is itself a finding.
+
 ### etcd-druid reconciliation failures
 
 - Entry point: `internal/controller/etcd/reconciler.go` — `Reconcile()` method
 - Component operators live in `internal/component/<name>/`
 - Each component implements: `PreSync`, `Sync`, `TriggerDelete`, `GetExistingResourceNames`
-- Error variables are package-level:
-  ```go
-  var ErrGetFoo = errors.New("ErrGetFoo")
-  ```
-- Errors are wrapped with:
-  ```go
-  druiderr.WrapError(err, ErrGetFoo, component.OperationPreSync, "failed to get foo for etcd %s", ...)
-  ```
 
 ### API validation failures
 
 - CEL rules: `api/core/v1alpha1/` — look for `+kubebuilder:validation:XValidation` markers
 - Generated code: `api/core/v1alpha1/zz_generated.deepcopy.go`
-- After changing API types, run `make generate` — NEVER manually edit zz_generated.deepcopy.go or any file with a `// Code generated` header
+- After changing API types: `cd api && make generate` — NEVER manually edit generated files
 
 ### Test failures
 
 - Shared helpers: `test/utils/`
-- OperatorContext construction:
-  ```go
-  opCtx := component.NewOperatorContext(ctx, logr.Discard(), uuid.NewString())
-  ```
-- Fake client construction:
-  ```go
-  // (getErr, listErr, createErr, updateErr, objects, objKey)
-  cl := testutils.CreateTestFakeClientForObjects(nil, nil, nil, nil, nil, nil)
-
-  // Inject a GET error for a specific key:
-  cl := testutils.CreateTestFakeClientForObjects(testutils.TestAPIInternalErr, nil, nil, nil, existingObjs, objKey)
-
-  // Builder pattern:
-  cl := testutils.NewTestClientBuilder().WithObjects(obj1, obj2).Build()
-  ```
-- Check DruidErrors returned from component code:
-  ```go
-  testutils.CheckDruidError(g, expectedErr, actualErr)
-  ```
+- OperatorContext, fake client, and DruidError assertion patterns: see `docs/development/testing.md`
 
 ## Phase 4: Form a Single Hypothesis
 
@@ -102,6 +80,8 @@ make test-unit          # etcd-druid
 make test               # etcd-backup-restore
 go test ./...           # etcd-wrapper
 ```
+
+If the fix reveals an undocumented pattern or gotcha, add it to `docs/development/`.
 
 ## Phase 6: If 3+ Fixes Have Failed
 

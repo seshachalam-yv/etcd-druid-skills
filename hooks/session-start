@@ -44,24 +44,23 @@ NEVER commit to upstream.
 NEVER push or create a PR without explicit human approval.
 
 ## Key Invariants
-- New components must implement the Operator interface (all four methods: PreSync, Sync, TriggerDelete, GetExistingResourceNames)
-- Error codes: typed string constants (druidapicommon.ErrorCode = "ERR_...") — never errors.New(); use druiderr.WrapError
-- API changes in api/core/v1alpha1/ require CEL validation (+kubebuilder:validation:XValidation)
-- After API changes: run `cd api && make generate` — two separate commits (API change, then generated output)
-- Generated files (zz_generated.deepcopy.go, api/core/v1alpha1/crds/, charts/crds/, client/): NEVER edit manually
-- etcd-druid tests: Go native testing.T + Gomega assertions — no Ginkgo in internal/component/ or internal/controller/etcd/
-- etcd-wrapper tests: Go native testing.T + Gomega assertions
-- etcd-backup-restore tests: Ginkgo v2 suite + Gomega assertions
+- NEVER commit to upstream; NEVER push without explicit human approval
+- NEVER manually edit generated files (zz_generated.deepcopy.go, api/core/v1alpha1/crds/, charts/crds/, client/)
+- After API changes: two commits — hand-written change first, then `cd api && make generate` output
 - Pre-PR: make ci-checks && make test-unit && make test-integration
 - Commits: imperative sentence case, issue number at end: "Fix X (#1350)", no trailing period
 - Branch naming: ai/TASK-{issue-id}/claude/{short-description} in fork
 
+## Development Guides (read before coding or reviewing)
+Each repo has docs/development/ with authoritative conventions, patterns, and make targets.
+When you find a pattern not documented there, add it as part of your work.
+
 ## Available Skills
-etcd-druid:feature-dev   Use when starting any feature, bug fix, or enhancement — design-to-PR with approval gates
-etcd-druid:tdd           Use when writing or fixing tests across the three repos
-etcd-druid:debug         Use when tests fail, reconciliation loops, backup failures, or unexpected behavior
-etcd-druid:review        Use before submitting work — conventions and safety invariants checklist
-etcd-druid:reference     Use for quick lookup: make targets, error patterns, operator interface, fake client, paths
+etcd-druid:feature-dev   Use for any development work — picking up an issue, planning features or bug fixes, adding components or API fields, design-to-PR
+etcd-druid:tdd           Use when writing new tests or learning testing patterns — TDD cycle, framework selection, fake client, table-driven tests
+etcd-druid:debug         Use when something is failing, broken, or behaving unexpectedly — build failures, test failures, reconciliation loops, backup failures
+etcd-druid:review        Use when validating code before a PR — pre-merge checklist, self-review, pattern validation
+etcd-druid:reference     Use for quick lookup: make targets, file paths, git workflow, branch naming
 ORIENTATION
 )
 

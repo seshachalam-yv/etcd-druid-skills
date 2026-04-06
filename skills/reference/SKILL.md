@@ -1,10 +1,13 @@
 ---
 name: reference
-description: Use when you need quick lookup of file paths, make targets, error patterns, fake client constructors, branch naming, or operator interface signatures for the etcd-druid ecosystem
+description: Use when you need quick lookup of file paths, make targets, branch naming, or git workflow for the etcd-druid ecosystem
 user-invocable: true
 ---
 
 # etcd-druid Ecosystem — Quick Reference Card
+
+For code patterns, conventions, and best practices: read `docs/development/` in the
+repo you are working in. This card covers locations, targets, and workflow only.
 
 ## Repository Paths
 
@@ -26,93 +29,45 @@ Worktree (active development):
 ```
 API types:           api/core/v1alpha1/
 Component operators: internal/component/<name>/
-Controllers:         internal/controller/etcd/reconciler.go (etcd, compaction, etcdcopybackupstask, etcdopstask, secret)
+Controllers:         internal/controller/etcd/reconciler.go
 Error types:         internal/errors/
 Test utilities:      test/utils/
 CEL validation:      test/it/crdvalidation/
 Generated code:      api/core/v1alpha1/zz_generated.deepcopy.go
-                     api/core/v1alpha1/crds/*.yaml  (generated CRD manifests)
-                     charts/crds/*.yaml             (copied from above by make generate)
-                     client/                        (generated typed clientset)
+                     api/core/v1alpha1/crds/*.yaml
+                     charts/crds/*.yaml
+                     client/
+Development docs:    docs/development/
 ```
 
-## Operator Interface (all 4 required)
+## Development Guides (read before coding)
 
-```go
-type Operator interface {
-    PreSync(ctx OperatorContext, etcd *druidv1alpha1.Etcd) error
-    Sync(ctx OperatorContext, etcd *druidv1alpha1.Etcd) error
-    TriggerDelete(ctx OperatorContext, etcdObjMeta metav1.ObjectMeta) error
-    GetExistingResourceNames(ctx OperatorContext, etcdObjMeta metav1.ObjectMeta) ([]string, error)
-}
-
-// Operation name constants:
-component.OperationPreSync                  = "PreSync"
-component.OperationSync                     = "Sync"
-component.OperationTriggerDelete            = "TriggerDelete"
-component.OperationGetExistingResourceNames = "GetExistingResourceNames"
-
-// Register: registry.Register(component.Kind, operator)
-// Find registration in: internal/controller/etcd/reconciler.go
+```
+etcd-druid:           docs/development/
+etcd-backup-restore:  docs/development/
+etcd-wrapper:         docs/development/
 ```
 
-## OperatorContext Construction (tests)
-
-```go
-import (
-    "github.com/gardener/etcd-druid/internal/component"
-    "github.com/go-logr/logr"
-    "github.com/google/uuid"
-)
-opCtx := component.NewOperatorContext(context.Background(), logr.Discard(), uuid.NewString())
-```
-
-## Error Handling (component code)
-
-```go
-import (
-    druidapicommon "github.com/gardener/etcd-druid/api/common"
-    druiderr "github.com/gardener/etcd-druid/internal/errors"
-)
-
-// Error codes are typed string constants — NOT errors.New():
-const (
-    ErrGetFoo    druidapicommon.ErrorCode = "ERR_GET_FOO"
-    ErrSyncFoo   druidapicommon.ErrorCode = "ERR_SYNC_FOO"
-    ErrDeleteFoo druidapicommon.ErrorCode = "ERR_DELETE_FOO"
-)
-
-// WrapError signature:
-// func WrapError(err error, code druidapicommon.ErrorCode, operation string, message string) error
-return druiderr.WrapError(err, ErrGetFoo, component.OperationPreSync,
-    fmt.Sprintf("failed to get foo for etcd %s", druidv1alpha1.GetNamespaceName(etcd.ObjectMeta)))
-```
-
-## Fake Client (tests — NO gomock)
-
-```go
-import testutils "github.com/gardener/etcd-druid/test/utils"
-
-// With error injection on specific get:
-cl := testutils.CreateTestFakeClientForObjects(getErr, nil, nil, nil, existingObjects, objKey)
-
-// Builder pattern:
-cl := testutils.NewTestClientBuilder().WithObjects(objs...).Build()
-```
+Key files in etcd-druid `docs/development/`:
+- `contribution.md` — contributing workflow
+- `testing.md` — test framework, fake client, helpers
+- `add-new-etcd-cluster-component.md` — new component guide
+- `changing-api.md` — API change and deprecation process
+- `getting-started-locally.md` — local dev setup
 
 ## Make Targets
 
 ```bash
 # etcd-druid root (fork or worktree)
-make test-unit            # Unit tests (Go native + Ginkgo suites)
-make test-integration     # Integration tests with envtest
-make ci-checks            # Full pre-PR: format + lint + license + api-diff
-make check                # Format + golangci-lint only
+make test-unit            # unit tests
+make test-integration     # integration tests with envtest
+make ci-checks            # full pre-PR: format + lint + license + api-diff
+make check                # format + golangci-lint only
 
 # API generation (run from api/ subdirectory):
-cd api && make generate       # Regenerate deepcopy, CRDs, charts/crds/, client/
-cd api && make check-generate # Verify no uncommitted diff after generate
-cd api && make check-apidiff  # Validate API compatibility
+cd api && make generate       # regenerate deepcopy, CRDs, charts/crds/, client/
+cd api && make check-generate # verify no uncommitted diff after generate
+cd api && make check-apidiff  # validate API compatibility
 
 # etcd-backup-restore
 make test
@@ -121,7 +76,9 @@ make test
 go test ./...
 ```
 
-After API type changes: commit hand-written API changes first, then `cd api && make generate` and commit the generated output separately. NEVER manually edit generated files.
+After API type changes: commit hand-written API changes first, then
+`cd api && make generate` and commit the generated output separately.
+NEVER manually edit generated files.
 
 ## Targeted Test Commands
 
@@ -156,20 +113,10 @@ ai/TASK-{issue-id}/claude/{short-description}
 Example: ai/TASK-1350/claude/add-configmap-ttl
 ```
 
-## CEL Validation (API fields)
-
-```go
-// +kubebuilder:validation:XValidation:rule="...",message="..."
-type EtcdSpec struct {
-    // +kubebuilder:validation:XValidation:rule="self >= 0",message="must be non-negative"
-    SomeField *int32 `json:"someField,omitempty"`
-}
-```
-
 ## Skills Available (on-demand)
 
 - `feature-dev` — full feature development workflow with approval gates
-- `tdd` — TDD patterns for all three repos
+- `tdd` — TDD cycle for all three repos
 - `debug` — systematic debugging workflow
 - `review` — code review checklist
 - `reference` — this card

@@ -1,6 +1,6 @@
 ---
 name: feature-dev
-description: Use when starting any feature, bug fix, or enhancement in etcd-druid — runs the full design-to-PR workflow with two human approval gates
+description: Use for any etcd-druid development work — picking up a GitHub issue, planning and implementing a feature or bug fix, adding a new component or API field, understanding how a controller or reconciliation concept works, or taking a change from design to PR. Covers the full development lifecycle for the gardener/etcd-druid project and its companion repos etcd-backup-restore and etcd-wrapper.
 user-invocable: true
 ---
 
