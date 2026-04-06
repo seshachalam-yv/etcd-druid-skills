@@ -80,7 +80,34 @@ Agent tool (general-purpose):
     - Important (should fix): [file:line — description]
     - Suggestion (nice to have): [file:line — description]
 
-    **Documentation gaps:** [conventions found in code but missing from docs/development/]
+    **Documentation gaps and plugin mistakes:**
+    For each convention found in code but absent from docs/development/, OR each place
+    where this plugin's skill/prompt told you something incorrect:
+
+    - Describe the gap or mistake
+    - State whether the fix belongs in:
+      - `docs/development/<file>.md` in the repo (missing convention), OR
+      - `skills/<skill>/SKILL.md` in the etcd-druid-skills plugin (wrong guidance)
+
+    For any plugin mistake, output a ready-to-use PR suggestion:
+
+    ```
+    Plugin PR suggestion
+    gh pr create \
+      --repo seshachalam-yv/etcd-druid-skills \
+      --base master \
+      --title "Fix <what was wrong> in <skill name> skill" \
+      --body $'
+    /kind bug
+
+    **What this PR does / why we need it:**
+    <describe what the skill said vs. what is actually correct>
+
+    **Discovered while:** <context>
+
+    **Fix:** <what the skill should say instead>
+    '
+    ```
 
     **Assessment:** ✅ Approved | ❌ Changes required
 ```

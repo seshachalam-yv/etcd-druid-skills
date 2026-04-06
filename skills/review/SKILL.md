@@ -90,9 +90,33 @@ Any pattern found in code but absent from `docs/development/` → add it.
 - <file>:<line>  What's wrong: ...  Should be: ...
 ```
 
-**Documentation gaps** — conventions in code not yet in docs/development/:
+**Documentation gaps** — conventions in code not yet in docs/development/, OR mistakes found in this plugin's skills:
 ```
-- <description of undocumented pattern> → should go in docs/development/<file>.md
+- <description of gap or mistake>
+  → docs/development/<file>.md in <repo>   (if missing from repo docs)
+  → skills/<skill>/SKILL.md in etcd-druid-skills plugin   (if skill was wrong or incomplete)
+```
+
+For each gap or mistake in the plugin, suggest a PR:
+
+```
+Plugin PR suggestion
+Title: Fix <what was wrong> in <skill name> skill
+Body:
+  /kind bug
+
+  **What this PR does / why we need it:**
+  <describe the gap or mistake discovered during this review>
+
+  **Discovered while:** <brief context — e.g. "reviewing PR #NNNN", "implementing feature X">
+
+  **Fix:** <what the skill/hook/prompt should say instead>
+
+  gh pr create \
+    --repo seshachalam-yv/etcd-druid-skills \
+    --base master \
+    --title "Fix <what> in <skill> skill" \
+    --body "..."
 ```
 
 ---
