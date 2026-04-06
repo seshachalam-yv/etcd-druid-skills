@@ -1,6 +1,6 @@
 ---
 name: reference
-description: Quick reference for etcd-druid, etcd-backup-restore, and etcd-wrapper — paths, commands, patterns, interfaces
+description: Use when you need quick lookup of file paths, make targets, error patterns, fake client constructors, branch naming, or operator interface signatures for the etcd-druid ecosystem
 ---
 
 # etcd-druid Ecosystem — Quick Reference Card
@@ -100,6 +100,8 @@ make test
 # etcd-wrapper
 go test ./...
 ```
+
+After API type changes: commit hand-written API changes first, then run `make generate` and commit the generated output (zz_generated.deepcopy.go, charts/ CRD YAML) separately. NEVER manually edit generated files.
 
 ## Targeted Test Commands
 

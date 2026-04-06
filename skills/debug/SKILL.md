@@ -1,6 +1,6 @@
 ---
 name: debug
-description: Systematic debugging for etcd-druid, etcd-backup-restore, and etcd-wrapper issues
+description: Use when hitting test failures, build errors, reconciliation loops, backup/restore failures, or unexpected behavior in etcd-druid, etcd-backup-restore, or etcd-wrapper
 ---
 
 # Debugging in the etcd-druid Ecosystem
@@ -57,7 +57,7 @@ If flaky: run 3× to confirm. Do not form a hypothesis until you can reproduce i
 
 - CEL rules: `api/core/v1alpha1/` — look for `+kubebuilder:validation:XValidation` markers
 - Generated code: `api/core/v1alpha1/zz_generated.deepcopy.go`
-- After changing API types, run `make generate`
+- After changing API types, run `make generate` — NEVER manually edit zz_generated.deepcopy.go or any file with a `// Code generated` header
 
 ### Test failures
 

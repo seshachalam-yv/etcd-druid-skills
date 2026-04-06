@@ -1,6 +1,6 @@
 ---
 name: tdd
-description: Use when implementing any feature or bugfix in the etcd-druid ecosystem — write failing tests first, then minimal code to pass, then refactor
+description: Use when writing or modifying tests in etcd-druid, etcd-backup-restore, or etcd-wrapper — includes framework selection, fake client patterns, and TDD cycle for all three repos
 ---
 
 # TDD for etcd-druid Ecosystem
@@ -179,3 +179,4 @@ testutils.CheckDruidError(g, expectedErr, actualErr)
 - NEVER use Ginkgo in etcd-druid or etcd-wrapper test files
 - ALWAYS run the test before writing implementation to confirm it fails
 - ALWAYS use `t.Parallel()` in table-driven tests unless the test mutates shared state
+- If API types in `api/core/v1alpha1/` change, run `make generate` — commit the hand-written API change first, then commit the `make generate` output (zz_generated.deepcopy.go, charts/ CRD YAML) separately. NEVER manually edit generated files.

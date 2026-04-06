@@ -1,6 +1,6 @@
 ---
 name: review
-description: Code review checklist for etcd-druid, etcd-backup-restore, and etcd-wrapper contributions
+description: Use when self-reviewing before a PR, reviewing someone else's contribution, or after implementing a feature in etcd-druid, etcd-backup-restore, or etcd-wrapper — run through this checklist before every merge
 ---
 
 # etcd-druid Code Review
@@ -53,8 +53,9 @@ Red flags: `fmt.Errorf("...: %w", err)` in component files, `_ = err`, empty err
 
 If `api/core/v1alpha1/` was touched:
 - New fields need `+kubebuilder:validation:XValidation` CEL annotation
-- `make generate` must have been run — `zz_generated.deepcopy.go` updated
+- `make generate` must have been run — `zz_generated.deepcopy.go` and `charts/` CRD YAML updated
 - Breaking changes need a deprecation path or version bump
+- Two-commit rule: Commit 1 contains only hand-written API changes; Commit 2 contains only `make generate` output (zz_generated.deepcopy.go, charts/ CRD YAML). NEVER manually edit generated files.
 
 ## Step 5: RBAC Markers
 
