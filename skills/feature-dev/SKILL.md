@@ -128,6 +128,7 @@ Chosen approach and why. Alternatives considered.
 - [ ] make ci-checks passes
 - [ ] make test-unit passes
 - [ ] make test-integration passes (if integration touched)
+- [ ] E2e verification: <test name or "not required — test-only change">
 - [ ] Documentation updated in docs/ (if user-facing change)
 - [ ] examples/ updated (if API changed)
 
@@ -226,6 +227,32 @@ make check-generate     # confirms make generate produces no uncommitted diff
 
 All must pass. Any failure → dispatch fix subagent with full failure output.
 Do not proceed to Gate 2 until clean.
+
+**E2e verification — decide based on change type:**
+
+| Change type | E2e needed? | Action |
+|---|---|---|
+| Test-only, no behaviour change | No | Skip |
+| Controller logic, component method | Yes | Find matching e2e test, run it targeted |
+| New API field, new feature | Yes | Find or write e2e test, run `make ci-e2e-kind` |
+| Bug fix with reproduction steps | Yes | Run the specific e2e scenario that reproduces the bug |
+| etcd-backup-restore or etcd-wrapper change | Yes | Build custom image, override in druid, run e2e — see `/etcd-druid:e2e` |
+
+**How to find the right e2e test:**
+```bash
+# List e2e test functions in etcd-druid
+grep -r "func Test" test/e2e/ --include="*.go"
+
+# Find tests related to your change (e.g. configmap, statefulset, backup)
+grep -r "TestEtcd\|func Test" test/e2e/ --include="*.go" | grep -i <your-component>
+
+# Run only the relevant test
+make PROVIDERS="none,local" \
+     GO_TEST_ARGS="-run TestEtcdReconcilerWithNoBackup -v" \
+     test-e2e
+```
+
+**If no e2e test covers the feature:** note it in the PR's "Special notes for reviewer" section. Opening a follow-up issue for e2e coverage is acceptable; blocking the PR for it is not required unless the change is high-risk.
 
 **Handoff:** Before presenting Gate 2, invoke `/etcd-druid:review` for a final whole-diff review.
 This is distinct from the per-task code-reviewer subagent — it reviews the complete change as a human reviewer would see it.
