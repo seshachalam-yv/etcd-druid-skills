@@ -39,6 +39,7 @@ All three run in the Gardener seed cluster. Changes must not break gardenlet's r
 | `tdd` | `/etcd-druid:tdd` | `*.go` edits | Writing new tests or learning the correct test pattern |
 | `debug` | `/etcd-druid:debug` | `*.go` edits | Something is failing, broken, or behaving unexpectedly |
 | `review` | `/etcd-druid:review` | `*.go` edits | Validating code before opening a PR |
+| `e2e` | `/etcd-druid:e2e` | — | Manual e2e testing — KIND setup, custom image builds, sidecar overrides, pre-PR CI |
 | `reference` | `/etcd-druid:reference` | — | Quick lookup: make targets, file paths, druidctl, git workflow |
 
 `api-change`, `tdd`, `debug`, and `review` activate automatically when Claude edits `.go` files — no invocation needed.

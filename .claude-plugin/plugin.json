@@ -1,7 +1,7 @@
 {
   "name": "etcd-druid",
   "description": "Expert skills for etcd-druid development: feature workflow, TDD, debugging, and domain reference. Inspired by the Superpowers plugin system.",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "author": { "name": "Seshachalam Yerasala Venkata" },
   "homepage": "https://github.com/seshachalam-yv/etcd-druid-skills",
   "repository": "https://github.com/seshachalam-yv/etcd-druid-skills",
@@ -13,7 +13,8 @@
     "skills/tdd",
     "skills/debug",
     "skills/review",
-    "skills/reference"
+    "skills/reference",
+    "skills/e2e"
   ],
   "hooks": "hooks/hooks.json"
 }

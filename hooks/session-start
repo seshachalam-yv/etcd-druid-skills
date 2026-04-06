@@ -68,6 +68,7 @@ etcd-druid:api-change    Use for API field additions or modifications — CEL va
 etcd-druid:tdd           Use when writing new tests or learning testing patterns — TDD cycle, framework selection, fake client, table-driven tests
 etcd-druid:debug         Use when something is failing, broken, or behaving unexpectedly — build failures, test failures, reconciliation loops, backup failures
 etcd-druid:review        Use when validating code before a PR — pre-merge checklist, self-review, pattern validation
+etcd-druid:e2e           Use for manual e2e testing — KIND cluster setup, custom image builds, sidecar image overrides, pre-PR CI validation
 etcd-druid:reference     Use for quick lookup: make targets, file paths, git workflow, branch naming
 ORIENTATION
 )

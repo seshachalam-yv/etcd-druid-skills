@@ -182,4 +182,5 @@ Dual-site backup: configure a secondary backup target via `StoreSpec.SecondarySt
 - `tdd` — TDD cycle for all three repos
 - `debug` — systematic debugging workflow
 - `review` — code review checklist
+- `e2e` — manual e2e testing: KIND setup, custom image builds, sidecar overrides, pre-PR CI
 - `reference` — this card
