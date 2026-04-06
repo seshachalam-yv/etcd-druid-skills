@@ -7,6 +7,5 @@
   "repository": "https://github.com/seshachalam-yv/etcd-druid-skills",
   "license": "Apache-2.0",
   "keywords": ["etcd-druid", "etcd-backup-restore", "etcd-wrapper", "gardener", "kubernetes", "operator", "go"],
-  "skills": "./skills/",
-  "hooks": "./hooks/hooks.json"
+  "skills": "./skills/"
 }
