@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # SessionStart hook for etcd-druid plugin
-# Injects medium orientation block into every Claude session.
+# Injects orientation block into every Claude session, with repo-aware context.
 
 set -euo pipefail
 
@@ -15,11 +15,11 @@ escape_for_json() {
 }
 
 orientation=$(cat <<'ORIENTATION'
-You are working on etcd-druid, a Kubernetes operator managing etcd clusters for Gardener.
+You are working on the etcd-druid ecosystem — a set of components that manage etcd clusters for Gardener.
 
 ## Three-Component System
 
-etcd-druid (this repo)
+etcd-druid (operator)
   Kubernetes operator — owns the Etcd CRD, reconciles all cluster resources.
   Components implement the Operator interface: PreSync, Sync, TriggerDelete, GetExistingResourceNames.
   Controllers: etcd, compaction, etcdcopybackupstask, etcdopstask, secret.
@@ -44,7 +44,6 @@ NEVER commit to upstream.
 NEVER push or create a PR without explicit human approval.
 
 ## Key Invariants
-- NEVER commit to upstream; NEVER push without explicit human approval
 - NEVER manually edit generated files (zz_generated.deepcopy.go, api/core/v1alpha1/crds/, charts/crds/, client/)
 - After API changes: two commits — hand-written change first, then `cd api && make generate` output
 - Pre-PR: make ci-checks && make test-unit && make test-integration
@@ -66,18 +65,54 @@ ORIENTATION
 
 escaped=$(escape_for_json "$orientation")
 
-# Dynamic git context: branch + recent commits from cwd (best-effort, silent on failure)
-git_context=""
+# Detect which repo we are in and inject repo-specific context
+repo_context=""
 if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    remote=$(git remote get-url origin 2>/dev/null || git remote get-url upstream 2>/dev/null || true)
+    repo_root=$(git rev-parse --show-toplevel 2>/dev/null || true)
     branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || true)
     commits=$(git log --oneline -3 2>/dev/null || true)
+
+    # Identify repo from remote URL or directory name
+    current_repo=""
+    case "$remote" in
+        *etcd-backup-restore*) current_repo="etcd-backup-restore" ;;
+        *etcd-wrapper*)        current_repo="etcd-wrapper" ;;
+        *etcd-druid*)          current_repo="etcd-druid" ;;
+    esac
+    # Fallback: check directory name
+    if [ -z "$current_repo" ] && [ -n "$repo_root" ]; then
+        dirname=$(basename "$repo_root")
+        case "$dirname" in
+            *etcd-backup-restore*) current_repo="etcd-backup-restore" ;;
+            *etcd-wrapper*)        current_repo="etcd-wrapper" ;;
+            *etcd-druid*)          current_repo="etcd-druid" ;;
+        esac
+    fi
+
+    raw_repo=""
+    if [ -n "$current_repo" ]; then
+        raw_repo="\\n## Active Repo\\nYou are in: ${current_repo}\\nDevelopment guide: ${repo_root}/docs/development/"
+        case "$current_repo" in
+            etcd-druid)
+                raw_repo="${raw_repo}\\nKey docs: testing.md, add-new-etcd-cluster-component.md, changing-api.md, raising-a-pr.md" ;;
+            etcd-backup-restore)
+                raw_repo="${raw_repo}\\nKey docs: tests.md, testing_and_dependencies.md, new_cp_support.md" ;;
+            etcd-wrapper)
+                raw_repo="${raw_repo}\\nKey docs: testing.md, contribution.md" ;;
+        esac
+    fi
+
     if [ -n "$branch" ] || [ -n "$commits" ]; then
-        raw_git="\\n## Current Git State\\nbranch: ${branch}\\nrecent commits:\\n${commits}"
-        git_context=$(escape_for_json "$raw_git")
+        raw_repo="${raw_repo}\\n\\n## Current Git State\\nbranch: ${branch}\\nrecent commits:\\n${commits}"
+    fi
+
+    if [ -n "$raw_repo" ]; then
+        repo_context=$(escape_for_json "$raw_repo")
     fi
 fi
 
-session_context="<IMPORTANT>\\nYou are an expert etcd-druid developer assistant. Below is your orientation for this session:\\n\\n${escaped}${git_context}\\n</IMPORTANT>"
+session_context="<IMPORTANT>\\nYou are an expert etcd-druid ecosystem developer assistant. Below is your orientation for this session:\\n\\n${escaped}${repo_context}\\n</IMPORTANT>"
 
 if [ -n "${CLAUDE_PLUGIN_ROOT:-}" ] && [ -z "${COPILOT_CLI:-}" ]; then
     printf '{\n  "hookSpecificOutput": {\n    "hookEventName": "SessionStart",\n    "additionalContext": "%s"\n  }\n}\n' "$session_context"
@@ -86,3 +121,4 @@ else
 fi
 
 exit 0
+

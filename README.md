@@ -1,11 +1,12 @@
 # etcd-druid-skills
 
-A Claude Code plugin that encodes expert knowledge for [etcd-druid](https://github.com/gardener/etcd-druid) contributors. It injects domain awareness, best practices, and workflow skills into every Claude session — so you spend less time on "how does this work" and more time on "what needs to be done."
+A Claude Code plugin that encodes expert knowledge for [etcd-druid](https://github.com/gardener/etcd-druid) contributors. It injects domain awareness and workflow skills into every Claude session — so you spend less time on "how does this work" and more time on "what needs to be done."
 
 ## What It Does
 
-- **Session orientation** — On every session start, Claude receives a concise briefing on the three-component system (etcd-druid, etcd-backup-restore, etcd-wrapper), working directories, key invariants, available skills, and the current git branch/recent commits.
-- **Domain skills** — Reusable, invocable skills covering the full development lifecycle: feature design through PR, TDD patterns, systematic debugging, pre-PR review, and domain reference.
+- **Session orientation** — On every session start, Claude receives a concise briefing on the three-component system, key invariants, available skills, and the current git state. If you open Claude inside one of the three repos, the hook detects which repo you're in and tells Claude exactly which `docs/development/` files to read.
+- **Domain skills** — Reusable, invocable skills covering the full development lifecycle: feature design through PR, TDD patterns, systematic debugging, pre-PR review, and quick reference.
+- **Living documentation** — Skills instruct Claude to read and update `docs/development/` in each repo as part of normal work. The repos own the patterns; the plugin owns the workflow.
 
 ## The Three-Component System
 
@@ -21,11 +22,11 @@ All three run in Gardener's **seed cluster**. etcd-druid is reconciled by garden
 
 | Skill | Invoke | Use when |
 |-------|--------|----------|
-| `feature-dev` | `/etcd-druid:feature-dev` | Starting any feature or bug fix — full design-to-PR workflow |
-| `tdd` | `/etcd-druid:tdd` | Writing or fixing tests in any of the three repos |
-| `debug` | `/etcd-druid:debug` | Test failures, reconciliation loops, backup failures, unexpected behavior |
-| `review` | `/etcd-druid:review` | Self-review before a PR or reviewing someone else's contribution |
-| `reference` | `/etcd-druid:reference` | Quick lookup: make targets, error patterns, operator interface, fake client, paths |
+| `feature-dev` | `/etcd-druid:feature-dev` | Any development work — picking up an issue, planning a feature or bug fix, design-to-PR |
+| `tdd` | `/etcd-druid:tdd` | Writing new tests or learning the correct test pattern for any of the three repos |
+| `debug` | `/etcd-druid:debug` | Something is failing, broken, or behaving unexpectedly |
+| `review` | `/etcd-druid:review` | Validating code before opening a PR — self-review or reviewing a colleague's PR |
+| `reference` | `/etcd-druid:reference` | Quick lookup: make targets, file paths, git workflow, branch naming |
 
 ## Feature Development Workflow (`feature-dev`)
 
@@ -57,10 +58,12 @@ Phase 3: Worktree Setup
     │
     ▼
 Phase 4: Per-Task Implementation  (repeat for each task)
+  • Read docs/development/ before writing any code
   • Implementer subagent writes code + tests, commits, reports
   • Spec-reviewer subagent: did it match the acceptance criteria exactly?
-  • Code-reviewer subagent: does it follow etcd-druid conventions?
+  • Code-reviewer subagent: does it follow the repo's documented conventions?
   • Fix loop until both reviewers ✅
+  • Document any pattern found but not yet in docs/development/
     │ all tasks done
     ▼
 Phase 5: Verify
@@ -90,13 +93,12 @@ Phase 6: PR Creation
 
 - New components must implement the `Operator` interface: `PreSync`, `Sync`, `TriggerDelete`, `GetExistingResourceNames`
 - Register via `registry.Register(component.Kind, operator)` in `internal/controller/etcd/reconciler.go`
-- Error codes: typed string constants (`druidapicommon.ErrorCode = "ERR_GET_FOO"`) — use `druiderr.WrapError`, never `fmt.Errorf`
-- API changes in `api/core/v1alpha1/` require CEL validation annotations (`+kubebuilder:validation:XValidation`)
 - Generated files (`zz_generated.deepcopy.go`, `api/core/v1alpha1/crds/*.yaml`, `charts/crds/*.yaml`, `client/`): NEVER edit manually — run `cd api && make generate`
 - **etcd-druid tests:** Go native `testing.T` + Gomega — no Ginkgo in `internal/`
 - **etcd-wrapper tests:** Go native `testing.T` + Gomega
 - **etcd-backup-restore tests:** Ginkgo v2 + Gomega
 - NEVER commit to upstream; NEVER push without explicit human approval
+- Conventions and code patterns live in each repo's `docs/development/` — read them, update them
 
 ## Installation
 
@@ -109,6 +111,7 @@ claude /install-plugin https://github.com/seshachalam-yv/etcd-druid-skills
 
 Found a gap, wrong pattern, or missing best practice? Open a PR against this repo.
 For skill improvements, edit the relevant `skills/<name>/SKILL.md` directly.
+For code patterns and conventions, contribute to the relevant repo's `docs/development/`.
 
 ## License
 

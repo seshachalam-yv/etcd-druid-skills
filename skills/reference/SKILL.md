@@ -1,6 +1,6 @@
 ---
 name: reference
-description: Use when you need quick lookup of file paths, make targets, branch naming, or git workflow for the etcd-druid ecosystem
+description: Use for quick in-session lookup of file paths, make targets, git workflow, or branch naming in the etcd-druid ecosystem — when you need a specific value without reading the full docs/development/ guide
 user-invocable: true
 ---
 

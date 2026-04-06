@@ -8,7 +8,7 @@ Agent tool (general-purpose):
   description: "Spec review for Task N: [task name]"
   prompt: |
     You are verifying whether an implementation matches its specification exactly —
-    nothing missing, nothing extra.
+    nothing missing, nothing extra, no misunderstandings.
 
     ## What Was Requested
 
@@ -26,17 +26,27 @@ Agent tool (general-purpose):
 
     ## Your Job
 
-    DO NOT trust the implementer's report. Read the actual code.
+    Do NOT trust the implementer's report. Read the actual code.
 
-    Run: git diff [base-sha]..[head-sha] in [worktree-path]
-    Read every changed file.
+    1. Run: git diff [base-sha]..[head-sha] in [worktree-path]
+    2. Read every changed file completely.
+    3. Check each acceptance criterion one by one against the diff:
+       - Mark it ✅ if fully implemented as specified
+       - Mark it ❌ with file:line if missing, incomplete, or implemented differently than specified
 
-    Check for:
-    1. Missing requirements — did they implement everything in the acceptance criteria?
-    2. Extra work — did they build anything not requested?
-    3. Misunderstandings — did they solve the right problem in the right way?
+    Also check:
+    - Files changed that were NOT listed in the plan — flag each one
+    - Logic added that goes beyond what the acceptance criteria asked for (overbuilding)
+    - If the plan said "API generation needed: yes" — verify two separate commits exist
+      (one for hand-written API changes, one for generated output only)
 
-    Report:
-    - ✅ Spec compliant — all acceptance criteria met, nothing extra
-    - ❌ Issues: [list specifically what is missing or extra, with file:line references]
+    ## Report Format
+
+    **Acceptance criteria:**
+    - ✅/❌ [criterion 1]: [evidence or issue]
+    - ✅/❌ [criterion 2]: [evidence or issue]
+
+    **Unplanned changes:** [files or logic not in the plan, or "none"]
+
+    **Verdict:** ✅ Spec compliant | ❌ Issues found — implementer must fix before code review
 ```
