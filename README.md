@@ -1,106 +1,233 @@
 # etcd-druid-skills
 
-A Claude Code plugin that encodes expert knowledge for [etcd-druid](https://github.com/gardener/etcd-druid) contributors. It injects domain awareness and workflow skills into every Claude session — so you spend less time on "how does this work" and more time on "what needs to be done."
+> A Claude Code plugin that encodes expert knowledge for [etcd-druid](https://github.com/gardener/etcd-druid) contributors — injects domain awareness, workflow discipline, and review rigor into every AI-assisted session.
 
-Inspired by and built on the [Superpowers](https://github.com/anthropics/claude-code-superpowers) plugin system for Claude Code.
+[![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
+[![Plugin](https://img.shields.io/badge/Claude%20Code-Plugin-blueviolet)](https://github.com/anthropics/claude-code)
+[![Inspired by Superpowers](https://img.shields.io/badge/Inspired%20by-Superpowers-orange)](https://github.com/anthropics/claude-code-superpowers)
 
-## What It Does
+---
 
-- **Session orientation** — On every session start, Claude receives a concise briefing on the three-component system, key invariants, available skills, and the current git state. If you open Claude inside one of the three repos, the hook detects which repo you're in and tells Claude exactly which `docs/development/` files to read.
-- **Domain skills** — Reusable, invocable skills covering the full development lifecycle: feature design through PR, TDD patterns, systematic debugging, pre-PR review, and quick reference.
-- **Living documentation** — Skills instruct Claude to read and update `docs/development/` in each repo as part of normal work. The repos own the patterns; the plugin owns the workflow.
+## Table of Contents
+
+- [Overview](#overview)
+- [The Three-Component System](#the-three-component-system)
+- [Skills](#skills)
+- [Feature Development Workflow](#feature-development-workflow-feature-dev)
+  - [Workflow Diagram](#workflow-diagram)
+  - [Per-Task Review Loop](#per-task-review-loop)
+  - [Commit Conventions](#commit-conventions)
+- [Key Invariants](#key-invariants)
+- [Installation](#installation)
+- [Contributing](#contributing)
+
+---
+
+## Overview
+
+Without this plugin, Claude starts each session knowing Go and Kubernetes but nothing about etcd-druid's operator interface, testing conventions, API generation process, or review requirements. You spend the first part of every session re-explaining context.
+
+With this plugin, Claude starts already oriented:
+
+| Without plugin | With plugin |
+|---|---|
+| "What's the Operator interface?" | Knows `PreSync`, `Sync`, `TriggerDelete`, `GetExistingResourceNames` |
+| May use Ginkgo in etcd-druid | Knows to use Go native + Gomega only |
+| May edit generated files | Knows generated files are off-limits |
+| No review discipline | Runs spec-review and code-review after every task |
+| Skips `make generate` | Enforces two-commit rule for API changes |
+
+**The plugin is a workflow orchestrator, not a code library.** It never embeds code patterns inline — those live in each repo's `docs/development/`. The plugin tells Claude where to look and enforces the process.
+
+Inspired by the [Superpowers](https://github.com/anthropics/claude-code-superpowers) plugin system for Claude Code.
+
+---
 
 ## The Three-Component System
 
 ```
-etcd-druid          Kubernetes operator — owns the Etcd CRD, reconciles all cluster resources
-etcd-backup-restore Sidecar — manages snapshots, restore, and etcd initialization
-etcd-wrapper        Sidecar — initializes etcd via backup-restore HTTP API, then runs embedded etcd
+┌─────────────────────────────────────────────────────────────┐
+│                     Gardener Seed Cluster                    │
+│                                                             │
+│  ┌─────────────────┐                                        │
+│  │   etcd-druid    │  Kubernetes operator                   │
+│  │   (operator)    │  Owns Etcd CRD, reconciles resources   │
+│  └────────┬────────┘                                        │
+│           │ manages                                          │
+│           ▼                                                  │
+│  ┌─────────────────────────────────────────────┐            │
+│  │              etcd StatefulSet               │            │
+│  │                                             │            │
+│  │  ┌──────────────┐    ┌──────────────────┐  │            │
+│  │  │ etcd-wrapper │───▶│ etcd-backup-     │  │            │
+│  │  │  (sidecar)   │    │ restore (sidecar)│  │            │
+│  │  └──────────────┘    └──────────────────┘  │            │
+│  │        │                     │              │            │
+│  │   starts etcd          snapshot/restore     │            │
+│  └─────────────────────────────────────────────┘            │
+└─────────────────────────────────────────────────────────────┘
 ```
 
-All three run in Gardener's **seed cluster**. etcd-druid is reconciled by gardenlet; changes must not break gardenlet's reconciliation assumptions.
+| Repo | Role | Test Framework |
+|------|------|---------------|
+| [etcd-druid](https://github.com/gardener/etcd-druid) | Kubernetes operator | Go native `testing.T` + Gomega |
+| [etcd-backup-restore](https://github.com/gardener/etcd-backup-restore) | Snapshot, restore, init sidecar | Ginkgo v2 + Gomega |
+| [etcd-wrapper](https://github.com/gardener/etcd-wrapper) | etcd starter sidecar | Go native `testing.T` + Gomega |
+
+---
 
 ## Skills
 
-| Skill | Invoke | Use when |
-|-------|--------|----------|
-| `feature-dev` | `/etcd-druid:feature-dev` | Any development work — picking up an issue, planning a feature or bug fix, design-to-PR |
-| `tdd` | `/etcd-druid:tdd` | Writing new tests or learning the correct test pattern for any of the three repos |
-| `debug` | `/etcd-druid:debug` | Something is failing, broken, or behaving unexpectedly |
-| `review` | `/etcd-druid:review` | Validating code before opening a PR — self-review or reviewing a colleague's PR |
-| `reference` | `/etcd-druid:reference` | Quick lookup: make targets, file paths, git workflow, branch naming |
+| Skill | Invoke | Activates on | Use when |
+|-------|--------|-------------|----------|
+| `feature-dev` | `/etcd-druid:feature-dev` | explicit | Picking up an issue, planning and implementing a feature or bug fix, design-to-PR |
+| `tdd` | `/etcd-druid:tdd` | `*.go` files | Writing new tests or learning the correct test pattern for any of the three repos |
+| `debug` | `/etcd-druid:debug` | `*.go` files | Something is failing, broken, or behaving unexpectedly |
+| `review` | `/etcd-druid:review` | `*.go` files | Validating code before opening a PR — self-review or reviewing a colleague's PR |
+| `reference` | `/etcd-druid:reference` | explicit | Quick lookup: make targets, file paths, EtcdOpsTask, druidctl, git workflow |
+
+The `tdd`, `debug`, and `review` skills activate automatically when Claude edits `.go` files (`paths: **/*.go` frontmatter), in addition to explicit invocation.
+
+---
 
 ## Feature Development Workflow (`feature-dev`)
 
-The `feature-dev` skill runs a structured design-to-PR workflow with two hard human approval gates.
+The `feature-dev` skill runs a structured design-to-PR workflow with **two hard human approval gates** — no code before Gate 1, no push before Gate 2.
 
-```
-Issue received
-    │
-    ▼
-Phase 1: Design
-  • Explore upstream (read-only) to understand affected controller/component/API
-  • Identify change type: API | component | controller | test-only
-  • Propose 2–3 approaches with trade-offs
-    │
-    ▼
-Phase 2: Code Plan
-  • Written to fork: docs/plans/YYYY-MM-DD-issue-{id}-{description}.md
-  • Includes: change type, tasks with acceptance criteria, files, test scope,
-    API generation flag, and pre-PR checklist
-    │
-    ▼
-⛔ GATE 1: Plan Approval  ──── changes requested ────▶ back to Code Plan
-  • No code written before this gate
-  • No worktree created before this gate
-    │ approved
-    ▼
-Phase 3: Worktree Setup
-  git worktree add ../etcd-druid-ai-TASK-{id} -b ai/TASK-{id}/claude/{desc} upstream/master
-    │
-    ▼
-Phase 4: Per-Task Implementation  (repeat for each task)
-  • Read docs/development/ before writing any code
-  • Implementer subagent writes code + tests, commits, reports
-  • Spec-reviewer subagent: did it match the acceptance criteria exactly?
-  • Code-reviewer subagent: does it follow the repo's documented conventions?
-  • Fix loop until both reviewers ✅
-  • Document any pattern found but not yet in docs/development/
-    │ all tasks done
-    ▼
-Phase 5: Verify
-  make ci-checks && make test-unit && make test-integration
-  (API changes: cd api && make check-generate)
-    │ all pass
-    ▼
-⛔ GATE 2: PR Approval  ──── changes requested ────▶ back to Verify
-  • Shows: PR title, body draft (/area /kind release-note), diff stat, commit list
-  • Options: Create PR | Push branch only | Make changes | Discard
-    │ approved
-    ▼
-Phase 6: PR Creation
-  git push origin <branch>
-  gh pr create --base master --title "..." --body "..."
+### Workflow Diagram
+
+```mermaid
+flowchart TD
+    A([Issue received]) --> B[Phase 1: Design\nExplore upstream · identify change type · propose approaches]
+    B --> C[Phase 2: Code Plan\nWrite to fork/docs/plans/]
+    C --> G1{⛔ GATE 1\nPlan Approval}
+    G1 -->|changes requested| C
+    G1 -->|approved| D[Phase 3: Worktree Setup\ngit worktree add ...]
+    D --> E[Phase 4: Per-Task Implementation]
+    E --> SR{Spec\nreview ✅?}
+    SR -->|no — fix| E
+    SR -->|yes| CR{Code\nreview ✅?}
+    CR -->|no — fix| E
+    CR -->|yes| MT{More\ntasks?}
+    MT -->|yes| E
+    MT -->|no| F[Phase 5: Verify\nmake ci-checks · test-unit · test-integration]
+    F --> CP{All checks\npass?}
+    CP -->|no — dispatch fix| F
+    CP -->|yes| G2{⛔ GATE 2\nPR Approval}
+    G2 -->|changes requested| F
+    G2 -->|approved| H([Phase 6: PR Creation\ngit push · gh pr create])
+
+    style G1 fill:#c0392b,color:#fff,stroke:#922b21
+    style G2 fill:#c0392b,color:#fff,stroke:#922b21
 ```
 
-### Commit conventions
+### Per-Task Review Loop
 
-- One commit per logical change — imperative, sentence case, no trailing period
-- Issue number at end: `Add snapshot lease rotation to memberlease component (#1350)`
-- API changes use two commits:
-  - Commit 1: hand-written API types/markers
-  - Commit 2: `cd api && make generate` output only
+Each task goes through two independent subagent reviews before it is marked complete:
+
+```mermaid
+sequenceDiagram
+    participant O as Orchestrator
+    participant I as Implementer
+    participant SR as Spec Reviewer
+    participant CR as Code Reviewer
+
+    O->>I: Task + acceptance criteria + worktree path
+    I-->>O: Report (commits, SHAs, files changed)
+    O->>SR: Acceptance criteria + base/head SHA
+    SR-->>O: ✅ or ❌ with file:line issues
+    alt ❌ spec issues
+        O->>I: Fix spec issues
+        I-->>O: Updated report
+        O->>SR: Re-review
+    end
+    O->>CR: Implementer report + base/head SHA
+    CR-->>O: ✅ or ❌ with file:line issues
+    alt ❌ quality issues
+        O->>I: Fix quality issues
+        I-->>O: Updated report
+        O->>CR: Re-review
+    end
+    O->>O: Mark task completed ✅
+```
+
+**Spec reviewer** checks: acceptance criteria satisfied, no unplanned files changed, two-commit rule for API generation.
+
+**Code reviewer** checks: docs/development/ conventions, Operator interface completeness, error handling, API change requirements, test framework correctness, commit message format, and known footguns (removed feature gates, removed flags).
+
+### Commit Conventions
+
+```
+Add snapshot lease rotation to memberlease component (#1350)   ✅
+Fixed the bug.                                                  ❌  (past tense, trailing period)
+add configmap ttl                                               ❌  (no issue number, lowercase)
+```
+
+**API changes use two commits:**
+
+```
+Commit 1: Add ExpirySeconds field to EtcdSpec  (#1350)
+          └── hand-written changes only: api/core/v1alpha1/*.go
+
+Commit 2: Run make generate for ExpirySeconds field (#1350)
+          └── generated output only: zz_generated.deepcopy.go, crds/*.yaml, charts/crds/*.yaml
+```
+
+---
 
 ## Key Invariants
 
-- New components must implement the `Operator` interface: `PreSync`, `Sync`, `TriggerDelete`, `GetExistingResourceNames`
-- Register via `registry.Register(component.Kind, operator)` in `internal/controller/etcd/reconciler.go`
-- Generated files (`zz_generated.deepcopy.go`, `api/core/v1alpha1/crds/*.yaml`, `charts/crds/*.yaml`, `client/`): NEVER edit manually — run `cd api && make generate`
-- **etcd-druid tests:** Go native `testing.T` + Gomega — no Ginkgo in `internal/`
-- **etcd-wrapper tests:** Go native `testing.T` + Gomega
-- **etcd-backup-restore tests:** Ginkgo v2 + Gomega
-- NEVER commit to upstream; NEVER push without explicit human approval
-- Conventions and code patterns live in each repo's `docs/development/` — read them, update them
+### Operator Interface (etcd-druid)
+
+Every component in `internal/component/<name>/` must implement all four methods:
+
+```
+PreSync(ctx, client, etcd)              → ReconcileStepResult
+Sync(ctx, client, etcd)                 → error
+TriggerDelete(ctx, client, etcd)        → error
+GetExistingResourceNames(ctx, client, etcd) → ([]string, error)
+```
+
+Register via `registry.Register(component.Kind, operator)` in `internal/controller/etcd/reconciler.go`.
+
+### Generated Files — Never Edit Manually
+
+```
+api/core/v1alpha1/zz_generated.deepcopy.go    ← generated
+api/core/v1alpha1/crds/*.yaml                 ← generated
+charts/crds/*.yaml                            ← generated
+client/                                       ← generated
+
+To regenerate: cd api && make generate
+To verify:     cd api && make check-generate
+```
+
+### Test Framework by Repo
+
+| Repo | Framework | What NOT to use |
+|------|-----------|-----------------|
+| etcd-druid | Go native `testing.T` + Gomega | Ginkgo, gomock |
+| etcd-wrapper | Go native `testing.T` + Gomega | Ginkgo, gomock |
+| etcd-backup-restore | Ginkgo v2 + Gomega | — |
+
+Universal: no `time.Sleep()` — use `Eventually` / `Consistently` for async assertions.
+
+### Known Footguns
+
+| Item | Status | Action |
+|------|--------|--------|
+| `UseEtcdWrapper` feature gate | **Removed** | Delete any reference |
+| `--enable-etcd-member-gc` flag | **Removed** (v0.42) | Delete any reference |
+| `UpgradeEtcdVersion` feature gate | Alpha (v0.36+) | Must be gated behind `featureGates.Enabled()` |
+
+### Hard Rules
+
+- NEVER commit to upstream (`github.com/gardener/*`)
+- NEVER push or create a PR without explicit human approval
+- NEVER edit generated files manually
+- Conventions live in `docs/development/` in each repo — read them, update them when you find gaps
+
+---
 
 ## Installation
 
@@ -109,11 +236,27 @@ claude /install-plugin https://github.com/seshachalam-yv/etcd-druid-skills
 /reload-plugins
 ```
 
+### What gets injected
+
+Every session start, Claude receives:
+- Orientation on the three-component system and key invariants
+- Detected active repo (etcd-druid / etcd-backup-restore / etcd-wrapper) with path to its `docs/development/`
+- Key docs to read in that repo
+- Current branch and recent commits
+
+---
+
 ## Contributing
 
-Found a gap, wrong pattern, or missing best practice? Open a PR against this repo.
-For skill improvements, edit the relevant `skills/<name>/SKILL.md` directly.
-For code patterns and conventions, contribute to the relevant repo's `docs/development/`.
+Found a gap, wrong pattern, or missing best practice?
+
+**For code patterns and conventions:** contribute to the relevant repo's `docs/development/` — that's where they belong.
+
+**For skill workflow issues:** open a PR against this repo and edit `skills/<name>/SKILL.md`.
+
+When the code-reviewer skill finds a plugin mistake, it outputs a ready-to-use `gh pr create` command targeting this repo so the fix is one copy-paste away.
+
+---
 
 ## License
 
