@@ -84,6 +84,8 @@ digraph feature_dev {
 | Controller logic | `internal/controller/<name>/` | No |
 | Test only | `internal/component/<name>/*_test.go` or `test/it/` | No |
 
+**API change note:** For any API change, invoke `/etcd-druid:api-change` — it covers field design, field-scoped vs cross-field CEL validation, two-commit generate workflow, CRD test requirements, and `/kind api-change` PR label. Cross-field CEL rules (those referencing `self.metadata` or fields across two sub-structs) must go on the root `Etcd` type, not on the sub-struct.
+
 ---
 
 ## Phase 2: Code Plan

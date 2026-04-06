@@ -178,6 +178,7 @@ Dual-site backup: configure a secondary backup target via `StoreSpec.SecondarySt
 ## Skills Available (on-demand)
 
 - `feature-dev` — full feature development workflow with approval gates
+- `api-change` — API field design, CEL validation (field-scoped + cross-field), two-commit generate, CRD tests
 - `tdd` — TDD cycle for all three repos
 - `debug` — systematic debugging workflow
 - `review` — code review checklist
