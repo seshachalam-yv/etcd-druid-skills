@@ -95,8 +95,7 @@ API changes use **two commits** — hand-written types first, `cd api && make ge
 ## Installation
 
 ```bash
-claude /install-plugin https://github.com/seshachalam-yv/etcd-druid-skills
-/reload-plugins
+claude plugin install https://github.com/seshachalam-yv/etcd-druid-skills
 ```
 
 ---

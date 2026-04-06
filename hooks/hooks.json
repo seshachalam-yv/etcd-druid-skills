@@ -2,7 +2,6 @@
   "hooks": {
     "SessionStart": [
       {
-        "matcher": "startup|clear|compact",
         "hooks": [
           {
             "type": "command",
@@ -41,8 +40,7 @@
           {
             "type": "command",
             "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/check-dev-docs.sh\"",
-            "async": true,
-            "if": "Edit(**.go)|Write(**.go)"
+            "async": true
           }
         ]
       }

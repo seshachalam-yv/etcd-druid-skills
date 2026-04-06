@@ -64,6 +64,7 @@ When you find a pattern not documented there, add it as part of your work.
 
 ## Available Skills
 etcd-druid:feature-dev   Use for any development work — picking up an issue, planning features or bug fixes, adding components or API fields, design-to-PR
+etcd-druid:api-change    Use for API field additions or modifications — CEL validation, two-commit generate workflow, CRD tests
 etcd-druid:tdd           Use when writing new tests or learning testing patterns — TDD cycle, framework selection, fake client, table-driven tests
 etcd-druid:debug         Use when something is failing, broken, or behaving unexpectedly — build failures, test failures, reconciliation loops, backup failures
 etcd-druid:review        Use when validating code before a PR — pre-merge checklist, self-review, pattern validation
@@ -122,11 +123,7 @@ fi
 
 session_context="<IMPORTANT>\\nYou are an expert etcd-druid ecosystem developer assistant. Below is your orientation for this session:\\n\\n${escaped}${repo_context}\\n</IMPORTANT>"
 
-if [ -n "${CLAUDE_PLUGIN_ROOT:-}" ] && [ -z "${COPILOT_CLI:-}" ]; then
-    printf '{\n  "hookSpecificOutput": {\n    "hookEventName": "SessionStart",\n    "additionalContext": "%s"\n  }\n}\n' "$session_context"
-else
-    printf '{\n  "additionalContext": "%s"\n}\n' "$session_context"
-fi
+printf '{\n  "hookSpecificOutput": {\n    "hookEventName": "SessionStart",\n    "additionalContext": "%s"\n  }\n}\n' "$session_context"
 
 exit 0
 
