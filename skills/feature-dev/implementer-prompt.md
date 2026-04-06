@@ -10,131 +10,195 @@ Agent tool (general-purpose):
 
     ## Task
 
-    [FULL TEXT of task from plan — paste here, do not make subagent read file]
+    [FULL TEXT of task from code plan — paste here, do not make subagent read file]
 
     ## Context
 
     - Issue: #[issue-id]
     - Worktree path (your working directory): [worktree-path]
-    - Fork: <fork-root> (your local fork of github.com/<your-github-user>/etcd-druid)
+    - Fork: [fork-root] (your local fork of github.com/<your-github-user>/etcd-druid)
     - Upstream (read-only reference): github.com/gardener/etcd-druid (check git remotes)
     - Branch: ai/TASK-[issue-id]/claude/[short-description]
     - Files affected: [list from plan]
+    - API generation needed: [yes | no]
 
     ## Before You Begin
 
-    If you have questions about requirements, approach, or anything unclear — ask now.
-    Do not guess. Do not make assumptions. Pause and ask.
+    Read the relevant existing code before writing anything. If requirements are
+    unclear — ask now. Do not guess. Do not make assumptions.
 
     ## etcd-druid Conventions
 
-    **Operator interface** (if task touches internal/component/):
-    Every new component must implement all four methods:
-      - PreSync(ctx OperatorContext, etcd *druidv1alpha1.Etcd) error
-      - Sync(ctx OperatorContext, etcd *druidv1alpha1.Etcd) error
-      - TriggerDelete(ctx OperatorContext, etcdObjMeta metav1.ObjectMeta) error
-      - GetExistingResourceNames(ctx OperatorContext, etcdObjMeta metav1.ObjectMeta) ([]string, error)
-    Register new component in createAndInitializeOperatorRegistry() in
-    internal/controller/etcd/reconciler.go
+    ### Operator interface (if task touches internal/component/)
 
-    **Generated code — NEVER edit manually:**
-    The following files are generated. Do NOT edit them by hand:
-      - api/core/v1alpha1/zz_generated.deepcopy.go
-      - Any file with the header "// Code generated ... DO NOT EDIT."
-    If these files need updating (e.g. new API field added), run:
-      cd [worktree-path] && make generate
-    Commit the regenerated files in a SEPARATE commit from the API change (see below).
-    If make generate fails, report BLOCKED — do not patch generated files manually.
+    Every component must implement all four methods exactly:
 
-    **API changes** (if task touches api/core/v1alpha1/):
-    - Add +kubebuilder:validation:XValidation CEL annotation for new fields
-    - Commit the API change first (hand-written types, markers, validation)
-    - Then run `make generate` and commit the generated output separately:
-        Commit 1: "Add <field> to EtcdSpec API (#NNNN)"   ← hand-written changes only
-        Commit 2: "Run make generate (#NNNN)"              ← only generated files
+    ```go
+    type Operator interface {
+        PreSync(ctx OperatorContext, etcd *druidv1alpha1.Etcd) error
+        Sync(ctx OperatorContext, etcd *druidv1alpha1.Etcd) error
+        TriggerDelete(ctx OperatorContext, etcdObjMeta metav1.ObjectMeta) error
+        GetExistingResourceNames(ctx OperatorContext, etcdObjMeta metav1.ObjectMeta) ([]string, error)
+    }
+    ```
 
-    **Error handling (internal/component/ code):**
-    Use druiderr.WrapError — NOT fmt.Errorf:
-      import druiderr "github.com/gardener/etcd-druid/internal/errors"
-      return druiderr.WrapError(err, ErrGetFoo, component.OperationPreSync,
-          "failed to get foo for etcd %s", druidv1alpha1.GetNamespaceName(etcd.ObjectMeta))
-    Error vars are package-level: var ErrGetFoo = errors.New("ErrGetFoo")
-    Never swallow errors silently.
+    Operation name constants (use these, do not invent strings):
+    ```go
+    component.OperationPreSync                  = "PreSync"
+    component.OperationSync                     = "Sync"
+    component.OperationTriggerDelete            = "TriggerDelete"
+    component.OperationGetExistingResourceNames = "GetExistingResourceNames"
+    ```
 
-    **Logging (etcd-druid):**
-    log.FromContext(ctx).WithValues("etcd", req.NamespacedName)
+    Register new component via `registry.Register(component.Kind, operator)` —
+    find registration in `internal/controller/etcd/reconciler.go` and follow the same pattern.
 
-    **OperatorContext construction (in tests):**
-      import "github.com/gardener/etcd-druid/internal/component"
-      import "github.com/google/uuid"
-      import "github.com/go-logr/logr"
+    ### Error handling (internal/component/ and internal/controller/)
+
+    Use `druiderr.WrapError` — never `fmt.Errorf`:
+    ```go
+    import (
+        druidapicommon "github.com/gardener/etcd-druid/api/common"
+        druiderr "github.com/gardener/etcd-druid/internal/errors"
+    )
+
+    // Error codes are typed string constants, NOT errors.New():
+    const (
+        ErrGetFoo    druidapicommon.ErrorCode = "ERR_GET_FOO"
+        ErrSyncFoo   druidapicommon.ErrorCode = "ERR_SYNC_FOO"
+        ErrDeleteFoo druidapicommon.ErrorCode = "ERR_DELETE_FOO"
+    )
+
+    // WrapError signature:
+    // func WrapError(err error, code druidapicommon.ErrorCode, operation string, message string) error
+    return druiderr.WrapError(err, ErrGetFoo, component.OperationPreSync,
+        fmt.Sprintf("failed to get foo for etcd %s", druidv1alpha1.GetNamespaceName(etcd.ObjectMeta)))
+    ```
+
+    Never swallow errors silently. Use `apierrors.IsNotFound(err)` to distinguish not-found from real errors.
+
+    ### Generated code — NEVER edit manually
+
+    Files generated by `cd [worktree-path]/api && make generate`:
+    - `api/core/v1alpha1/zz_generated.deepcopy.go`
+    - `api/core/v1alpha1/crds/*.yaml` (CRD manifests)
+    - `charts/crds/*.yaml` (copied from above)
+    - `client/` package (typed clientset, listers, informers)
+    - Any file with `// Code generated` header
+
+    If API generation is needed for this task:
+    1. Commit hand-written API changes first
+    2. Run: `cd [worktree-path]/api && make generate`
+    3. Commit only the generated output in a second commit
+
+    Commit message pattern for two-commit API changes:
+    ```
+    Commit 1: "Add <field> to EtcdSpec (#[issue-id])"
+    Commit 2: "Run make generate (#[issue-id])"
+    ```
+
+    If `make generate` fails — report BLOCKED. Never patch generated files by hand.
+
+    ### API changes (if task touches api/core/v1alpha1/)
+
+    - Add `+kubebuilder:validation:XValidation:rule="...",message="..."` CEL annotation for new fields
+    - Add CEL validation test in `test/it/crdvalidation/etcd/` or `test/it/crdvalidation/etcdopstask/`
+    - Update `examples/` if the API surface changes
+
+    ### Logging
+
+    `log.FromContext(ctx).WithValues("etcd", req.NamespacedName)`
+
+    ### Tests
+
+    **Unit tests** (`internal/component/`, `internal/controller/`):
+    - Go native `testing.T` — never Ginkgo in these packages
+    - Gomega assertions: `import . "github.com/onsi/gomega"`
+    - Table-driven with struct slice; `t.Parallel()` in subtests
+    - Fake client (no gomock):
+      ```go
+      import testutils "github.com/gardener/etcd-druid/test/utils"
+
+      // Inject errors by position: (getErr, listErr, createErr, updateErr, objects, objKey)
+      cl := testutils.CreateTestFakeClientForObjects(getErr, nil, nil, nil, existingObjects, objKey)
+
+      // Builder pattern:
+      cl := testutils.NewTestClientBuilder().WithObjects(objs...).Build()
+      ```
+    - OperatorContext:
+      ```go
+      import (
+          "github.com/gardener/etcd-druid/internal/component"
+          "github.com/go-logr/logr"
+          "github.com/google/uuid"
+      )
       opCtx := component.NewOperatorContext(context.Background(), logr.Discard(), uuid.NewString())
+      ```
+    - Check DruidErrors:
+      ```go
+      testutils.CheckDruidError(g, expectedErr, actualErr)
+      ```
+    - Never `time.Sleep()` — use `Eventually` / `Consistently`
 
-    **Tests:**
-    - Use Go native testing.T (not Ginkgo) with Gomega assertions
-    - Import: . "github.com/onsi/gomega"
-    - Use table-driven struct slices for multiple scenarios
-    - DO NOT use gomock — use testutils fake client instead:
-        import "github.com/gardener/etcd-druid/test/utils"
-        // Single object with error injection:
-        cl := testutils.CreateTestFakeClientForObjects(getErr, nil, nil, nil, existingObjects, objKey)
-        // Or builder pattern:
-        cl := testutils.NewTestClientBuilder().WithObjects(objs...).Build()
-    - Never use time.Sleep() — use gomega.Eventually/Consistently
-    - Check existing tests in the same package before writing new ones
-    - Helpers live in test/utils/ — use before creating new ones
+    **Integration tests** (`test/it/`):
+    - Go native `testing.T` + Gomega (new pattern in `test/it/`)
+    - Ginkgo still used in `test/integration/` (legacy — do not add new suites there)
+    - Run with envtest (real kube-apiserver + etcd control plane)
 
-    **Commit message style** (one commit per task):
-    "Verb noun detail (#[issue-id])"
-    Examples:
-      Add PreSync method to statefulset operator (#1350)
-      Fix TLS secret rotation in configmap component (#1350)
-      Add unit tests for memberlease operator (#1350)
+    ### Commit message style
 
-    ## When You're in Over Your Head
+    One commit per logical change. Format: `Verb noun detail (#[issue-id])`
+    - `Add PreSync method to configmap component (#1350)`
+    - `Fix snapshot lease rotation in memberlease operator (#1350)`
+    - No trailing period. Sentence case. Imperative.
 
-    STOP and report BLOCKED or NEEDS_CONTEXT (do not keep trying) if:
+    ## When to Stop and Ask
 
-    1. You can't find the function/type you need after grepping the codebase
-    2. The task requires changing more files than listed — stop and ask
-    3. Tests fail after 2 fix attempts and you don't understand why
-    4. The plan step conflicts with what you see in the actual code
-    5. You're about to make a guess about an API you haven't verified
+    Report BLOCKED or NEEDS_CONTEXT (do not keep trying) if:
+    1. You cannot find a function or type after grepping the codebase
+    2. The task requires changing more files than listed
+    3. Tests fail after 2 attempts and you don't understand why
+    4. The plan conflicts with what you see in the actual code
+    5. You are about to guess at an API you have not confirmed exists
+    6. `make generate` or `make ci-checks` fails in an unexpected way
 
-    Report NEEDS_CONTEXT when you need information only the human has.
-    Report BLOCKED when the task itself appears impossible as specified.
-    Never hallucinate an API or pattern you haven't confirmed exists.
+    NEEDS_CONTEXT = you need information only the human has.
+    BLOCKED = the task appears impossible as specified.
 
     ## Your Job
 
     1. Implement exactly what the task specifies — nothing more, nothing less
-    2. Write tests following the pattern above (check existing tests in same package first)
-    3. Run: make test-unit (for unit tests) or make test-integration (for integration tests)
-    4. Commit with the message style above
-    5. Self-review (see below)
-    6. Report back
-
-    Work from: [worktree-path]
+    2. Check existing tests in the same package before writing new ones
+    3. Check existing helpers in `test/utils/` before creating new ones
+    4. Run tests:
+       - Unit: `cd [worktree-path] && make test-unit`
+       - Integration: `cd [worktree-path] && make test-integration`
+    5. Run checks: `cd [worktree-path] && make ci-checks`
+    6. Commit with correct message style
+    7. Self-review (below)
+    8. Report back
 
     ## Self-Review Before Reporting
 
-    - Did I implement everything in the task acceptance criteria?
-    - Did I follow Go native testing.T + Gomega (not Ginkgo)?
-    - Did I follow the commit message style (no trailing period)?
-    - Did I avoid overbuilding (YAGNI)?
-    - Do tests pass: make test-unit?
-    - Did I only commit to the worktree branch, not upstream?
-    - If I touched api/core/v1alpha1/ or any struct with DeepCopy: did I run `make generate` and commit the generated files in a separate commit?
-    - Did I manually edit any file containing "// Code generated"? (If yes — revert it and run make generate instead.)
+    - [ ] All acceptance criteria from the task are implemented
+    - [ ] Go native testing.T + Gomega — no Ginkgo in component/controller packages
+    - [ ] No gomock — fake client used
+    - [ ] Commit message: imperative, sentence case, issue number, no trailing period
+    - [ ] YAGNI — nothing built beyond what was asked
+    - [ ] `make test-unit` passes
+    - [ ] `make ci-checks` passes
+    - [ ] Only committed to the worktree branch, not to upstream
+    - [ ] If API types changed: `cd api && make generate` was run and committed separately
+    - [ ] No file with `// Code generated` header was manually edited
 
     Fix any issues before reporting.
 
     ## Report Format
 
     - **Status:** DONE | DONE_WITH_CONCERNS | BLOCKED | NEEDS_CONTEXT
-    - What I implemented (files changed, with paths)
-    - Test results (pass count, command run)
-    - Commit SHA(s)
+    - Files changed (with paths)
+    - Test results (command run, pass count or output)
+    - Commit SHA(s) with messages
     - Self-review findings (if any)
-    - Concerns (if DONE_WITH_CONCERNS)
+    - Concerns (if DONE_WITH_CONCERNS) or what is missing (if BLOCKED/NEEDS_CONTEXT)
 ```

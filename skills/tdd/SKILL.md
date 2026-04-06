@@ -124,16 +124,18 @@ For component errors in etcd-druid, use `druiderr` (not `fmt.Errorf`):
 
 ```go
 import (
+    druidapicommon "github.com/gardener/etcd-druid/api/common"
     druidv1alpha1 "github.com/gardener/etcd-druid/api/core/v1alpha1"
     druiderr "github.com/gardener/etcd-druid/internal/errors"
 )
 
-var ErrGetMyResource = errors.New("ErrGetMyResource")
+// Error codes are typed string constants — NOT errors.New():
+const ErrGetMyResource druidapicommon.ErrorCode = "ERR_GET_MY_RESOURCE"
 
 func getMyResource(ctx component.OperatorContext, cl client.Client, etcd *druidv1alpha1.Etcd) error {
     if err := cl.Get(ctx, client.ObjectKey{...}, obj); err != nil {
         return druiderr.WrapError(err, ErrGetMyResource, component.OperationPreSync,
-            "failed to get my resource for etcd %s", druidv1alpha1.GetNamespaceName(etcd.ObjectMeta))
+            fmt.Sprintf("failed to get my resource for etcd %s", druidv1alpha1.GetNamespaceName(etcd.ObjectMeta)))
     }
     return nil
 }
@@ -180,4 +182,4 @@ testutils.CheckDruidError(g, expectedErr, actualErr)
 - NEVER use Ginkgo in etcd-druid or etcd-wrapper test files
 - ALWAYS run the test before writing implementation to confirm it fails
 - ALWAYS use `t.Parallel()` in table-driven tests unless the test mutates shared state
-- If API types in `api/core/v1alpha1/` change, run `make generate` — commit the hand-written API change first, then commit the `make generate` output (zz_generated.deepcopy.go, charts/ CRD YAML) separately. NEVER manually edit generated files.
+- If API types in `api/core/v1alpha1/` change, run `cd api && make generate` — commit the hand-written API change first, then commit the `make generate` output (zz_generated.deepcopy.go, api/core/v1alpha1/crds/*.yaml, charts/crds/*.yaml, client/) separately. NEVER manually edit generated files.

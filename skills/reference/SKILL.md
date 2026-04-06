@@ -26,12 +26,14 @@ Worktree (active development):
 ```
 API types:           api/core/v1alpha1/
 Component operators: internal/component/<name>/
-Controller:          internal/controller/etcd/reconciler.go
+Controllers:         internal/controller/etcd/reconciler.go (etcd, compaction, etcdcopybackupstask, etcdopstask, secret)
 Error types:         internal/errors/
 Test utilities:      test/utils/
-CEL validation:      hack/cel-tests/
+CEL validation:      test/it/crdvalidation/
 Generated code:      api/core/v1alpha1/zz_generated.deepcopy.go
-                     charts/   (CRD YAML)
+                     api/core/v1alpha1/crds/*.yaml  (generated CRD manifests)
+                     charts/crds/*.yaml             (copied from above by make generate)
+                     client/                        (generated typed clientset)
 ```
 
 ## Operator Interface (all 4 required)
@@ -44,7 +46,14 @@ type Operator interface {
     GetExistingResourceNames(ctx OperatorContext, etcdObjMeta metav1.ObjectMeta) ([]string, error)
 }
 
-// Register in: internal/controller/etcd/reconciler.go → createAndInitializeOperatorRegistry()
+// Operation name constants:
+component.OperationPreSync                  = "PreSync"
+component.OperationSync                     = "Sync"
+component.OperationTriggerDelete            = "TriggerDelete"
+component.OperationGetExistingResourceNames = "GetExistingResourceNames"
+
+// Register: registry.Register(component.Kind, operator)
+// Find registration in: internal/controller/etcd/reconciler.go
 ```
 
 ## OperatorContext Construction (tests)
@@ -61,16 +70,22 @@ opCtx := component.NewOperatorContext(context.Background(), logr.Discard(), uuid
 ## Error Handling (component code)
 
 ```go
-import druiderr "github.com/gardener/etcd-druid/internal/errors"
-
-var (
-    ErrGetFoo    = errors.New("ErrGetFoo")
-    ErrCreateFoo = errors.New("ErrCreateFoo")
+import (
+    druidapicommon "github.com/gardener/etcd-druid/api/common"
+    druiderr "github.com/gardener/etcd-druid/internal/errors"
 )
 
-// In component method:
+// Error codes are typed string constants — NOT errors.New():
+const (
+    ErrGetFoo    druidapicommon.ErrorCode = "ERR_GET_FOO"
+    ErrSyncFoo   druidapicommon.ErrorCode = "ERR_SYNC_FOO"
+    ErrDeleteFoo druidapicommon.ErrorCode = "ERR_DELETE_FOO"
+)
+
+// WrapError signature:
+// func WrapError(err error, code druidapicommon.ErrorCode, operation string, message string) error
 return druiderr.WrapError(err, ErrGetFoo, component.OperationPreSync,
-    "failed to get foo for etcd %s", druidv1alpha1.GetNamespaceName(etcd.ObjectMeta))
+    fmt.Sprintf("failed to get foo for etcd %s", druidv1alpha1.GetNamespaceName(etcd.ObjectMeta)))
 ```
 
 ## Fake Client (tests — NO gomock)
@@ -85,15 +100,19 @@ cl := testutils.CreateTestFakeClientForObjects(getErr, nil, nil, nil, existingOb
 cl := testutils.NewTestClientBuilder().WithObjects(objs...).Build()
 ```
 
-## Common Make Targets
+## Make Targets
 
 ```bash
-# etcd-druid (fork or worktree)
-make test-unit            # Unit tests
-make test-integration     # Integration tests
-make generate             # Regenerate code after API changes
-make check                # Lint + vet
-golangci-lint run ./...   # Lint only
+# etcd-druid root (fork or worktree)
+make test-unit            # Unit tests (Go native + Ginkgo suites)
+make test-integration     # Integration tests with envtest
+make ci-checks            # Full pre-PR: format + lint + license + api-diff
+make check                # Format + golangci-lint only
+
+# API generation (run from api/ subdirectory):
+cd api && make generate       # Regenerate deepcopy, CRDs, charts/crds/, client/
+cd api && make check-generate # Verify no uncommitted diff after generate
+cd api && make check-apidiff  # Validate API compatibility
 
 # etcd-backup-restore
 make test
@@ -102,7 +121,7 @@ make test
 go test ./...
 ```
 
-After API type changes: commit hand-written API changes first, then run `make generate` and commit the generated output (zz_generated.deepcopy.go, charts/ CRD YAML) separately. NEVER manually edit generated files.
+After API type changes: commit hand-written API changes first, then `cd api && make generate` and commit the generated output separately. NEVER manually edit generated files.
 
 ## Targeted Test Commands
 

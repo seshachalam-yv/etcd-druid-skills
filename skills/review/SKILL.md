@@ -33,30 +33,36 @@ New or modified component in `internal/component/<name>/` must implement all fou
 - `TriggerDelete(ctx OperatorContext, etcdObjMeta metav1.ObjectMeta) error`
 - `GetExistingResourceNames(ctx OperatorContext, etcdObjMeta metav1.ObjectMeta) ([]string, error)`
 
-Verify registration in `createAndInitializeOperatorRegistry()` in `internal/controller/etcd/reconciler.go`.
+Verify registration via `registry.Register(component.Kind, operator)` in `internal/controller/etcd/reconciler.go`.
 
 ## Step 3: Error Handling
 
 Component code must use `druiderr`, NOT `fmt.Errorf`:
 
 ```go
-import druiderr "github.com/gardener/etcd-druid/internal/errors"
+import (
+    druidapicommon "github.com/gardener/etcd-druid/api/common"
+    druiderr "github.com/gardener/etcd-druid/internal/errors"
+)
 
-var ErrGetFoo = errors.New("ErrGetFoo")
+// Error codes are typed string constants — NOT errors.New():
+const ErrGetFoo druidapicommon.ErrorCode = "ERR_GET_FOO"
 
 return druiderr.WrapError(err, ErrGetFoo, component.OperationPreSync,
-    "failed to get foo for etcd %s", druidv1alpha1.GetNamespaceName(etcd.ObjectMeta))
+    fmt.Sprintf("failed to get foo for etcd %s", druidv1alpha1.GetNamespaceName(etcd.ObjectMeta)))
 ```
 
-Red flags: `fmt.Errorf("...: %w", err)` in component files, `_ = err`, empty error branches.
+Red flags: `fmt.Errorf("...: %w", err)` in component files, `errors.New(...)` used as error code, `_ = err`, empty error branches.
 
 ## Step 4: API Changes
 
 If `api/core/v1alpha1/` was touched:
-- New fields need `+kubebuilder:validation:XValidation` CEL annotation
-- `make generate` must have been run — `zz_generated.deepcopy.go` and `charts/` CRD YAML updated
-- Breaking changes need a deprecation path or version bump
-- Two-commit rule: Commit 1 contains only hand-written API changes; Commit 2 contains only `make generate` output (zz_generated.deepcopy.go, charts/ CRD YAML). NEVER manually edit generated files.
+- New fields need `+kubebuilder:validation:XValidation:rule="...",message="..."` CEL annotation
+- `cd api && make generate` must have been run — all of these must appear in the diff:
+  `zz_generated.deepcopy.go`, `api/core/v1alpha1/crds/*.yaml`, `charts/crds/*.yaml`, `client/`
+- Two-commit rule: Commit 1 = hand-written API changes only; Commit 2 = `make generate` output only. NEVER manually edit generated files.
+- CEL validation test added in `test/it/crdvalidation/etcd/` or `test/it/crdvalidation/etcdopstask/`
+- Breaking changes need a deprecation path (see `docs/development/changing-api.md`)
 
 ## Step 5: RBAC Markers
 
