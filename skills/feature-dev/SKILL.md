@@ -62,14 +62,6 @@ digraph feature_dev {
 }
 ```
 
-## Hard Rules
-
-- NEVER write code before Gate 1 (plan approval)
-- NEVER push or create a PR before Gate 2 (PR approval)
-- NEVER skip spec-review or code-review after each task
-- NEVER commit to upstream (github.com/gardener/etcd-druid)
-- ALL implementation work happens inside the git worktree
-
 ---
 
 ## Phase 1: Design
@@ -234,6 +226,7 @@ Do not proceed to Gate 2 until clean.
 
 **Handoff:** Before presenting Gate 2, invoke `/etcd-druid:review` for a final whole-diff review.
 This is distinct from the per-task code-reviewer subagent — it reviews the complete change as a human reviewer would see it.
+`review` runs as an isolated read-only subagent (`context: fork`) — results are summarized back to this session.
 Gate 2 only after review returns LGTM.
 
 ---

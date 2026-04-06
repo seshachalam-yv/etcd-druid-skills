@@ -19,7 +19,7 @@ Standalone checklist for reviewing etcd-druid, etcd-backup-restore, and etcd-wra
 | Rationalization | Why it fails |
 |---|---|
 | "I reviewed something similar recently" | You reviewed different code. Read this diff. |
-| "The implementer said it's clean" | Spec reviewer exists because implementer reports are not sufficient |
+| "The author said it passes all tests" | Test passage is not the same as convention compliance — read the diff |
 | "It's a small change" | Small changes in API types and generated files are highest risk |
 | "I know the conventions" | `docs/development/` may have been updated since you last read it |
 
