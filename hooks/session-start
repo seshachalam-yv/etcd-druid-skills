@@ -97,6 +97,8 @@ if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
             *etcd-backup-restore*) current_repo="etcd-backup-restore" ;;
             *etcd-wrapper*)        current_repo="etcd-wrapper" ;;
             *etcd-druid*)          current_repo="etcd-druid" ;;
+            # Non-standard fork name: still inject default orientation without repo-specific docs
+            *) current_repo="" ;;
         esac
     fi
 

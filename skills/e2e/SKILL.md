@@ -249,14 +249,15 @@ make PROVIDERS="none,local" test-e2e
 
 **First: read the CI pipeline for the repo you changed.**
 
-Each repo defines its own checks in `.github/workflows/`. Before running anything locally, read those files:
+Each repo defines its own checks in `.github/workflows/`:
 
-```bash
-ls .github/workflows/
-# read the main build/check workflow (usually base.yaml or build.yaml)
-```
+| Repo | Main pipeline file |
+|---|---|
+| etcd-druid | `.github/workflows/base.yaml` |
+| etcd-backup-restore | `.github/workflows/build.yaml` |
+| etcd-wrapper | `.github/workflows/build.yaml` |
 
-This tells you exactly which jobs run on a PR — don't guess from memory. The commands below are a baseline derived from current pipeline state, but the pipeline is authoritative.
+Read the relevant file before running anything locally — it shows exactly which jobs run on a PR. The commands below are a baseline derived from current pipeline state, but the pipeline is authoritative.
 
 ### etcd-druid pipeline jobs (from `.github/workflows/base.yaml`)
 

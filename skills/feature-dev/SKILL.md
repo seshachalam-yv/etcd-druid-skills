@@ -236,7 +236,7 @@ Do not proceed to Gate 2 until clean.
 | Controller logic, component method | Yes | Find matching e2e test, run it targeted |
 | New API field, new feature | Yes | Find or write e2e test, run `make ci-e2e-kind` |
 | Bug fix with reproduction steps | Yes | Run the specific e2e scenario that reproduces the bug |
-| etcd-backup-restore or etcd-wrapper change | Yes | Build custom image, override in druid, run e2e — see `/etcd-druid:e2e` |
+| etcd-backup-restore or etcd-wrapper change | Yes | Build custom image, override in druid, run e2e — see `/etcd-druid:e2e` Scenario B or C |
 
 **How to find the right e2e test:**
 ```bash
