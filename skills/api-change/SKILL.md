@@ -263,15 +263,9 @@ func TestValidateAdditionalAdvertisePeerUrls(t *testing.T) {
 
 ---
 
-## Step 6: Update examples/
+## Step 6: Update examples/ and docs/
 
-If the new field is user-facing (an operator would set it), add an example usage to:
-
-```
-examples/etcd/druid_v1alpha1_etcd.yaml
-```
-
-Optional fields can be commented out. Show the type, not just a placeholder:
+**examples/** — if the new field is user-facing (an operator would set it), add an example to `examples/etcd/druid_v1alpha1_etcd.yaml`. Optional fields can be commented out. Show the type, not just a placeholder:
 
 ```yaml
 # additionalAdvertisePeerUrls:
@@ -280,42 +274,83 @@ Optional fields can be commented out. Show the type, not just a placeholder:
 #   - http://etcd-main-0.etcd-main-peer.default.svc:2380
 ```
 
+**docs/** — if the change is user-facing or changes operator behaviour, update `docs/`. The PR checklist in `.github/pull_request_template.md` requires:
+- If new docs files added or docs structure modified: update `mkdocs.yml` and `docs/README.md` (Table of Contents). Follow `docs/development/updating-documentation.md` to test locally.
+- If changing the API behaviour: update `docs/development/changing-api.md` or relevant guide.
+
 ---
 
 ## Step 7: PR Requirements
 
-**`/kind` label for API changes:** `api-change` — not `feature` or `enhancement`.
+The PR template lives in `.github/pull_request_template.md`. Fill it in exactly — Prow bots read the `/area` and `/kind` lines.
 
-**PR body must include:**
+**Categories for API changes:**
+
+```
+/area control-plane
+/kind api-change
+/kind enhancement        ← add if the field is a new user-facing feature
+```
+
+`/kind` values: `api-change|bug|cleanup|discussion|enhancement|epic|flake|impediment|poc|post-mortem|question|regression|task|technical-debt|test`
+
+`/area` values: `audit-logging|auto-scaling|backup|compliance|control-plane-migration|control-plane|cost|delivery|dev-productivity|disaster-recovery|documentation|high-availability|logging|metering|monitoring|networking|open-source|ops-productivity|os|performance|quality|robustness|scalability|security|storage|testing|usability|user-management`
+
+**PR body template (copy from `.github/pull_request_template.md`):**
 
 ```
 /area control-plane
 /kind api-change
 
-**What this PR does / why we need it:**
-<description>
+**What this PR does / why we need it**:
+<description — include a YAML snippet showing the new field if it's user-facing>
 
-**Fixes:** #<issue-number>
+**Which issue(s) this PR fixes**:
+Fixes #<issue-number>
 
-**Special notes for reviewer:**
-Two-commit rule followed: commit 1 = hand-written API changes, commit 2 = make generate output.
+**Checklist**:
+- [ ] Update documentation in the `/docs` folder (if applicable)
+    - If new files added to docs, or docs structure modified:
+        - [ ] Update mkdocs.yml
+        - [ ] Update docs/README.md (Table of Contents)
+- [ ] Add tests that cover your changes (if applicable)
+    - [x] Unit tests
+    - [x] Integration tests
+    - [ ] E2E tests
 
-**Release note:**
-feature operator
+**Special notes for your reviewer**:
+Two-commit rule followed: commit 1 = hand-written API changes, commit 2 = `make generate` output.
+CEL validations added: <list each rule and what it enforces>
+
+**Release note**:
+```feature operator
+<one-line summary of the new field and what it enables>
+```
 ```
 
-**Reviewer checklist items specific to API changes:**
+Release note categories: `breaking|noteworthy|feature|bugfix|doc|other`
+Release note target groups: `user|operator|developer|dependency`
+
+**Before pushing:** squash commits to a minimal number, rebase against `upstream/master`:
+
+```bash
+git rebase upstream/master
+# then squash to: 1 commit (hand-written API changes) + 1 commit (make generate output)
+```
+
+**Reviewer checklist — API changes:**
 - [ ] New fields have `+optional` or `+required`
 - [ ] Optional fields have `omitempty` in JSON tag
 - [ ] CEL rules have `has()` guards on optional field references
 - [ ] Field-scoped rules placed on innermost struct
 - [ ] Cross-field rules (referencing `self.metadata` or two sub-structs) placed on `Etcd` root type
 - [ ] `MaxItems` set on lists used in CEL iteration
-- [ ] Commit 1 = hand-written only; Commit 2 = generated only
+- [ ] Commit 1 = hand-written only; Commit 2 = `make generate` output only
 - [ ] `cd api && make check-generate` passes
 - [ ] `cd api && make check-apidiff` passes
 - [ ] Test added in `test/it/crdvalidation/etcd/` for every CEL rule
 - [ ] `examples/` updated if field is user-facing
+- [ ] `docs/` updated if behaviour is user-facing; `mkdocs.yml` and `docs/README.md` updated if new files added
 - [ ] No manual edits to `zz_generated.deepcopy.go`, CRD YAMLs, or `docs/api-reference/`
 
 ---

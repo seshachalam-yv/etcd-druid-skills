@@ -243,24 +243,44 @@ Present:
 - `git diff --stat upstream/master...HEAD`
 - Full commit list
 
-**PR body format** (matches `.github/pull_request_template.md`):
+**PR body format** (copy from `.github/pull_request_template.md` — Prow bots read `/area` and `/kind`):
 
 ```
-/area <area>        ← audit-logging|auto-scaling|backup|control-plane|disaster-recovery|etcd-config|monitoring|observability|operations|security|testing
+/area <area>
+/kind <kind>
 
-/kind <kind>        ← api-change|bug|cleanup|enhancement|feature|flake|task|test
-
-**What this PR does / why we need it:**
+**What this PR does / why we need it**:
 <description>
 
-**Fixes:** #<issue-number>
+**Which issue(s) this PR fixes**:
+Fixes #<issue-number>
 
-**Special notes for reviewer:**
+**Checklist**:
+- [ ] Update documentation in the `/docs` folder (if applicable)
+    - If new files added to docs, or docs structure modified:
+        - [ ] Update mkdocs.yml
+        - [ ] Update docs/README.md (Table of Contents)
+- [ ] Add tests that cover your changes (if applicable)
+    - [ ] Unit tests
+    - [ ] Integration tests
+    - [ ] E2E tests
+
+**Special notes for your reviewer**:
 <any reviewer context>
 
-**Release note:**
-<category> <target_group>   ← e.g. "feature user" or "bugfix operator"
+**Release note**:
+```<category> <target_group>
+<one-line summary>
 ```
+```
+
+`/area` values: `audit-logging|auto-scaling|backup|compliance|control-plane-migration|control-plane|cost|delivery|dev-productivity|disaster-recovery|documentation|high-availability|logging|metering|monitoring|networking|open-source|ops-productivity|os|performance|quality|robustness|scalability|security|storage|testing|usability|user-management`
+
+`/kind` values: `api-change|bug|cleanup|discussion|enhancement|epic|flake|impediment|poc|post-mortem|question|regression|task|technical-debt|test`
+
+Release note categories: `breaking|noteworthy|feature|bugfix|doc|other` — target groups: `user|operator|developer|dependency`
+
+**Before pushing:** rebase against `upstream/master` and squash to a minimal number of commits.
 
 Say: **"Ready to create PR. Choose one:
   A) Create PR — I push and open it now
