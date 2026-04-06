@@ -1,13 +1,25 @@
 ---
 name: debug
-description: Use whenever something is failing, broken, stuck, or not behaving as expected in etcd-druid, etcd-backup-restore, or etcd-wrapper — make or go test command failures with error output, controller reconciliation loops, Kubernetes resources not appearing, backup or restore failures, or any situation where actual behavior diverges from expected. Do not use for questions about how things work, how to implement a feature, or environment setup.
+description: Use when something is failing or broken in etcd-druid, etcd-backup-restore, or etcd-wrapper — test failures, reconciliation loops, backup failures, build errors. Do not use for how-to questions, feature design, or environment setup.
 user-invocable: true
+effort: high
 paths: "**/*.go"
 ---
 
 # Debugging in the etcd-druid Ecosystem
 
 Use this skill when you hit: test failures, unexpected reconciliation behavior, backup/restore failures, etcd startup issues, or build failures.
+
+## ⛔ Iron Law
+
+**NO FIX ATTEMPT WITHOUT A REPRODUCIBLE FAILURE FIRST.**
+
+| Rationalization | Why it fails |
+|---|---|
+| "I can see what's wrong from the error" | You have a hypothesis. Reproduce it — your hypothesis may be wrong |
+| "I've seen this before" | You've seen something similar. Reproduce this specific instance |
+| "It's obviously X" | "Obviously" precedes most debugging rabbit holes |
+| "Reproducing it takes too long" | Fixing without reproduction takes longer |
 
 ## Phase 1: Read the Error Carefully
 
@@ -98,3 +110,9 @@ Stop. Do not attempt another fix.
 - Changing code before reproducing the failure — go back to Phase 2
 - Multiple changes in one attempt — you can't know what worked
 - "One more quick fix" after two failures — see Phase 6
+
+## Handoff
+
+After Phase 5 (fix confirmed, tests green):
+- If this was a test failure with no regression test: invoke `/etcd-druid:tdd` to add one
+- If fix is complete and PR-bound: invoke `/etcd-druid:review`

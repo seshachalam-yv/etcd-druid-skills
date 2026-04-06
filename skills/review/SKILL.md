@@ -1,19 +1,33 @@
 ---
 name: review
-description: Use whenever someone wants code reviewed or validated before opening a PR in etcd-druid, etcd-backup-restore, or etcd-wrapper — pre-merge checklists, self-reviews before submitting, "final check" on a completed implementation, pattern validation ("is testing.T okay here?", "is this commit format right?"), or any "review my changes before I open a PR" request. Do not use for implementation help, debugging test failures, or explanatory questions.
+description: Use before opening a PR in etcd-druid, etcd-backup-restore, or etcd-wrapper — pre-merge checklist, self-review, pattern validation. Do not use for implementation help, debugging test failures, or questions about how things work.
 user-invocable: true
+effort: medium
 paths: "**/*.go"
+context: fork
+agent: Explore
 ---
 
 # etcd-druid Code Review
 
 Standalone checklist for reviewing etcd-druid, etcd-backup-restore, and etcd-wrapper contributions.
 
+## ⛔ Iron Law
+
+**NO VERDICT WITHOUT READING THE DIFF AND docs/development/ FIRST.**
+
+| Rationalization | Why it fails |
+|---|---|
+| "I reviewed something similar recently" | You reviewed different code. Read this diff. |
+| "The implementer said it's clean" | Spec reviewer exists because implementer reports are not sufficient |
+| "It's a small change" | Small changes in API types and generated files are highest risk |
+| "I know the conventions" | `docs/development/` may have been updated since you last read it |
+
 ## When to Use
 
 - Before creating a PR (self-review gate)
 - When reviewing someone else's PR
-- After implementing a feature (sanity check)
+- After implementing a feature — invoked by `feature-dev` Phase 5 before Gate 2
 
 ---
 
@@ -89,6 +103,16 @@ Any pattern found in code but absent from `docs/development/` → add it.
 
 ---
 
+## Red Flags — Stop and Re-read
+
+- Forming a verdict before reading the full diff
+- Skipping `docs/development/` because "I know this codebase"
+- Marking API changes LGTM without checking both commits exist
+- Missing the two-commit rule for `make generate` output
+- Skipping the Repo Differences table for a repo you don't usually work in
+
+---
+
 ## Verdict
 
 **LGTM** — all items pass, ready for PR.
@@ -136,3 +160,8 @@ Body:
 | Test framework | Go native + Gomega | Ginkgo v2 + Gomega | Go native + Gomega |
 | Error wrapping | `druiderr.WrapError` | repo-specific patterns | standard wraps |
 | Operator interface | Required | N/A | N/A |
+
+## Handoff
+
+- LGTM → return to caller (feature-dev Gate 2, or done if standalone)
+- Plugin mistake found → output the `gh pr create` block above

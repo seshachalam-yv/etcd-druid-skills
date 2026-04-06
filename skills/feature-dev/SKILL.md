@@ -1,12 +1,24 @@
 ---
 name: feature-dev
-description: Use for any etcd-druid development work — picking up a GitHub issue, planning and implementing a feature or bug fix, adding a new component or API field, understanding how a controller or reconciliation concept works, or taking a change from design to PR. Covers the full development lifecycle for the gardener/etcd-druid project and its companion repos etcd-backup-restore and etcd-wrapper.
+description: Use for any etcd-druid development work — picking up a GitHub issue, planning a feature or bug fix, adding a component or API field, design-to-PR workflow. Do not use for writing tests only, debugging failures, or reviewing someone else's code.
 user-invocable: true
+effort: high
 ---
 
 # etcd-druid Feature Development
 
 Full workflow from issue to merged PR. Two hard gates: plan approval before code, PR approval before push.
+
+## ⛔ Iron Law
+
+**NO CODE BEFORE GATE 1. NO PUSH BEFORE GATE 2.**
+
+| Rationalization | Why it fails |
+|---|---|
+| "The task is tiny, a plan is overkill" | Small tasks skip assumptions that compound fastest |
+| "I already know what to write" | Gate 1 is for the human to catch wrong assumptions before code exists |
+| "The plan is in my head, that's enough" | Plans not written are not reviewable and lost after compaction |
+| "Just a quick prototype to show direction" | Prototypes become the implementation. Gate 1 exists for this. |
 
 ## Workflow Overview
 
@@ -219,6 +231,10 @@ make check-generate     # confirms make generate produces no uncommitted diff
 
 All must pass. Any failure → dispatch fix subagent with full failure output.
 Do not proceed to Gate 2 until clean.
+
+**Handoff:** Before presenting Gate 2, invoke `/etcd-druid:review` for a final whole-diff review.
+This is distinct from the per-task code-reviewer subagent — it reviews the complete change as a human reviewer would see it.
+Gate 2 only after review returns LGTM.
 
 ---
 

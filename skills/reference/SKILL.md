@@ -1,10 +1,17 @@
 ---
 name: reference
-description: Use for quick in-session lookup of file paths, make targets, git workflow, or branch naming in the etcd-druid ecosystem — when you need a specific value without reading the full docs/development/ guide
+description: Use for quick lookup of make targets, file paths, git workflow, branch naming, EtcdOpsTask, druidctl, or feature gates in the etcd-druid ecosystem.
 user-invocable: true
+effort: low
 ---
 
 # etcd-druid Ecosystem — Quick Reference Card
+
+## Current Git State
+
+- Branch: !`git branch --show-current 2>/dev/null || echo "(not in a git repo)"`
+- Remote: !`git remote get-url origin 2>/dev/null || echo "(no origin)"`
+- Recent: !`git log --oneline -3 2>/dev/null || echo "(no commits)"`
 
 For code patterns, conventions, and best practices: read `docs/development/` in the
 repo you are working in. This card covers locations, targets, and workflow only.
