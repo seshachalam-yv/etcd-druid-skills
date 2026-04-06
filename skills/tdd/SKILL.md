@@ -50,10 +50,12 @@ go test ./... 2>&1 | grep -A 5 "FAIL\|--- FAIL"     # etcd-wrapper
 
 Implement only what the test requires. No extra logic.
 
-Run and confirm green:
+Run and confirm green — read the full output before claiming it passes:
 ```bash
 make test-unit  # or go test ./... or make test
 ```
+
+Do not say "tests pass" without running the command and reading the output in this message.
 
 ### Step 3 — Refactor: Clean up while staying green
 

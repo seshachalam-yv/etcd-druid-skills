@@ -102,6 +102,10 @@ Path: `<fork-root>/docs/plans/YYYY-MM-DD-issue-{id}-{short-description}.md`
 **Plan format:**
 
 ```markdown
+> **For agentic workers:** Gate 1 is pre-approved for etcd-steward work.
+> For etcd-druid work, present this plan and wait for human approval before starting.
+> Use feature-dev Phase 4 (per-task subagent loop) to execute tasks.
+
 ## Issue
 Link: https://github.com/gardener/etcd-druid/issues/{id}
 Summary: one sentence.
@@ -161,12 +165,33 @@ After Gate 1 approval:
 ```bash
 cd <fork-root>
 git fetch upstream
-git worktree add ../etcd-druid-ai-TASK-{id} \
+
+# Safety: ensure worktree directory is gitignored before creating it
+git check-ignore -q .worktrees || {
+  echo '.worktrees/' >> .gitignore
+  git add .gitignore
+  git commit -m "Add .worktrees/ to .gitignore"
+}
+
+git worktree add .worktrees/etcd-druid-ai-TASK-{id} \
   -b ai/TASK-{id}/claude/{short-description} upstream/master
 ```
 
-Worktree path: `<fork-root>/../etcd-druid-ai-TASK-{id}`
+Worktree path: `<fork-root>/.worktrees/etcd-druid-ai-TASK-{id}`
 Branch: `ai/TASK-{id}/claude/{short-description}`
+
+After creating the worktree, run setup and verify a clean baseline:
+
+```bash
+cd <worktree-path>
+go mod download
+
+# Verify baseline is clean — new failures mean pre-existing problems, not yours
+make test-unit
+```
+
+If baseline tests fail: report to user and ask whether to proceed or investigate first.
+Do not start implementation on a broken baseline.
 
 Pass worktree path to all subagents.
 
@@ -227,6 +252,10 @@ make check-generate     # confirms make generate produces no uncommitted diff
 
 All must pass. Any failure → dispatch fix subagent with full failure output.
 Do not proceed to Gate 2 until clean.
+
+**Verification discipline:** Do not claim "all checks pass" based on a previous run or inference.
+Run each command fresh in this session, read the full output, then state the result with evidence.
+If you haven't run it in this message, you cannot claim it passes.
 
 **E2e verification — decide based on change type:**
 
@@ -316,5 +345,7 @@ Show the PR URL.
 |--------|--------|
 | DONE | Proceed to spec review |
 | DONE_WITH_CONCERNS | Read concerns. Correctness/scope issue → fix first. Observation only → note and proceed |
-| NEEDS_CONTEXT | Provide missing context and re-dispatch implementer |
-| BLOCKED | More context → re-dispatch with stronger model → break task smaller → escalate to human |
+| NEEDS_CONTEXT | Provide missing context and re-dispatch implementer. NEEDS_CONTEXT = information only the human has |
+| BLOCKED | More context → re-dispatch with stronger model → break task smaller → escalate to human. BLOCKED = task appears impossible as specified |
+
+**Never dispatch multiple implementer subagents in parallel.** Concurrent writes to the same worktree cause conflicts and corrupt the branch history. Always wait for one to complete (or report BLOCKED/NEEDS_CONTEXT) before dispatching the next.
