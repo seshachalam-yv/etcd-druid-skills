@@ -1,6 +1,7 @@
 ---
 name: tdd
 description: Use when writing or modifying tests in etcd-druid, etcd-backup-restore, or etcd-wrapper — includes framework selection, fake client patterns, and TDD cycle for all three repos
+user-invocable: true
 ---
 
 # TDD for etcd-druid Ecosystem

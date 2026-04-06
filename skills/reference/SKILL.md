@@ -1,6 +1,7 @@
 ---
 name: reference
 description: Use when you need quick lookup of file paths, make targets, error patterns, fake client constructors, branch naming, or operator interface signatures for the etcd-druid ecosystem
+user-invocable: true
 ---
 
 # etcd-druid Ecosystem — Quick Reference Card

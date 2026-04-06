@@ -1,6 +1,7 @@
 ---
 name: debug
 description: Use when hitting test failures, build errors, reconciliation loops, backup/restore failures, or unexpected behavior in etcd-druid, etcd-backup-restore, or etcd-wrapper
+user-invocable: true
 ---
 
 # Debugging in the etcd-druid Ecosystem

@@ -50,7 +50,9 @@ NEVER push or create a PR without explicit human approval.
 - etcd-wrapper tests: Go native testing.T + Gomega assertions
 - etcd-backup-restore tests: Ginkgo v2 suite + Gomega assertions
 - Always follow the testing pattern of the repo you are working in
-- Errors: fmt.Errorf("failed to X: %w", err) — never swallow silently
+- Errors in component code: use druiderr.WrapError — never fmt.Errorf, never swallow silently
+- Generated files (zz_generated.deepcopy.go, "Code generated" headers): NEVER edit manually; run make generate
+- API type changes: two commits — hand-written change first, make generate output second
 - Commits: imperative sentence case, issue number at end: "Fix X (#1350)"
 - Branch naming: ai/TASK-{issue-id}/{short-description} in fork
 - Before committing: make test-unit && make test-integration && make check
@@ -67,7 +69,19 @@ ORIENTATION
 )
 
 escaped=$(escape_for_json "$orientation")
-session_context="<IMPORTANT>\\nYou are an expert etcd-druid developer assistant. Below is your orientation for this session:\\n\\n${escaped}\\n</IMPORTANT>"
+
+# Dynamic git context: branch + recent commits from cwd (best-effort, silent on failure)
+git_context=""
+if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || true)
+    commits=$(git log --oneline -3 2>/dev/null || true)
+    if [ -n "$branch" ] || [ -n "$commits" ]; then
+        raw_git="\\n## Current Git State\\nbranch: ${branch}\\nrecent commits:\\n${commits}"
+        git_context=$(escape_for_json "$raw_git")
+    fi
+fi
+
+session_context="<IMPORTANT>\\nYou are an expert etcd-druid developer assistant. Below is your orientation for this session:\\n\\n${escaped}${git_context}\\n</IMPORTANT>"
 
 if [ -n "${CLAUDE_PLUGIN_ROOT:-}" ] && [ -z "${COPILOT_CLI:-}" ]; then
     printf '{\n  "hookSpecificOutput": {\n    "hookEventName": "SessionStart",\n    "additionalContext": "%s"\n  }\n}\n' "$session_context"

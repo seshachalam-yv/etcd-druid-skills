@@ -1,6 +1,7 @@
 ---
 name: review
 description: Use when self-reviewing before a PR, reviewing someone else's contribution, or after implementing a feature in etcd-druid, etcd-backup-restore, or etcd-wrapper — run through this checklist before every merge
+user-invocable: true
 ---
 
 # etcd-druid Code Review

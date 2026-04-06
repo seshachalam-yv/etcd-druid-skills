@@ -1,6 +1,7 @@
 ---
 name: feature-dev
 description: Use when starting any feature, bug fix, or enhancement in etcd-druid — runs the full design-to-PR workflow with two human approval gates
+user-invocable: true
 ---
 
 # etcd-druid Feature Development
