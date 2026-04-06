@@ -2,7 +2,7 @@
 
 A Claude Code plugin that encodes expert knowledge for [etcd-druid](https://github.com/gardener/etcd-druid) contributors. It injects domain awareness and workflow skills into every Claude session — so you spend less time on "how does this work" and more time on "what needs to be done."
 
-Built on the [Superpowers](https://github.com/anthropics/claude-code-superpowers) plugin system for Claude Code.
+Inspired by and built on the [Superpowers](https://github.com/anthropics/claude-code-superpowers) plugin system for Claude Code.
 
 ## What It Does
 
