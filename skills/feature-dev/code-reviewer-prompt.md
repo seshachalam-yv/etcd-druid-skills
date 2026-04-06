@@ -66,6 +66,13 @@ Agent tool (general-purpose):
     - [ ] Issue number at end: (#NNNN)
     - [ ] One commit per logical change
 
+    ### Known footguns (check if the touched code is anywhere near these)
+    - [ ] No reference to removed `UseEtcdWrapper` feature gate
+    - [ ] No reference to removed `--enable-etcd-member-gc` flag (etcd-backup-restore)
+    - [ ] If EtcdOpsTask controller touched: task state machine transitions are correct
+          (Pending→InProgress→Succeeded/Failed/Rejected, FIFO, one active per cluster)
+    - [ ] If `UpgradeEtcdVersion` feature gate used: properly gated behind featureGates.Enabled()
+
     ### Code quality
     - [ ] No overbuilding — only what the task asked for
     - [ ] Existing helpers used, not reimplemented

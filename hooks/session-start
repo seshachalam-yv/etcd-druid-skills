@@ -23,12 +23,20 @@ etcd-druid (operator)
   Kubernetes operator — owns the Etcd CRD, reconciles all cluster resources.
   Components implement the Operator interface: PreSync, Sync, TriggerDelete, GetExistingResourceNames.
   Controllers: etcd, compaction, etcdcopybackupstask, etcdopstask, secret.
+  EtcdOpsTask CRD (v0.34+): one-shot operational tasks (OnDemandSnapshot, QuorumRecovery,
+    Compaction, Defragmentation, BackupCopy); FIFO, one active task per cluster;
+    state machine: Pending→InProgress→Succeeded/Failed/Rejected.
+  Feature gate UpgradeEtcdVersion (alpha, v0.36+). UseEtcdWrapper was REMOVED.
+  druidctl CLI: reconcile suspend/resume, resource protection, list/filter.
   Logging: logr via log.FromContext(ctx).WithValues("etcd", req.NamespacedName).
 
 etcd-backup-restore (sidecar)
   Manages snapshots, restore, and etcd initialization.
   HTTP API: /initialization/start, /initialization/status, /snapshot/full,
             /snapshot/delta, /snapshot/latest, /config, /healthz, /metrics
+  v0.41+: --store-endpoint-override (overrides endpoint in credential secrets),
+          dual-site backup (secondary backup target via StoreSpec).
+  v0.42+: --enable-etcd-member-gc flag REMOVED (do not reference).
   Logging: logrus, field-based, level=info/error.
 
 etcd-wrapper (sidecar)

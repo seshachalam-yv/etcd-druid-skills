@@ -113,6 +113,61 @@ ai/TASK-{issue-id}/claude/{short-description}
 Example: ai/TASK-1350/claude/add-configmap-ttl
 ```
 
+## EtcdOpsTask (New Controller — etcd-druid v0.34+)
+
+`EtcdOpsTask` CRD (`etcdopstask.druid.gardener.cloud/v1alpha1`) — manages one-shot operational tasks against an etcd cluster.
+
+```
+Controller:    internal/controller/etcdopstask/
+CRD:           api/core/v1alpha1/etcdopstask_types.go
+```
+
+Supported task types:
+- `OnDemandSnapshot` — trigger an on-demand full/delta snapshot
+- `QuorumRecovery` — recover quorum after node loss
+- `Compaction` — trigger etcd compaction
+- `Defragmentation` — defrag etcd storage
+- `BackupCopy` — copy backup to a secondary target
+
+Execution model: FIFO, one active task per Etcd cluster.
+
+Status state machine:
+```
+Pending → InProgress → Succeeded
+                    ↘ Failed
+                    ↘ Rejected  (invalid task or cluster not ready)
+```
+
+## druidctl CLI
+
+CLI tool for operators to interact with etcd-druid without direct kubectl.
+Merged in PR #1212.
+
+Key commands:
+```bash
+druidctl reconcile suspend --namespace <ns> --name <etcd>
+druidctl reconcile resume  --namespace <ns> --name <etcd>
+druidctl protect           --namespace <ns> --name <etcd>   # set deletion protection
+druidctl list              --namespace <ns>                  # list Etcd resources
+```
+
+## Feature Gates (etcd-druid)
+
+| Gate | Status | Notes |
+|------|--------|-------|
+| `UpgradeEtcdVersion` | alpha | Allows in-place etcd version upgrades |
+| `UseEtcdWrapper` | **removed** | Do not reference in new code |
+
+## etcd-backup-restore API (v0.41+)
+
+| Flag | Status | Notes |
+|------|--------|-------|
+| `--store-endpoint-override` | new | Overrides endpoint in credential secrets |
+| `--enable-etcd-member-gc` | **removed** | Do not reference in v0.42+ code |
+
+Dual-site backup: configure a secondary backup target via `StoreSpec.SecondaryStoreSpec`
+(available in etcd-druid v0.34+ as `StoreSpec.EndpointOverride`).
+
 ## Skills Available (on-demand)
 
 - `feature-dev` — full feature development workflow with approval gates

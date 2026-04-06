@@ -2,6 +2,7 @@
 name: tdd
 description: Use when the goal is to write tests that don't exist yet or learn the correct testing pattern — starting a TDD cycle, choosing between Ginkgo and native testing.T, setting up a Ginkgo suite, writing async assertions without time.Sleep, adding unit tests for a new method, or designing table-driven tests for better coverage. Applies across etcd-druid, etcd-backup-restore, and etcd-wrapper. Do not apply when debugging a panic in an already-written test, fixing flaky tests, or diagnosing CI failures.
 user-invocable: true
+paths: "**/*.go"
 ---
 
 # TDD for etcd-druid Ecosystem

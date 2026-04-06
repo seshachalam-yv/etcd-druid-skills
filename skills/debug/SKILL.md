@@ -2,6 +2,7 @@
 name: debug
 description: Use whenever something is failing, broken, stuck, or not behaving as expected in etcd-druid, etcd-backup-restore, or etcd-wrapper — make or go test command failures with error output, controller reconciliation loops, Kubernetes resources not appearing, backup or restore failures, or any situation where actual behavior diverges from expected. Do not use for questions about how things work, how to implement a feature, or environment setup.
 user-invocable: true
+paths: "**/*.go"
 ---
 
 # Debugging in the etcd-druid Ecosystem

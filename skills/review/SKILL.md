@@ -2,6 +2,7 @@
 name: review
 description: Use whenever someone wants code reviewed or validated before opening a PR in etcd-druid, etcd-backup-restore, or etcd-wrapper — pre-merge checklists, self-reviews before submitting, "final check" on a completed implementation, pattern validation ("is testing.T okay here?", "is this commit format right?"), or any "review my changes before I open a PR" request. Do not use for implementation help, debugging test failures, or explanatory questions.
 user-invocable: true
+paths: "**/*.go"
 ---
 
 # etcd-druid Code Review
@@ -78,6 +79,13 @@ Core rules that apply regardless of repo:
 
 New feature → update `docs/`. New component → mention in operator registry comment.
 Any pattern found in code but absent from `docs/development/` → add it.
+
+## Step 10: Known Footguns
+
+- `UseEtcdWrapper` feature gate was **removed** — any reference to it is a bug.
+- `--enable-etcd-member-gc` flag in etcd-backup-restore was **removed** in v0.42 — do not reference.
+- EtcdOpsTask controller lives in `internal/controller/etcdopstask/` — review task state machine transitions if touched.
+- `UpgradeEtcdVersion` feature gate is alpha — if touched, gating code must check `featureGates.Enabled(features.UpgradeEtcdVersion)`.
 
 ---
 
