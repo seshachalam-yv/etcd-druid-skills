@@ -2,6 +2,8 @@
 
 A Claude Code plugin that encodes expert knowledge for [etcd-druid](https://github.com/gardener/etcd-druid) contributors. It injects domain awareness and workflow skills into every Claude session — so you spend less time on "how does this work" and more time on "what needs to be done."
 
+Built on the [Superpowers](https://github.com/anthropics/claude-code-superpowers) plugin system for Claude Code.
+
 ## What It Does
 
 - **Session orientation** — On every session start, Claude receives a concise briefing on the three-component system, key invariants, available skills, and the current git state. If you open Claude inside one of the three repos, the hook detects which repo you're in and tells Claude exactly which `docs/development/` files to read.
