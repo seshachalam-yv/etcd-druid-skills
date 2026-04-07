@@ -137,6 +137,8 @@ If new docs files are added or structure changes: `mkdocs.yml` and `docs/README.
 - <file>:<line>  What's wrong: ...  Should be: ...
 ```
 
+If you are the author receiving this verdict, follow `skills/receiving-review/SKILL.md` to handle the feedback.
+
 **Documentation gaps** — conventions in code not yet in docs/development/, OR mistakes found in this plugin's skills:
 ```
 - <description of gap or mistake>
