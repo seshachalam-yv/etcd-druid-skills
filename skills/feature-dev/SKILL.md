@@ -277,9 +277,7 @@ make check-generate     # confirms make generate produces no uncommitted diff
 All must pass. Any failure → dispatch fix subagent with full failure output.
 Do not proceed to Gate 2 until clean.
 
-**Verification discipline:** Do not claim "all checks pass" based on a previous run or inference.
-Run each command fresh in this session, read the full output, then state the result with evidence.
-If you haven't run it in this message, you cannot claim it passes.
+**Verification discipline:** Apply the verification gate (`skills/verification/SKILL.md`). Do not claim "all checks pass" based on a previous run or inference.
 
 **E2e verification — decide based on change type:**
 
@@ -360,6 +358,7 @@ gh pr create \
 ```
 
 Show the PR URL.
+For handling incoming review feedback after the PR is open, follow `skills/receiving-review/SKILL.md`.
 
 ---
 
@@ -373,6 +372,22 @@ Show the PR URL.
 | BLOCKED | More context → re-dispatch with stronger model → break task smaller → escalate to human. BLOCKED = task appears impossible as specified |
 
 **Never dispatch multiple implementer subagents in parallel.** Concurrent writes to the same worktree cause conflicts and corrupt the branch history. Always wait for one to complete (or report BLOCKED/NEEDS_CONTEXT) before dispatching the next.
+
+### When parallel agents ARE appropriate
+
+The ban on parallel implementers applies only to tasks writing to the same worktree.
+Parallel agents are appropriate when tasks have no shared write state:
+
+| Scenario | Safe to parallelize? |
+|----------|---------------------|
+| Two implementers on the same worktree | NO — git conflicts |
+| Implementer + spec-reviewer | YES — reviewer is read-only |
+| Implementer + code-reviewer | YES — reviewer is read-only |
+| Fix lint in unrelated packages across separate worktrees | YES — separate branches |
+| Run tests in etcd-druid + etcd-backup-restore simultaneously | YES — separate repos |
+| Two read-only exploration agents | YES — no writes |
+
+**Rule:** if both agents could write to the same file path at the same time, serialize. Otherwise, parallelize freely.
 
 ---
 
