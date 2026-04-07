@@ -18,6 +18,50 @@ The plugin is a **workflow orchestrator, not a code library**. Code patterns and
 
 ---
 
+## Usage
+
+### Invoke a skill directly
+
+Type a slash command in Claude Code to activate the relevant workflow:
+
+```
+/etcd-druid:feature-dev   I want to implement issue #1420 — add snapshotCount field to EtcdSpec
+/etcd-druid:tdd           Write tests for the memberlease component's rotation logic
+/etcd-druid:debug         make test-unit is failing with "nil pointer in configmap.Sync"
+/etcd-druid:review        Review my changes before I open a PR
+/etcd-druid:api-change    I need to add a new field to EtcdSpec with CEL validation
+/etcd-druid:e2e           Run e2e tests against my custom etcd-backup-restore image
+/etcd-druid:reference     What make targets do I need to run before opening a PR?
+```
+
+### Let skills activate automatically
+
+`api-change`, `tdd`, `debug`, and `review` also activate automatically when Claude edits `.go` files — no invocation needed for those workflows.
+
+### Example session
+
+```
+You:   /etcd-druid:feature-dev
+
+Claude: [reads the issue, explores upstream, identifies it as an API change + component change]
+        [writes docs/plans/2026-04-07-issue-1420-snapshot-count.md]
+        "Code plan written. Reply 'approved' to proceed."
+
+You:   approved
+
+Claude: [creates worktree, dispatches implementer subagent for each task]
+        [spec-reviewer and code-reviewer run after each task]
+        [runs make ci-checks && make test-unit]
+        "All checks pass. Ready to create PR. Choose: A) Create PR  B) Push branch only  C) Make changes  D) Discard"
+
+You:   A
+
+Claude: [opens PR against upstream/master]
+        PR: https://github.com/gardener/etcd-druid/pull/XXXX
+```
+
+---
+
 ## The four-component system
 
 ```
@@ -33,6 +77,8 @@ All four run in the Gardener seed cluster. Changes must not break gardenlet's re
 
 ## Skills
 
+### User-invocable
+
 | Skill | Invoke | Auto-activates on | Use when |
 |-------|--------|--------------------|----------|
 | `feature-dev` | `/etcd-druid:feature-dev` | — | Picking up an issue, planning a feature or bug fix, design-to-PR |
@@ -44,6 +90,59 @@ All four run in the Gardener seed cluster. Changes must not break gardenlet's re
 | `reference` | `/etcd-druid:reference` | — | Quick lookup: make targets, file paths, druidctl, git workflow |
 
 `api-change`, `tdd`, `debug`, and `review` activate automatically when Claude edits `.go` files — no invocation needed.
+
+### Cross-cutting guides (referenced by skills, not user-invocable)
+
+| Guide | Referenced from | Purpose |
+|-------|----------------|---------|
+| `verification` | `tdd`, `debug`, `feature-dev` | 5-step gate: run the command, read the output, then claim it passes — never before |
+| `receiving-review` | `feature-dev`, `review` | Anti-sycophancy process for handling upstream maintainer feedback on a PR |
+| `tdd/testing-anti-patterns.md` | `tdd` | 5 etcd-druid-specific test anti-patterns with correct alternatives |
+
+These guides exist to enforce discipline that applies across multiple workflows. They are not directly invocable — the relevant skill points you to them at the right moment.
+
+---
+
+## Philosophy
+
+### Discipline through Iron Laws, not reminders
+
+Each skill opens with an Iron Law — an unconditional rule stated once, with a rationalization table. The rationalization table names the specific thoughts Claude uses to talk itself out of following the rule ("this task is too small for a plan") and explains why each one fails. This is more effective than repeating the rule as a reminder, because reminders get rationalized away.
+
+Every skill has its own Iron Law:
+
+| Skill | Iron Law |
+|-------|----------|
+| `feature-dev` | NO CODE BEFORE GATE 1. NO PUSH BEFORE GATE 2. |
+| `tdd` | NO IMPLEMENTATION CODE BEFORE A FAILING TEST. |
+| `debug` | NO FIX ATTEMPT WITHOUT A REPRODUCIBLE FAILURE FIRST. |
+| `review` | NO VERDICT WITHOUT READING THE DIFF AND docs/development/ FIRST. |
+| `verification` | NO COMPLETION CLAIMS WITHOUT FRESH VERIFICATION EVIDENCE. |
+| `receiving-review` | NO FEEDBACK IMPLEMENTATION WITHOUT INDEPENDENT VERIFICATION FIRST. |
+
+### Anti-sycophancy: verification before assertion
+
+The verification gate (`skills/verification/SKILL.md`) enforces a 5-step rule that applies across all workflows:
+
+1. Identify the verification command
+2. Run it in **this message** — not a previous one
+3. Read the full output — not just the exit code
+4. Verify the claim against the output
+5. Then make the claim — with evidence
+
+This prevents Claude from asserting "tests pass" based on memory, inference, or a run from a previous message. Evidence precedes assertion — always.
+
+The same principle applies to review feedback. The `receiving-review` guide prevents sycophantic implementation — Claude must verify each maintainer suggestion against the actual code before implementing it, and must ask for clarification rather than guessing when a comment is unclear.
+
+### Session orientation via hooks
+
+On every session start (and after context compaction), a `SessionStart` hook injects:
+- The three-component system overview
+- Which repo you are currently in
+- The current branch and recent commits
+- The list of available skills
+
+Claude never loses its domain grounding mid-session, even after compaction truncates earlier context.
 
 ---
 
