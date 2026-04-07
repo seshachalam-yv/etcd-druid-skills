@@ -115,6 +115,8 @@ make test               # etcd-backup-restore
 go test ./...           # etcd-wrapper
 ```
 
+Apply the verification gate (`skills/verification/SKILL.md`) before claiming the fix is confirmed.
+
 If the fix reveals an undocumented pattern or gotcha, add it to `docs/development/`.
 
 ## Phase 6: If 3+ Fixes Have Failed
