@@ -31,12 +31,15 @@ BEFORE claiming work is complete, a test passes, or a check is clean:
 2. RUN it in this message — not a previous one
 
 3. READ the full output — not just the exit code
-   - Look for `FAIL`, `--- FAIL`, `Error`, `WARN` in the output
+   - Look for `FAIL`, `--- FAIL`, `Error` in the output
    - Count passing vs failing tests
    - Read any stack traces
 
 4. VERIFY the claim against the output
-   - "All tests pass" requires zero failures in the output
-   - "ci-checks passes" requires no diff and no lint errors
+   - "Tests pass" requires zero test failures in the output (`FAIL` / `--- FAIL` absent)
+   - "ci-checks passes" requires no diff and no lint errors reported
+   - "Integration tests pass" requires zero failures in the envtest output
+   - "verify passes" (etcd-backup-restore) requires both check and test-unit to show no failures
+   - Any positive claim requires the specific evidence from the output that supports it
 
 5. THEN make the claim — with the command and result as evidence
