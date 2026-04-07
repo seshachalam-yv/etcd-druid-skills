@@ -10,9 +10,9 @@
 
 ## What it does
 
-Without this plugin, Claude knows Go and Kubernetes but nothing specific about the etcd stack. You re-explain the operator interface, test framework rules, API generation process, and review requirements every session.
+Without this plugin, Claude knows Go and Kubernetes but nothing specific about etcd-druid, etcd-backup-restore, or etcd-wrapper. You re-explain the operator interface, test framework rules, API generation process, and review requirements every session.
 
-With this plugin, Claude starts already oriented — it knows which repo you're in, reads `docs/development/` before writing code, enforces the two-gate workflow, and runs spec and code review after every task.
+With this plugin, Claude starts already oriented — it knows which of etcd-druid, etcd-backup-restore, or etcd-wrapper you're working in, reads `docs/development/` before writing code, enforces the two-gate workflow, and runs spec and code review after every task.
 
 The plugin is a **workflow orchestrator, not a code library**. Code patterns and conventions live in each repo's `docs/development/`. The plugin tells Claude where to look and enforces the process.
 
@@ -97,7 +97,7 @@ Type a slash command in Claude Code to activate the relevant workflow:
 ```
 You:   /etcd-druid:feature-dev
 
-Claude: [reads the issue, explores upstream, identifies it as an API change + component change]
+Claude: [reads the issue, explores etcd-druid upstream, identifies it as an API change in api/core/v1alpha1/ + configmap component change]
         [writes docs/plans/2026-04-07-issue-1420-snapshot-count.md]
         "Code plan written. Reply 'approved' to proceed."
 
@@ -193,8 +193,8 @@ The same principle applies to review feedback. The `receiving-review` guide prev
 ### Session orientation via hooks
 
 On every session start (and after context compaction), a `SessionStart` hook injects:
-- The three-component system overview
-- Which repo you are currently in
+- The etcd-druid / etcd-backup-restore / etcd-wrapper component overview
+- Which of etcd-druid, etcd-backup-restore, or etcd-wrapper you are currently in
 - The current branch and recent commits
 - The list of available skills
 
@@ -206,16 +206,16 @@ Claude never loses its domain grounding mid-session, even after compaction trunc
 
 | Rule | Detail |
 |------|--------|
-| Operator interface | Every component implements `PreSync`, `Sync`, `TriggerDelete`, `GetExistingResourceNames` |
+| Operator interface | Every etcd-druid component implements `PreSync`, `Sync`, `TriggerDelete`, `GetExistingResourceNames` |
 | Generated files | Never edit manually: `zz_generated.deepcopy.go`, `crds/*.yaml`, `charts/crds/*.yaml`, `client/` |
 | etcd-druid tests | Go native `testing.T` + Gomega — no Ginkgo, no gomock |
 | etcd-backup-restore tests | Ginkgo v2 + Gomega |
-| etcd-steward tests | Go native `testing.T` — no Ginkgo |
 | etcd-wrapper tests | Go native `testing.T` + Gomega |
+| etcd-steward tests | Go native `testing.T` — no Ginkgo (future; not yet implemented) |
 | Async assertions | `Eventually` / `Consistently` — never `time.Sleep()` |
 | Upstream repos | Never commit or push to `github.com/gardener/*` directly |
 | `UseEtcdWrapper` feature gate | **Removed** — delete any reference |
-| `--enable-etcd-member-gc` flag | **Removed** in v0.42 — delete any reference |
+| `--enable-etcd-member-gc` flag (etcd-backup-restore) | **Removed** in v0.42 — delete any reference |
 | `UseEtcdSteward` feature gate | Alpha, disabled by default — do not enable in production |
 
 ---
