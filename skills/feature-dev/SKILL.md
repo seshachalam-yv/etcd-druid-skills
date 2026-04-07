@@ -9,6 +9,17 @@ effort: high
 
 Full workflow from issue to merged PR. Two hard gates: plan approval before code, PR approval before push.
 
+## Work type — classify first
+
+Before any other step, classify what you're building:
+
+| Type | Examples | How the workflow adapts |
+|------|----------|------------------------|
+| **Incremental** | Add API field, fix controller bug, new component method | Full workflow as written. "Look at merged PRs" applies. Spec-reviewer covers the whole task. |
+| **New sidecar / new binary** | etcd-steward, etcd-wrapper rewrite | Phases are larger. Break tasks at package boundary (one task = one `pkg/<name>`). "Look at merged PRs" step is skipped — no prior art exists. Spec-reviewer scope is per-package, not per-PR. Two-commit API rule only applies to tasks that touch `api/core/v1alpha1/`. |
+
+When in doubt: if the task touches >5 packages or creates a new binary, it's a new sidecar.
+
 ## ⛔ Iron Law
 
 **NO CODE BEFORE GATE 1. NO PUSH BEFORE GATE 2.**
@@ -71,7 +82,8 @@ digraph feature_dev {
    - Which controller, component, or API is affected?
    - Change type: API (`api/core/v1alpha1/`) | component (`internal/component/`) | controller (`internal/controller/`) | test only
    - Test scope required: unit (`make test-unit`) | integration (`make test-integration`) | both
-   - **Look at previously merged PRs** for similar change types (`gh pr list --state merged --repo gardener/etcd-druid`). Find 1–2 comparable PRs and read their diffs to understand how the team structures commits, names things, and what reviewers flag. This shapes your plan before the human sees it.
+   - **Look at previously merged PRs** *(incremental work only — skip for new sidecars)*
+     (`gh pr list --state merged --repo gardener/etcd-druid`). Find 1–2 comparable PRs and read their diffs to understand how the team structures commits, names things, and what reviewers flag. This shapes your plan before the human sees it.
 3. Ask clarifying questions one at a time — domain-focused
 4. Propose 2–3 approaches with trade-offs
 5. Confirm approach before writing plan
@@ -121,12 +133,24 @@ Chosen approach and why. Alternatives considered.
 
 ## Tasks
 - [ ] Task 1: <name>
-      Acceptance criteria: <what done looks like>
+      Acceptance criteria: <see format below>
       Files: <list>
       Tests: unit | integration | both
       API generation: yes | no
 
 - [ ] Task 2: ...
+
+### Acceptance criteria format
+
+Each criterion must be falsifiable by reading code or running a test — not by trusting the implementer's description.
+
+| ❌ Vague — spec-reviewer cannot check | ✅ Falsifiable — spec-reviewer reads code or runs test |
+|---------------------------------------|-------------------------------------------------------|
+| "state transitions are persisted" | `after Init() returns, member.Transitions[0].State == StateNew` (verified by `TestInitializer_NewSingleNode`) |
+| "covers all 4 initialization paths" | `TestInitializer_PathA`, `_PathB`, `_PathC`, `_PathD` all exist and pass |
+| "LastRestoration is updated" | `EtcdMember.Status.LastRestoration.Status == RestorationSucceeded` after `TestRestoreFromSnapshot` |
+
+For state machine work: write the exact transition sequence for each path as a table, then name the test that verifies it. The test name IS the acceptance criterion.
 
 ## PR Checklist (pre-submission)
 - [ ] make ci-checks passes

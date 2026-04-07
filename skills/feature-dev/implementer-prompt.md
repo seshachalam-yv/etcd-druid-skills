@@ -22,6 +22,21 @@ Agent tool (general-purpose):
     - Files affected: [list from plan]
     - API generation needed: [yes | no]
 
+    ## Multi-Repo Declaration (required when task touches >1 repo)
+
+    Before writing any file, state explicitly for each repo you will touch:
+
+    | Repo path | Role | Write allowed? | Branch |
+    |-----------|------|---------------|--------|
+    | `/path/to/fork` | fork | yes | `ai/TASK-{id}/...` |
+    | `/path/to/upstream` | reference only | **NO** | — |
+    | `/path/to/new-sidecar` | new binary | yes | `ai/...` |
+
+    Rules:
+    - NEVER write to `github.com/gardener/*` upstream repos — they are read-only references
+    - ALWAYS run `git branch` before `git add` to confirm you are on the correct branch
+    - If `make generate` is needed: run it in the repo that owns the API (`cd <fork>/api && make generate`), never in upstream
+
     ## Before You Begin
 
     Read all files under `[worktree-path]/docs/development/` — these are the
