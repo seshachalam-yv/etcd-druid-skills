@@ -18,6 +18,60 @@ The plugin is a **workflow orchestrator, not a code library**. Code patterns and
 
 ---
 
+## Feature Development Workflow
+
+```
+Issue / bug report
+      │
+      ▼
+ [feature-dev]
+      │
+      ├─ 1. Orient ──── read upstream, identify change type, check docs/development/
+      │
+      ├─ 2. Design ──── explore 2-3 approaches, identify risks and cross-repo impact
+      │
+      ├─ 3. Plan ─────── write docs/plans/<date>-<title>.md with tasks + acceptance criteria
+      │                                         │
+      │                               ┌─────────▼─────────┐
+      │                               │   GATE 1: Approve  │ ← human reviews plan
+      │                               └─────────┬─────────┘
+      │                                         │
+      ├─ 4. Implement ── per-task loop:
+      │        implementer subagent
+      │              ↓
+      │        spec-reviewer  ── did it match acceptance criteria?
+      │              ↓
+      │        code-reviewer  ── follows conventions, no regressions?
+      │              ↓ (fix and re-review until both ✅)
+      │
+      ├─ 5. Verify ───── make ci-checks && make test-unit && make test-integration
+      │                  e2e if required (see decision table in skill)
+      │                                         │
+      │                               ┌─────────▼─────────┐
+      │                               │   GATE 2: Approve  │ ← human reviews PR body
+      │                               └─────────┬─────────┘
+      │                                         │
+      └─ 6. PR ─────────── gh pr create
+```
+
+### Two-commit rule for API changes
+
+API changes always produce exactly two commits — never combined:
+
+```bash
+git commit -m "Add EtcdMember types and status fields (#1420)"   # hand-written change
+git commit -m "Run cd api && make generate (#1420)"              # generated output only
+```
+
+### Commit message format
+
+```bash
+Add snapshot lease rotation to memberlease component (#1350)   # ✅ imperative, issue ref, no period
+Fixed the bug.                                                  # ❌ past tense, trailing period, vague
+```
+
+---
+
 ## Usage
 
 ### Invoke a skill directly
@@ -62,16 +116,18 @@ Claude: [opens PR against upstream/master]
 
 ---
 
-## The four-component system
+## The component system
 
 ```
 etcd-druid            Kubernetes operator — owns Etcd CRD, reconciles all cluster resources
-etcd-steward          Sidecar — manages etcd member lifecycle, snapshots, and restore (replaces etcd-backup-restore)
-etcd-backup-restore   Legacy sidecar — snapshots, restore, and etcd initialization (being replaced by etcd-steward)
-etcd-wrapper          Sidecar — starts embedded etcd via steward/backup-restore HTTP API
+etcd-backup-restore   Sidecar — snapshots, restore, and etcd initialization (current)
+etcd-wrapper          Sidecar — starts embedded etcd via the backup-restore HTTP API
+etcd-steward          Future sidecar — not yet implemented; will replace etcd-backup-restore
 ```
 
-All four run in the Gardener seed cluster. Changes must not break gardenlet's reconciliation assumptions.
+etcd-druid, etcd-backup-restore, and etcd-wrapper are active. etcd-steward is planned and in early design — no upstream code exists yet. When contributing to etcd-steward, the `feature-dev` skill applies with the "new sidecar" classification (skip merged-PR lookup, break tasks at package boundary).
+
+All active components run in the Gardener seed cluster. Changes must not break gardenlet's reconciliation assumptions.
 
 ---
 
@@ -143,60 +199,6 @@ On every session start (and after context compaction), a `SessionStart` hook inj
 - The list of available skills
 
 Claude never loses its domain grounding mid-session, even after compaction truncates earlier context.
-
----
-
-## Feature Development Workflow
-
-```
-Issue / bug report
-      │
-      ▼
- [feature-dev]
-      │
-      ├─ 1. Orient ──── read upstream, identify change type, check docs/development/
-      │
-      ├─ 2. Design ──── explore 2-3 approaches, identify risks and cross-repo impact
-      │
-      ├─ 3. Plan ─────── write docs/plans/<date>-<title>.md with tasks + acceptance criteria
-      │                                         │
-      │                               ┌─────────▼─────────┐
-      │                               │   GATE 1: Approve  │ ← human reviews plan
-      │                               └─────────┬─────────┘
-      │                                         │
-      ├─ 4. Implement ── per-task loop:
-      │        implementer subagent
-      │              ↓
-      │        spec-reviewer  ── did it match acceptance criteria?
-      │              ↓
-      │        code-reviewer  ── follows conventions, no regressions?
-      │              ↓ (fix and re-review until both ✅)
-      │
-      ├─ 5. Verify ───── make ci-checks && make test-unit && make test-integration
-      │                  e2e if required (see decision table in skill)
-      │                                         │
-      │                               ┌─────────▼─────────┐
-      │                               │   GATE 2: Approve  │ ← human reviews PR body
-      │                               └─────────┬─────────┘
-      │                                         │
-      └─ 6. PR ─────────── gh pr create
-```
-
-### Two-commit rule for API changes
-
-API changes always produce exactly two commits — never combined:
-
-```
-commit 1: Add EtcdMember types and registration          ← hand-written
-commit 2: Run cd api && make generate                    ← generated output only
-```
-
-### Commit message format
-
-```bash
-Add snapshot lease rotation to memberlease component (#1350)   # ✅ imperative, issue ref, no period
-Fixed the bug.                                                  # ❌ past tense, trailing period, vague
-```
 
 ---
 
