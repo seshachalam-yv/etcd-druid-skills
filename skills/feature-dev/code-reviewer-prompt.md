@@ -67,8 +67,9 @@ Agent tool (general-purpose):
     - [ ] One commit per logical change
 
     ### Known footguns (check if the touched code is anywhere near these)
-    - [ ] No reference to removed `UseEtcdWrapper` feature gate
-    - [ ] No reference to removed `--enable-etcd-member-gc` flag (etcd-backup-restore)
+    - [ ] No new conditional check on `UseEtcdWrapper` feature gate — it is GA (locked true), so `Enabled(UseEtcdWrapper)` is always true. Any NEW check is dead code; flag if introduced.
+    - [ ] No reference to removed `--enable-etcd-member-gc` or `--k8s-member-gc-duration` flags (etcd-backup-restore v0.42+)
+    - [ ] No use of deprecated `PreferClose` in `ClientService.TrafficDistribution` — use `PreferSameZone` or `PreferSameNode`
     - [ ] If EtcdOpsTask controller touched: task state machine transitions are correct
           (Pending→InProgress→Succeeded/Failed/Rejected, FIFO, one active per cluster)
     - [ ] If `UpgradeEtcdVersion` feature gate used: properly gated behind featureGates.Enabled()

@@ -43,6 +43,10 @@ Agent tool (general-purpose):
     authoritative source for conventions, patterns, and make targets in this repo.
     Do this before writing a single line of code.
 
+    Follow `skills/tdd/SKILL.md` when writing tests: write the failing test first,
+    confirm it fails, then implement the minimal code to make it pass.
+    Read `skills/tdd/testing-anti-patterns.md` before writing any test in this repo.
+
     If the relevant repo is etcd-backup-restore or etcd-wrapper, read their
     `docs/development/` directories instead.
 
@@ -83,7 +87,7 @@ Agent tool (general-purpose):
     - [ ] Conventions followed as documented in docs/development/
     - [ ] Commit message: imperative, sentence case, issue number, no trailing period
     - [ ] YAGNI — nothing built beyond what was asked
-    - [ ] Tests pass
+    - [ ] Tests pass (apply `skills/verification/SKILL.md` — run the command, read output, then claim)
     - [ ] `make ci-checks` passes
     - [ ] Only committed to the worktree branch, not to upstream
     - [ ] If API types changed: `cd api && make generate` was run and committed separately

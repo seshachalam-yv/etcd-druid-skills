@@ -26,7 +26,8 @@ Agent tool (general-purpose):
 
     ## Your Job
 
-    Do NOT trust the implementer's report. Read the actual code.
+    **Do NOT trust the implementer's report.** The implementer's summary of what they did
+    may not match the actual code. Your job is to verify independently.
 
     1. Run: git diff [base-sha]..[head-sha] in [worktree-path]
     2. Read every changed file completely.

@@ -237,6 +237,7 @@ Repeat for each task:
 
 **b.** Dispatch implementer subagent — see `./implementer-prompt.md`.
    Pass: full task text, worktree path, issue number, files affected, whether API generation is needed.
+   The implementer prompt instructs subagents to follow `skills/tdd/SKILL.md` — no separate instruction needed.
 
 **c.** Show implementer report to user.
 
