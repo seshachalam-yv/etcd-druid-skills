@@ -17,32 +17,76 @@ escape_for_json() {
 orientation=$(cat <<'ORIENTATION'
 You are working on the etcd-druid ecosystem — a set of components that manage etcd clusters for Gardener.
 
-## Three-Component System
+## Component System
 
-etcd-druid (operator)
+etcd-druid (operator)  [v0.36.1 / v0.37.0-dev]
   Kubernetes operator — owns the Etcd CRD, reconciles all cluster resources.
   Components implement the Operator interface: PreSync, Sync, TriggerDelete, GetExistingResourceNames.
+  10 components: clientservice, configmap, memberlease, peerservice, poddistruptionbudget,
+    role, rolebinding, serviceaccount, snapshotlease, statefulset.
   Controllers: etcd, compaction, etcdcopybackupstask, etcdopstask, secret.
-  EtcdOpsTask CRD (v0.34+): one-shot operational tasks (OnDemandSnapshot, QuorumRecovery,
+  3 CRDs: Etcd, EtcdCopyBackupsTask, EtcdOpsTask (druid.gardener.cloud/v1alpha1).
+  EtcdOpsTask (v0.34+): one-shot operational tasks (OnDemandSnapshot, QuorumRecovery,
     Compaction, Defragmentation, BackupCopy); FIFO, one active task per cluster;
+    also auto-triggered during hibernation (replicas=0) and UpgradeEtcdVersion flow;
     state machine: Pending→InProgress→Succeeded/Failed/Rejected.
-  Feature gate UpgradeEtcdVersion (alpha, v0.36+). UseEtcdWrapper was REMOVED.
-  druidctl CLI: reconcile suspend/resume, resource protection, list/filter.
+  Feature gates (api/config/v1alpha1/features.go):
+    UpgradeEtcdVersion — alpha, v0.36+ (coordinates etcd 3.5.27 upgrade across all repos).
+    UseEtcdWrapper — GA, locked true (cannot be disabled).
+  OperatorConfiguration: new config mechanism replacing CLI flags (v0.31+).
+  druidctl CLI (druidctl/ — own go.mod): reconcile suspend/resume, resource protection, list/filter.
+  Generated client library: client/ (clientset, informers, listers — separate go.mod).
+  Build: make build (replaced make druid in v0.33). make ci-checks for pre-PR validation.
+  CI: GitHub Actions (.github/workflows/base.yaml). golangci-lint v2.
   Logging: logr via log.FromContext(ctx).WithValues("etcd", req.NamespacedName).
+  Go 1.24+ / etcd 3.5.27 / K8s v0.34.3.
 
-etcd-backup-restore (sidecar)
+etcd-backup-restore (sidecar)  [v0.42.0 / v0.43.0-dev]
   Manages snapshots, restore, and etcd initialization.
   HTTP API: /initialization/start, /initialization/status, /snapshot/full,
-            /snapshot/delta, /snapshot/latest, /config, /healthz, /metrics
-  v0.41+: --store-endpoint-override (overrides endpoint in credential secrets),
-          dual-site backup (secondary backup target via StoreSpec).
-  v0.42+: --enable-etcd-member-gc flag REMOVED (do not reference).
+            /snapshot/delta, /snapshot/latest, /config, /healthz, /metrics.
+            When --enable-profiling is true: /debug/pprof/* (10 endpoints).
+  Subcommands: server, snapshot, restore, compact, initialize, copy.
+  Key packages: snapshotter, restorer, compactor, defragmentor, initializer,
+    member, leaderelection, health/heartbeat, snapstore, server.
+  Snapshot providers: S3, ABS (Azure), GCS, Swift, OSS (Alibaba), ECS, OCS, Local.
+  v0.40+: snapshot compression enabled by default (--compress-snapshots=true, gzip).
+  v0.41+: --store-endpoint-override (replaces deprecated secret-based endpoint),
+          dual-site backup sync (--secondary-* flags, Copier component).
+  v0.42+: --enable-etcd-member-gc AND --k8s-member-gc-duration both REMOVED.
+          --next-cluster-version-compatible flag added for etcd version upgrade.
+  Immutable snapshots: S3 (Object Lock), ABS, GCS, OSS (WORM Lock).
+  Build: make build, make verify (check + test-unit). Uses go mod vendor.
+  CI: GitHub Actions (.github/workflows/build.yaml). golangci-lint v2.
   Logging: logrus, field-based, level=info/error.
+  Go 1.25+ / etcd 3.5.27.
 
-etcd-wrapper (sidecar)
+etcd-steward (planned sidecar — replaces etcd-backup-restore)
+  Planned refactoring of etcd-backup-restore with cleaner architecture.
+  Not yet in upstream — references here are forward-looking.
+  Expected: Go native testing.T (no Ginkgo).
+
+etcd-wrapper (sidecar)  [v0.7.0 / v0.8.0-dev]
   Calls backup-restore HTTP API to initialize etcd, then starts embedded etcd
   via go.etcd.io/etcd/server/v3/embed.
+  Exposes /readyz (GET, port 9095) and /stop (POST) endpoints.
+  CLI flags (stdlib flag, NOT cobra): --etcd-wrapper-port (9095),
+    --etcd-client-port (2379), --backup-restore-host-port (:8080),
+    --backup-restore-tls-enabled, --etcd-ready-timeout.
+  Key packages: internal/app, internal/bootstrap, internal/brclient,
+    internal/types, internal/util, internal/signal.
+  Build: make build (CGO_ENABLED=0). Uses go mod vendor.
+  CI: GitHub Actions (.github/workflows/build.yaml). golangci-lint v2.
   Logging: zap, structured JSON.
+  Go 1.25+ / etcd 3.5.27.
+
+## Etcd Version Upgrade Flow (UpgradeEtcdVersion — alpha, v0.36+)
+Coordinated across all three repos:
+1. etcd-druid enables feature gate, creates EtcdOpsTask (OnDemandSnapshot) before upgrade.
+2. --next-cluster-version-compatible flag added to configmap for downgrade safety.
+3. etcd-backup-restore passes flag to embedded etcd during compaction.
+4. etcd-wrapper starts embedded etcd 3.5.27 with upgraded config.
+If touching upgrade-related code, check all three repos for paired changes.
 
 ## Working Directories
 Fork (implementation):  your local fork of github.com/<your-github-user>/etcd-druid
@@ -53,6 +97,7 @@ NEVER push or create a PR without explicit human approval.
 
 ## Key Invariants
 - NEVER manually edit generated files (zz_generated.deepcopy.go, api/core/v1alpha1/crds/, charts/crds/, client/)
+  A PreToolUse hook will BLOCK edits to these files automatically.
 - After API changes: two commits — hand-written change first, then `cd api && make generate` output
 - Pre-PR: make ci-checks && make test-unit && make test-integration
 - Commits: imperative sentence case, issue number at end: "Fix X (#1350)", no trailing period

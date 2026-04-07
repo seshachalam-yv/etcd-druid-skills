@@ -107,10 +107,14 @@ If new docs files are added or structure changes: `mkdocs.yml` and `docs/README.
 
 ## Step 10: Known Footguns
 
-- `UseEtcdWrapper` feature gate was **removed** — any reference to it is a bug.
-- `--enable-etcd-member-gc` flag in etcd-backup-restore was **removed** in v0.42 — do not reference.
-- EtcdOpsTask controller lives in `internal/controller/etcdopstask/` — review task state machine transitions if touched.
-- `UpgradeEtcdVersion` feature gate is alpha — if touched, gating code must check `featureGates.Enabled(features.UpgradeEtcdVersion)`.
+- `UseEtcdWrapper` feature gate is **GA, locked true** — it cannot be disabled. Any code that checks `Enabled(UseEtcdWrapper)` is dead code.
+- `--enable-etcd-member-gc` AND `--k8s-member-gc-duration` flags in etcd-backup-restore were **both removed** in v0.42 — do not reference either.
+- `PreferClose` in `ClientService.TrafficDistribution` is **deprecated** — use `PreferSameZone` or `PreferSameNode` instead.
+- `StoreSpec` secret-based endpoint configuration is **deprecated** — use `spec.backup.store.endpointOverride` (etcd-druid) / `--store-endpoint-override` (etcd-backup-restore) instead.
+- EtcdOpsTask controller lives in `internal/controller/etcdopstask/` — review task state machine transitions if touched. `OnDemandSnapshot` is also auto-triggered during hibernation (replicas=0) and `UpgradeEtcdVersion` flow.
+- `UpgradeEtcdVersion` feature gate is alpha — if touched, gating code must check `featureGates.Enabled(features.UpgradeEtcdVersion)`. Feature gates defined in `api/config/v1alpha1/features.go`.
+- Snapshot compression is **enabled by default** in etcd-backup-restore v0.40+ — do not add explicit `--compress-snapshots=true` unless overriding the default policy.
+- etcd-backup-restore and etcd-wrapper use **vendored dependencies** — any dependency change requires `make revendor`, not just `go mod tidy`.
 
 ---
 
@@ -171,6 +175,13 @@ Body:
 | Test framework | Go native + Gomega | Ginkgo v2 + Gomega | Go native + Gomega |
 | Error wrapping | `druiderr.WrapError` | repo-specific patterns | standard wraps |
 | Operator interface | Required | N/A | N/A |
+| CLI framework | cobra (main), stdlib flag (druidctl) | cobra | stdlib `flag` |
+| Dependency management | `make tidy` | `make revendor` (vendor/) | `make revendor` (vendor/) |
+| Logging | logr (structured) | logrus (field-based) | zap (structured JSON) |
+| CI pipeline | `.github/workflows/base.yaml` | `.github/workflows/build.yaml` | `.github/workflows/build.yaml` |
+| Lint config | golangci-lint v2 | golangci-lint v2 | golangci-lint v2 |
+| Generated files | deepcopy, CRDs, client/, api-ref | none | none |
+| Commit convention | imperative, `(#NNNN)` suffix | imperative, `(#NNNN)` suffix | imperative, `(#NNNN)` suffix |
 
 ## Handoff
 

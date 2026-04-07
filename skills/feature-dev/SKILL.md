@@ -373,3 +373,51 @@ Show the PR URL.
 | BLOCKED | More context → re-dispatch with stronger model → break task smaller → escalate to human. BLOCKED = task appears impossible as specified |
 
 **Never dispatch multiple implementer subagents in parallel.** Concurrent writes to the same worktree cause conflicts and corrupt the branch history. Always wait for one to complete (or report BLOCKED/NEEDS_CONTEXT) before dispatching the next.
+
+---
+
+## Multi-Repo Changes
+
+Some changes span multiple repos (e.g., a new API field in etcd-druid + a new flag in etcd-backup-restore + a config change in etcd-wrapper). The etcd version upgrade flow (`UpgradeEtcdVersion`) is a canonical example.
+
+### When to suspect a multi-repo change
+
+- Adding a new field to `EtcdSpec` that affects sidecar behaviour
+- Changing backup/restore semantics (snapshot format, compression, storage)
+- Changing etcd configuration that flows through the wrapper
+- Any change related to `UpgradeEtcdVersion`, `--next-cluster-version-compatible`, or `--store-endpoint-override`
+
+### Multi-repo workflow
+
+1. **Identify the dependency chain.** etcd-druid depends on etcd-backup-restore and etcd-wrapper via image vector (`internal/images/images.yaml`). Changes flow:
+   ```
+   etcd-backup-restore (or etcd-wrapper) → image released → etcd-druid image vector updated
+   ```
+
+2. **Plan per-repo.** The code plan (Phase 2) must list tasks per repo with explicit cross-repo dependencies. Example:
+   ```
+   Task 1 (etcd-backup-restore): Add --new-flag to server subcommand
+   Task 2 (etcd-druid): Pass --new-flag via StatefulSet container args
+   Task 3 (etcd-druid): Add spec.etcd.newField API type + CEL validation
+   Dependency: Task 2 depends on Task 1 being merged and released
+   ```
+
+3. **Separate PRs per repo.** Each repo gets its own PR. Never combine cross-repo changes into a single PR.
+
+4. **Test each repo independently first:**
+   ```bash
+   # In etcd-backup-restore fork:
+   make verify && make ci-e2e-kind
+
+   # In etcd-wrapper fork:
+   make test && make check
+
+   # In etcd-druid fork:
+   make ci-checks && make test-unit && make test-integration
+   ```
+
+5. **Integration test with custom images.** After individual tests pass, test the full stack together using `/etcd-druid:e2e` Scenario B (custom backup-restore) or C (custom wrapper) with `IMAGEVECTOR_OVERWRITE`.
+
+6. **PR ordering.** Open the sidecar PR first (etcd-backup-restore or etcd-wrapper). Once merged and released, update the image vector in etcd-druid and open that PR. If changes are purely additive (new flag with a safe default), the etcd-druid PR can be opened in parallel with a note that it depends on the sidecar release.
+
+7. **Vendoring.** etcd-backup-restore and etcd-wrapper use `go mod vendor`. After any dependency change: `make revendor`. etcd-druid does NOT vendor — use `make tidy`.

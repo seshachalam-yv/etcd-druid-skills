@@ -62,17 +62,38 @@ that is itself a finding.
 - Entry point: `internal/controller/etcd/reconciler.go` — `Reconcile()` method
 - Component operators live in `internal/component/<name>/`
 - Each component implements: `PreSync`, `Sync`, `TriggerDelete`, `GetExistingResourceNames`
+- Controller registration: `internal/controller/register.go`
+- EtcdOpsTask controller: `internal/controller/etcdopstask/`
+- Feature gate checks: `api/config/v1alpha1/features.go`
 
 ### API validation failures
 
 - CEL rules: `api/core/v1alpha1/` — look for `+kubebuilder:validation:XValidation` markers
 - Generated code: `api/core/v1alpha1/zz_generated.deepcopy.go`
 - After changing API types: `cd api && make generate` — NEVER manually edit generated files
+- CEL tests: `test/it/crdvalidation/etcd/`, `test/it/crdvalidation/etcdopstask/`
 
 ### Test failures
 
 - Shared helpers: `test/utils/`
 - OperatorContext, fake client, and DruidError assertion patterns: see `docs/development/testing.md`
+- Integration test env: `test/it/` (newer, Go native) and `test/integration/` (older, Ginkgo)
+
+### etcd-backup-restore failures
+
+- Snapshotter: `pkg/snapshot/snapshotter/snapshotter.go` — full/delta loop, event watch
+- Restorer: `pkg/snapshot/restorer/restorer.go` — base restore + delta apply
+- Compactor: `pkg/compactor/compactor.go` — embedded etcd restore + compact + snapshot
+- HTTP server: `pkg/server/httpAPI.go` — endpoint handlers, leader forwarding
+- Member control: `pkg/member/member_control.go` — scale-up, learner promotion
+- Snapstore: `pkg/snapstore/` — provider-specific implementations (S3, ABS, GCS, etc.)
+
+### etcd-wrapper failures
+
+- Bootstrap loop: `internal/bootstrap/bootstrap.go` — BR init loop, config fetch
+- Embedded etcd start: `internal/app/app.go` — `Setup()` → `Start()` flow
+- BR client: `internal/brclient/brclient.go` — HTTP calls to backup-restore sidecar
+- Readiness: `internal/app/readycheck.go` — `/readyz` endpoint, etcd client polling
 
 ## Phase 4: Form a Single Hypothesis
 
@@ -103,6 +124,116 @@ Stop. Do not attempt another fix.
 - Question your hypothesis — re-read the original error
 - Check if the issue is architectural (wrong abstraction, wrong layer)
 - Ask the human before trying more
+
+## Debugging with Delve
+
+For complex reconciliation bugs or stepping through controller logic:
+
+```bash
+# Debug a specific test
+dlv test ./internal/component/statefulset/... -- -test.run TestFoo
+
+# Debug integration tests with envtest
+dlv test ./test/it/controller/etcd/... -- -test.run TestReconciler
+
+# Attach to a running controller in KIND (etcd-druid)
+# First deploy with debug mode:
+make deploy-debug   # deploys with dlv listening on :2345
+# Then attach from host:
+dlv connect localhost:2345
+```
+
+For etcd-backup-restore, similar debugging works:
+```bash
+dlv test ./pkg/snapshot/snapshotter/... -- -test.run TestSnapshotter
+```
+
+For etcd-wrapper:
+```bash
+dlv test ./internal/app/... -- -test.run TestSuit
+```
+
+## Log Analysis
+
+Each repo uses a different logging framework. Know where to look and how to increase verbosity.
+
+### etcd-druid (logr)
+
+```bash
+# Controller logs in KIND cluster
+kubectl logs -n etcd-druid-e2e deploy/etcd-druid -f
+
+# Filter by reconciliation key
+kubectl logs -n etcd-druid-e2e deploy/etcd-druid | grep "etcd.*etcd-main"
+
+# Increase verbosity: set log level in OperatorConfiguration or --zap-log-level=debug
+```
+
+### etcd-backup-restore (logrus)
+
+```bash
+# Sidecar logs in a pod
+kubectl logs -n <ns> <etcd-pod> -c etcd-backup-restore -f
+
+# Key log fields to watch: "operation", "snapstore", "kind" (Full/Incr)
+# Snapshot failures: grep for "failed to save" or "error taking snapshot"
+# Restore failures: grep for "failed to restore" or "restoration failure"
+
+# Increase verbosity: --log-level=5 (default is 4)
+```
+
+### etcd-wrapper (zap)
+
+```bash
+# Wrapper logs in a pod
+kubectl logs -n <ns> <etcd-pod> -c etcd-wrapper -f
+
+# Key log fields: "msg", "error"
+# Init loop: grep for "initialization" or "trigger"
+# Etcd startup: grep for "starting etcd" or "embed"
+```
+
+## Build Failure Triage
+
+### `make ci-checks` failures
+
+| Failure pattern | Cause | Fix |
+|----------------|-------|-----|
+| `goimports-reviser` diff | Import ordering wrong | `make format` then commit |
+| `golangci-lint` errors | Lint violations | Fix reported issues; check `.golangci.yaml` for config |
+| License header missing | New file without SPDX header | `make add-license-headers` |
+| `check-git-status` fails | Uncommitted changes after format/generate | Commit generated changes separately |
+| `check-apidiff` fails | Breaking API change | Read `docs/development/changing-api.md` for deprecation path |
+| `check-generate` fails | Generated files stale | `cd api && make generate` and commit output |
+
+### `make test-unit` / `make test-integration` failures
+
+| Failure pattern | Cause | Fix |
+|----------------|-------|-----|
+| `envtest` binary missing | Setup not run | `make start-envtest` or set `KUBEBUILDER_ASSETS` |
+| CRD not found in envtest | Wrong CRD path | Check `CRDDirectoryPaths` in test setup |
+| Flaky `Eventually` timeout | Timeout too short or race | Increase timeout; add retry-on-conflict for status updates |
+| `gomock` expectation not met | Mock setup wrong | Check `EXPECT()` calls match actual invocations |
+| `NEGATIVE:` test prefix | etcd-backup-restore naming convention | Not a failure — these run in a separate pass |
+
+### Dependency / module failures
+
+| Failure pattern | Cause | Fix |
+|----------------|-------|-----|
+| `go mod tidy` produces diff | Deps changed but not tidied | `make tidy` (etcd-druid) or `make revendor` (ebr, wrapper) |
+| `vendor/` directory stale | Deps changed but not re-vendored | `make revendor` (etcd-backup-restore, etcd-wrapper only) |
+| Module mismatch (api/ vs root) | API module has separate go.mod | `cd api && go mod tidy` separately |
+
+## envtest Debugging Tips
+
+envtest starts a real API server and etcd for integration tests. Common issues:
+
+- **API server won't start:** Check if ports 1024-65535 range has conflicts. envtest picks random ports.
+- **CRD installation fails:** Verify CRD YAML files exist at the paths in `CRDDirectoryPaths`. Both CEL and non-CEL variants must be present.
+- **K8s version mismatch:** CEL validation tests require K8s >= 1.29. Use `skipCELTestsForOlderK8sVersions(t)` guard.
+- **Slow tests:** envtest startup takes 5-10s. Group related tests in the same test function to share the env.
+- **Status update conflicts:** Use retry-on-conflict when updating `.status` — see etcd-druid PR #1302 for the pattern.
+- **Cleanup:** `defer testEnv.Stop()` must always run. Leaked envtest processes block ports.
 
 ## Red Flags — Stop and Re-read
 

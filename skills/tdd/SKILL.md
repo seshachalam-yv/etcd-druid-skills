@@ -26,8 +26,8 @@ Three repos, two test frameworks. Follow Red-Green-Refactor strictly.
 | Repo | Framework | Run command |
 |------|-----------|-------------|
 | etcd-druid | Go native `testing.T` + Gomega | `make test-unit` |
-| etcd-wrapper | Go native `testing.T` + Gomega | `go test ./...` |
-| etcd-backup-restore | Ginkgo v2 + Gomega | `make test` |
+| etcd-wrapper | Go native `testing.T` + Gomega | `make test` |
+| etcd-backup-restore | Ginkgo v2 + Gomega | `make test-unit` (via `hack/test-unit.sh`) |
 
 Before writing any tests, read `docs/development/` in the repo you are working in.
 The testing guide there is authoritative for patterns, helpers, and conventions.
@@ -88,6 +88,80 @@ Stop and re-read the Iron Law if you catch yourself thinking:
 - "This test would need a fake client — too complex, I'll just run it manually"
 - "The existing test covers this close enough"
 - "I changed the implementation slightly so the old test doesn't apply"
+
+## Integration Tests (etcd-druid)
+
+etcd-druid has two integration test directories — use the newer one (`test/it/`) for new tests:
+
+| Directory | Style | When to use |
+|-----------|-------|-------------|
+| `test/it/` | Go native `testing.T` + envtest | **New tests** — controller IT, CRD validation |
+| `test/integration/` | Ginkgo + envtest | **Existing tests** — modify in place, do not migrate |
+
+### envtest setup pattern
+
+```go
+func TestMyController(t *testing.T) {
+    g := gomega.NewWithT(t)
+    testEnv := &envtest.Environment{
+        CRDDirectoryPaths: []string{filepath.Join("..", "..", "api", "core", "v1alpha1", "crds")},
+    }
+    cfg, err := testEnv.Start()
+    g.Expect(err).NotTo(gomega.HaveOccurred())
+    defer testEnv.Stop()
+    // ...
+}
+```
+
+**Important:**
+- Do NOT use `t.Parallel()` in envtest integration tests — they share the API server
+- Use `Eventually` / `Consistently` for async controller assertions, never `time.Sleep()`
+- CRD installation happens via `CRDDirectoryPaths` — both CEL and non-CEL variants exist
+- Use `skipCELTestsForOlderK8sVersions(t)` guard for CEL validation tests
+
+### Fake client and test builders (etcd-druid)
+
+etcd-druid uses a fake client builder for unit tests (not gomock). Key utilities in `test/utils/`:
+
+```go
+// Build an Etcd resource for testing
+etcd := utils.EtcdBuilderWithoutDefaults("test-ns", "etcd-main").
+    WithReplicas(3).
+    WithProviderLocal().
+    Build()
+
+// Create a fake client pre-loaded with objects
+fakeClient := fake.NewClientBuilder().
+    WithScheme(scheme).
+    WithObjects(etcd).
+    WithStatusSubresource(etcd).
+    Build()
+```
+
+**Rules:**
+- Use `EtcdBuilderWithoutDefaults` (not `EtcdBuilderWithDefaults`) when you need to control specific field values
+- Use `WithStatusSubresource` when the test reads or writes `.status`
+- Use `fake.NewClientBuilder()` from `sigs.k8s.io/controller-runtime/pkg/client/fake`
+- NEVER use gomock for component tests — the fake client replaces it entirely
+
+### etcd-backup-restore test patterns
+
+Uses Ginkgo v2 with a specific naming convention:
+- **Positive tests:** Normal `It("should do X")` blocks
+- **Negative tests:** Prefixed with `NEGATIVE:` — e.g., `It("NEGATIVE: should fail when X")`
+- Tests run in two passes: positive first (`--skip="NEGATIVE:.*"`), then negative (`--focus="NEGATIVE:.*"`)
+- Race detection enabled by default (`-race -trace`)
+- Mock generation via `go.uber.org/mock`
+
+### etcd-wrapper test patterns
+
+Uses `testing.T` + Gomega with:
+- `g := NewWithT(t)` pattern everywhere
+- Table-driven tests as the standard
+- Custom `TestRoundTripper` (function implementing `http.RoundTripper`) for HTTP mocking
+- `EtcdFakeKV` struct implementing `clientv3.KV` for etcd client mocking
+- `internal/testutil/tls.go` generates real CA + client certs in test temp dirs
+- `zaptest.NewLogger(t)` for production-like zap loggers in tests
 
 ## Handoff
 
