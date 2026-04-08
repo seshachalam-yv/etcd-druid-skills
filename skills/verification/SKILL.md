@@ -25,6 +25,7 @@ BEFORE claiming work is complete, a test passes, or a check is clean:
    - etcd-druid unit: `make test-unit`
    - etcd-druid lint:  `make ci-checks`
    - etcd-druid integration: `make test-integration`
+   - etcd-druid generated files: `cd api && make check-generate` (fails if `make generate` would produce a diff — run this if `api/` was touched)
    - etcd-backup-restore: `make verify`
    - etcd-wrapper: `make test && make check`
 
@@ -40,6 +41,15 @@ BEFORE claiming work is complete, a test passes, or a check is clean:
    - "ci-checks passes" requires no diff and no lint errors reported
    - "Integration tests pass" requires zero failures in the envtest output
    - "verify passes" (etcd-backup-restore) requires both check and test-unit to show no failures
+   - "check-generate passes" requires exit 0 with no "would regenerate" output
    - Any positive claim requires the specific evidence from the output that supports it
 
 5. THEN make the claim — with the command and result as evidence
+
+## Handoff
+
+After all required verification commands pass for the repo being worked on:
+
+- **From `tdd`** — return to the TDD cycle (test passes → next test)
+- **From `receiving-review`** — CI clean → proceed to Step 5 (respond with evidence)
+- **From `/etcd-druid:implement`** — all gates pass → proceed to Gate 2 and PR creation
