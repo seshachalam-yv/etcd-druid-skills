@@ -233,6 +233,18 @@ Each skill opens with an Iron Law — an unconditional rule stated once, with a 
 | `verification` | NO COMPLETION CLAIMS WITHOUT FRESH VERIFICATION EVIDENCE. |
 | `receiving-review` | NO FEEDBACK IMPLEMENTATION WITHOUT INDEPENDENT VERIFICATION FIRST. |
 
+### Assumption surfacing before action
+
+The most common LLM coding failure is running with a wrong assumption silently. `feature-dev` Phase 1 requires Claude to state every assumption explicitly — expected behaviour, scope, which repo, whether the change is breaking — before proposing approaches. Any assumption it is not confident in must be surfaced as a question. Silent interpretation is not allowed.
+
+### YAGNI enforcement
+
+LLMs tend to overbuild: they add parameters "for future flexibility", introduce abstractions for a single call site, and implement 500 lines where 50 would do. This plugin enforces YAGNI at three gates:
+
+- **Implementer self-review**: every new function, type, and parameter must be used by this task
+- **Code-reviewer checklist**: flags anything that exists "for future use"
+- **Spec-reviewer**: flags logic added beyond what the acceptance criteria asked for
+
 ### Anti-sycophancy: verification before assertion
 
 The verification gate (`skills/verification/SKILL.md`) enforces a 5-step rule that applies across all workflows:

@@ -84,9 +84,10 @@ digraph feature_dev {
    - Test scope required: unit (`make test-unit`) | integration (`make test-integration`) | both
    - **Look at previously merged PRs** *(incremental work only — skip for new sidecars)*
      (`gh pr list --state merged --repo gardener/etcd-druid`). Find 1–2 comparable PRs and read their diffs to understand how the team structures commits, names things, and what reviewers flag. This shapes your plan before the human sees it.
-3. Ask clarifying questions one at a time — domain-focused
-4. Propose 2–3 approaches with trade-offs
-5. Confirm approach before writing plan
+3. **State your assumptions explicitly before asking anything.** Before proposing approaches, list every assumption you are making: expected behaviour, scope, which repo is affected, whether the change is breaking. Ask about any you are not confident in. Do not silently pick an interpretation and run with it.
+4. Ask clarifying questions one at a time — domain-focused
+5. Propose 2–3 approaches with trade-offs
+6. Confirm approach before writing plan
 
 **Change type guide:**
 

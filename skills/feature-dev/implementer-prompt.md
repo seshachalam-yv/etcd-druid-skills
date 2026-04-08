@@ -86,7 +86,9 @@ Agent tool (general-purpose):
     - [ ] All acceptance criteria from the task are implemented
     - [ ] Conventions followed as documented in docs/development/
     - [ ] Commit message: imperative, sentence case, issue number, no trailing period
-    - [ ] YAGNI — nothing built beyond what was asked
+    - [ ] YAGNI — nothing built beyond what was asked; no parameter added "for future flexibility"
+    - [ ] No abstraction introduced that is only used once in this task
+    - [ ] No existing comment or code unrelated to this task was modified or removed
     - [ ] Tests pass (apply `skills/verification/SKILL.md` — run the command, read output, then claim)
     - [ ] `make ci-checks` passes
     - [ ] Only committed to the worktree branch, not to upstream

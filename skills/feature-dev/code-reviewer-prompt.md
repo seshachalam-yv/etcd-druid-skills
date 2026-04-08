@@ -75,6 +75,10 @@ Agent tool (general-purpose):
     - [ ] If `UpgradeEtcdVersion` feature gate used: properly gated behind featureGates.Enabled()
 
     ### Code quality
+    - [ ] YAGNI: every new function, type, and parameter introduced by this task is actually used
+          by this task. Flag anything that exists "for future use" or "for flexibility" — it is bloat.
+    - [ ] No abstraction introduced for a single call site
+    - [ ] No existing comment or code unrelated to this task was silently modified or removed
     - [ ] No overbuilding — only what the task asked for
     - [ ] Existing helpers used, not reimplemented
     - [ ] make ci-checks would pass
