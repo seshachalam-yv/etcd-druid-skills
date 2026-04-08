@@ -50,9 +50,6 @@ case "$FILE_PATH" in
     */api/core/v1alpha1/*)
         SPECIFIC_DOC="docs/development/api-conventions.md — field naming, CEL validation placement, two-commit generate rule"
         ;;
-    */hack/*)
-        SPECIFIC_DOC="docs/development/ — check Makefile and hack/ scripts for context"
-        ;;
 esac
 
 if [ -n "$SPECIFIC_DOC" ]; then
