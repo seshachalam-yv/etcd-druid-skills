@@ -114,6 +114,16 @@ type EtcdConfig struct {
 
 **`has()` guard:** Always wrap optional field references in `has(self.fieldName)` before dereferencing. Omitting the guard causes the rule to fail when the field is absent.
 
+**Silent-pass failure mode:** If a test asserts that an invalid value is rejected but gets `nil` instead, the `XValidation` rule is placed on the wrong struct. A rule annotated on `EtcdConfig` can only reference `self.*` fields within `EtcdConfig` — it cannot see `self.spec.backup.*` or `self.metadata.*`. Move the rule to the innermost struct that owns all referenced fields, or to the `Etcd` root type for cross-field rules. Verify the rule was emitted in the CRD output:
+
+```bash
+kubectl apply --dry-run=server -f api/core/v1alpha1/crds/druid.gardener.cloud_etcds.yaml 2>&1 | grep -A2 "x-kubernetes-validations"
+# or dry-run without a cluster:
+grep "x-kubernetes-validations" api/core/v1alpha1/crds/druid.gardener.cloud_etcds.yaml
+```
+
+If `x-kubernetes-validations` does not appear at the path you expect, the annotation was on the wrong type — regenerate after moving it.
+
 ### 3c. Cross-field CEL (on the root `Etcd` or `EtcdSpec` type)
 
 Use when the rule references `self.metadata` OR fields from two different sub-structs:

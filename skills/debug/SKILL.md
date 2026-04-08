@@ -249,6 +249,7 @@ envtest starts a real API server and etcd for integration tests. Common issues:
 - **API server won't start:** Check if ports 1024-65535 range has conflicts. envtest picks random ports.
 - **CRD installation fails:** Verify CRD YAML files exist at the paths in `CRDDirectoryPaths`. Both CEL and non-CEL variants must be present.
 - **K8s version mismatch:** CEL validation tests require K8s >= 1.29. Use `skipCELTestsForOlderK8sVersions(t)` guard.
+- **CEL rule silently accepts invalid input** (test asserts rejection, got `nil`): the `XValidation` rule is placed on the wrong struct level — `self.*` can only reference fields within the struct it is annotated on. Move the rule to the innermost struct that owns all referenced fields, or to the `Etcd` root type for cross-field rules. Confirm the rule was emitted by running `kubectl apply --dry-run=server -f api/core/v1alpha1/crds/*.yaml` and checking that `x-kubernetes-validations` appears at the expected path in the output.
 - **Slow tests:** envtest startup takes 5-10s. Group related tests in the same test function to share the env.
 - **Status update conflicts:** Use retry-on-conflict when updating `.status` — see etcd-druid PR #1302 for the pattern.
 - **Cleanup:** `defer testEnv.Stop()` must always run. Leaked envtest processes block ports.
