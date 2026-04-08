@@ -135,9 +135,18 @@ __OBS_DIFF_PLACEHOLDER__
 ---
 ENTRY
 )
-    # Replace placeholder with obs_diff safely (no shell re-evaluation)
+    # Replace placeholder with obs_diff safely — use temp file to support multi-line
+    # values and to avoid BSD awk's "newline in string" error with awk -v.
+    local diff_tmp
+    diff_tmp=$(mktemp)
+    printf '%s' "$obs_diff" > "$diff_tmp"
     new_entry=$(printf '%s' "$new_entry" \
-        | awk -v diff="$obs_diff" '/__OBS_DIFF_PLACEHOLDER__/{print diff; next} {print}')
+        | awk -v dfile="$diff_tmp" '
+            BEGIN { while ((getline line < dfile) > 0) d = d line ORS }
+            /__OBS_DIFF_PLACEHOLDER__/ { printf "%s", d; next }
+            { print }
+        ')
+    rm -f "$diff_tmp"
 
     # Insert before Resolved section
     if grep -q '^## Resolved' "$OBSERVATIONS_FILE"; then
