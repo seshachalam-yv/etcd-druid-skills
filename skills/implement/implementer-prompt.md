@@ -76,7 +76,10 @@ Agent tool (general-purpose):
     2. Check existing tests in the same package before writing new ones
     3. Check existing helpers in `test/utils/` before creating new ones
     4. Run tests per `docs/development/` instructions (or `make test-unit` / `make ci-checks`)
-    5. Commit with correct message style (imperative, sentence case, issue number, no trailing period)
+    5. Commit with correct message style (imperative, sentence case, issue number, no trailing period).
+       **API change exception:** if `api/core/v1alpha1/*.go` was edited, two commits are required —
+       Commit 1: hand-written `.go` changes only; Commit 2: `cd api && make generate` output only.
+       Never mix hand-written and generated files in the same commit.
     6. If you updated any docs, include that in your report
     7. Self-review (below)
     8. Report back

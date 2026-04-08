@@ -56,7 +56,7 @@ Agent tool (general-purpose):
     - [ ] examples/ updated if API surface changed
 
     ### Tests
-    - [ ] Correct test framework for this repo (see docs/development/)
+    - [ ] Correct test framework for this repo — etcd-druid and etcd-wrapper use Go native `testing.T` + Gomega (NO Ginkgo); etcd-backup-restore uses Ginkgo v2
     - [ ] No gomock — fake client used
     - [ ] No time.Sleep() — Eventually/Consistently for async assertions
     - [ ] Table-driven for multiple scenarios
