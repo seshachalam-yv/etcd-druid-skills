@@ -164,6 +164,11 @@ if printf '%s' "$LAST_MESSAGE" | grep -q '<plugin-gap'; then
                 "$gap_body" \
                 "$(printf '%s' "$gap_body" | head -c 200)" \
                 "explicit-marker"
+            # Persist to cross-session memory store
+            bash "${PLUGIN_ROOT}/hooks/write-memory.sh" \
+                "$(printf '%s' "$gap_body" | cut -c1-200)" \
+                "$(basename "$gap_file" .md),${gap_type:-missing_convention},etcd-druid" \
+                "0.8" &
         fi
     done < <(printf '%s' "$LAST_MESSAGE" | grep -oP '<plugin-gap[^>]*>.*?</plugin-gap>' || true)
 fi
@@ -276,5 +281,10 @@ write_observation \
     "$OBS_CORRECT" \
     "$OBS_EVIDENCE" \
     "llm-evaluator"
+
+# Persist to cross-session memory store
+MEMORY_CONTENT=$(printf '%s' "$OBS_CORRECT" | cut -c1-200)
+MEM_TAGS="$(basename "$OBS_FILE" .md),${OBS_TYPE},etcd-druid"
+bash "${PLUGIN_ROOT}/hooks/write-memory.sh" "$MEMORY_CONTENT" "$MEM_TAGS" "0.8" &
 
 exit 0
