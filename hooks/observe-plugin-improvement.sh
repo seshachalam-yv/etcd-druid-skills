@@ -102,7 +102,8 @@ _(none yet)_
 HEADER
     fi
 
-    # Build entry
+    # Build entry — obs_diff inserted via awk after heredoc to prevent shell
+    # expansion of any $(...) or `...` sequences the LLM may have emitted.
     local new_entry
     new_entry=$(cat <<ENTRY
 
@@ -123,7 +124,7 @@ ${obs_correct}
 
 **Apply:**
 \`\`\`bash
-${obs_diff}
+__OBS_DIFF_PLACEHOLDER__
 \`\`\`
 
 **Evidence:**
@@ -134,6 +135,9 @@ ${obs_diff}
 ---
 ENTRY
 )
+    # Replace placeholder with obs_diff safely (no shell re-evaluation)
+    new_entry=$(printf '%s' "$new_entry" \
+        | awk -v diff="$obs_diff" '/__OBS_DIFF_PLACEHOLDER__/{print diff; next} {print}')
 
     # Insert before Resolved section
     if grep -q '^## Resolved' "$OBSERVATIONS_FILE"; then
@@ -283,6 +287,8 @@ OBS_SECTION=$(printf '%s' "$EVAL_OUTPUT" | jq -r '.plugin_section')
 OBS_WRONG=$(printf '%s' "$EVAL_OUTPUT" | jq -r '.wrong_text')
 OBS_CORRECT=$(printf '%s' "$EVAL_OUTPUT" | jq -r '.correct_text')
 OBS_DIFF=$(printf '%s' "$EVAL_OUTPUT" | jq -r '.diff_apply // "MULTILINE — apply manually"')
+# NOTE: the em-dash (—) in "MULTILINE — apply manually" above must byte-match the
+# literal at the Channel 1 call site; don't convert it to a hyphen or en-dash
 OBS_EVIDENCE=$(printf '%s' "$EVAL_OUTPUT" | jq -r '.evidence')
 
 write_observation \
