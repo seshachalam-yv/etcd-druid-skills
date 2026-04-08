@@ -23,6 +23,9 @@ PLUGIN_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 PATTERNS_FILE="${PLUGIN_ROOT}/.claude-plugin/generated-file-patterns.txt"
 
 if [ ! -f "$PATTERNS_FILE" ]; then
+    # Patterns file missing — emit a non-blocking warning so the developer knows
+    # generated-file protection is disabled, then allow the edit through.
+    jq -n '{"continue":true,"suppressOutput":false,"hookSpecificOutput":{"hookEventName":"PreToolUse","additionalContext":"WARNING: .claude-plugin/generated-file-patterns.txt not found — generated file protection is DISABLED. Restore the file from git to re-enable blocking."}}'
     exit 0
 fi
 
