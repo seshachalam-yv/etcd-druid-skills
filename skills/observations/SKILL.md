@@ -11,6 +11,15 @@ Review captured plugin improvement observations and decide what to do with each 
 Observations come from three sources: explicit `<plugin-gap>` markers Claude emits,
 user correction detection, and review-skill gap capture.
 
+## ⛔ Iron Law
+
+**NO PR RAISED WITHOUT AN EXPLICIT USER "R" CHOICE.**
+
+| Rationalization | Why it fails |
+|---|---|
+| "The fix is obviously correct" | The user decides what gets raised, not you. Show it first. |
+| "All previous observations were accepted" | Each observation is independent. Ask for each one. |
+
 ---
 
 ## Step 1: Read and pre-verify all open observations
