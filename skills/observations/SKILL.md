@@ -54,6 +54,7 @@ For each observation that survived pre-verification, show it clearly:
 ─────────────────────────────────────────
 OBS-NNN | <type> | <confidence> confidence | source: <source>
 File: <plugin_file> § <plugin_section>
+Count: <count>  ← how many times this gap was independently observed
 
 CURRENT FILE CONTENT at that section:
   <paste the relevant 3-5 lines from the actual file>
@@ -63,6 +64,8 @@ Wrong / Missing:
 
 Proposed fix:
   <correct_text>
+
+Apply: <sed command, or "MULTILINE — apply manually">
 
 Evidence that revealed this:
   "<evidence>"
@@ -154,3 +157,9 @@ If any were skipped: "Run /etcd-druid:observations again when ready."
 - Never batch-dismiss — show each observation individually
 - The `correct_text` field is a **proposed fix**, not ground truth — verify it matches the current file before applying
 - If an observation's `wrong_text` is not found in the file, auto-resolve it — do not show to user
+
+## Handoff
+
+- All observations triaged → return to whatever triggered the session (continue normal work)
+- Observations remain open (user skipped) → they will re-surface at the next session-start
+- Fix applied and PR raised → the PR is the handoff; no further action needed in this session
