@@ -3,7 +3,7 @@
 > A Claude Code plugin for contributors to the [Gardener etcd stack](https://github.com/gardener/etcd-druid). Injects domain awareness, workflow discipline, and review rigor into every AI-assisted session.
 
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-1.4.0-green.svg)](.claude-plugin/plugin.json)
+[![Version](https://img.shields.io/badge/version-1.7.0-green.svg)](.claude-plugin/plugin.json)
 [![Claude Code Plugin](https://img.shields.io/badge/Claude%20Code-Plugin-blueviolet)](https://github.com/anthropics/claude-code)
 [![Inspired by Superpowers](https://img.shields.io/badge/Inspired%20by-Superpowers-orange)](https://github.com/obra/superpowers)
 
@@ -19,25 +19,31 @@ The plugin is a **workflow orchestrator, not a code library**. Code patterns and
 
 ---
 
-## Feature Development Workflow
+## Development Workflow
+
+The workflow is split into two focused skills — plan first, then implement:
 
 ```
 Issue / bug report
       │
       ▼
- [feature-dev]
+  [/etcd-druid:plan]
       │
       ├─ 1. Orient ──── read upstream, identify change type, check docs/development/
       │
       ├─ 2. Design ──── explore 2-3 approaches, identify risks and cross-repo impact
       │
-      ├─ 3. Plan ─────── write docs/plans/<date>-<title>.md with tasks + acceptance criteria
-      │                                         │
-      │                               ┌─────────▼─────────┐
-      │                               │   GATE 1: Approve  │ ← human reviews plan
-      │                               └─────────┬─────────┘
-      │                                         │
-      ├─ 4. Implement ── per-task loop:
+      └─ 3. Code plan ─ write docs/plans/<date>-<title>.md with tasks + acceptance criteria
+                                               │
+                                     ┌─────────▼─────────┐
+                                     │   GATE 1: Approve  │ ← human reviews plan
+                                     └─────────┬─────────┘
+                                               │
+  [/etcd-druid:implement]
+      │
+      ├─ 1. Worktree ── git worktree add, go mod download, baseline tests
+      │
+      ├─ 2. Implement ── per-task loop:
       │        implementer subagent
       │              ↓
       │        spec-reviewer  ── did it match acceptance criteria?
@@ -45,15 +51,28 @@ Issue / bug report
       │        code-reviewer  ── follows conventions, no regressions?
       │              ↓ (fix and re-review until both ✅)
       │
-      ├─ 5. Verify ───── make ci-checks && make test-unit && make test-integration
+      ├─ 3. Verify ───── make ci-checks && make test-unit && make test-integration
       │                  e2e if required (see decision table in skill)
+      │                  CI pipeline check: verify all jobs pass per repo
       │                                         │
       │                               ┌─────────▼─────────┐
-      │                               │   GATE 2: Approve  │ ← human reviews PR body
+      │                               │   GATE 2: Approve  │ ← human reviews PR body + diff
       │                               └─────────┬─────────┘
       │                                         │
-      └─ 6. PR ─────────── gh pr create
+      └─ 4. PR ─────────── gh pr create
 ```
+
+### Pre-PR CI requirement
+
+Before Gate 2, Claude verifies that all CI jobs pass for the relevant repo. For etcd-druid:
+
+```bash
+make ci-checks        # format + lint + license + api-diff
+make test-unit        # Go native + Ginkgo suites
+make test-integration # envtest-based integration tests (if touched)
+```
+
+For etcd-backup-restore and etcd-wrapper: `make verify`. If any CI job fails, the fix subagent is dispatched before Gate 2 is presented. Gate 2 is never presented with failing CI.
 
 ### Two-commit rule for API changes
 
@@ -80,13 +99,14 @@ Fixed the bug.                                                  # ❌ past tense
 Type a slash command in Claude Code to activate the relevant workflow:
 
 ```
-/etcd-druid:feature-dev   I want to implement issue #1420 — add snapshotCount field to EtcdSpec
-/etcd-druid:tdd           Write tests for the memberlease component's rotation logic
-/etcd-druid:debug         make test-unit is failing with "nil pointer in configmap.Sync"
-/etcd-druid:review        Review my changes before I open a PR
-/etcd-druid:api-change    I need to add a new field to EtcdSpec with CEL validation
-/etcd-druid:e2e           Run e2e tests against my custom etcd-backup-restore image
-/etcd-druid:reference     What make targets do I need to run before opening a PR?
+/etcd-druid:plan        I want to implement issue #1420 — add snapshotCount field to EtcdSpec
+/etcd-druid:implement   docs/plans/2026-04-08-issue-1420-snapshot-count.md
+/etcd-druid:tdd         Write tests for the memberlease component's rotation logic
+/etcd-druid:debug       make test-unit is failing with "nil pointer in configmap.Sync"
+/etcd-druid:review      Review my changes before I open a PR
+/etcd-druid:api-change  I need to add a new field to EtcdSpec with CEL validation
+/etcd-druid:e2e         Run e2e tests against my custom etcd-backup-restore image
+/etcd-druid:reference   What make targets do I need to run before opening a PR?
 ```
 
 ### Let skills activate automatically
@@ -96,18 +116,20 @@ Type a slash command in Claude Code to activate the relevant workflow:
 ### Example session
 
 ```
-You:   /etcd-druid:feature-dev
+You:   /etcd-druid:plan
 
 Claude: [reads the issue, explores etcd-druid upstream, identifies it as an API change
          in api/core/v1alpha1/ + configmap component change]
-        [writes docs/plans/2026-04-07-issue-1420-snapshot-count.md]
+        [writes docs/plans/2026-04-08-issue-1420-snapshot-count.md]
         "Code plan written. Reply 'approved' to proceed."
 
 You:   approved
 
+You:   /etcd-druid:implement docs/plans/2026-04-08-issue-1420-snapshot-count.md
+
 Claude: [creates worktree, dispatches implementer subagent for each task]
         [spec-reviewer and code-reviewer run after each task]
-        [runs make ci-checks && make test-unit]
+        [runs make ci-checks && make test-unit — all pass]
         "All checks pass. Ready to create PR. Choose:
           A) Create PR  B) Push branch only  C) Make changes  D) Discard"
 
@@ -128,7 +150,7 @@ etcd-wrapper          Sidecar — starts embedded etcd via the backup-restore HT
 etcd-steward          Planned sidecar — will replace etcd-backup-restore (not yet in upstream)
 ```
 
-etcd-druid, etcd-backup-restore, and etcd-wrapper are active in production. etcd-steward is a planned refactoring of etcd-backup-restore with a cleaner architecture — no upstream code exists yet. When contributing to etcd-steward, the `feature-dev` skill applies with the "new sidecar" classification (skip merged-PR lookup, break tasks at package boundary).
+etcd-druid, etcd-backup-restore, and etcd-wrapper are active in production. etcd-steward is a planned refactoring of etcd-backup-restore with a cleaner architecture — no upstream code exists yet. When contributing to etcd-steward, the `plan` + `implement` skills apply with the "new sidecar" classification (skip merged-PR lookup, break tasks at package boundary).
 
 All active components run in the Gardener seed cluster. Changes must not break gardenlet's reconciliation assumptions.
 
@@ -139,7 +161,8 @@ All active components run in the Gardener seed cluster. Changes must not break g
 ### Skills
 
 **Development workflow**
-- **feature-dev** — Full issue-to-PR lifecycle with two approval gates, subagent-driven implementation, and cross-repo guidance
+- **plan** — Design phase: issue orientation, approach selection, code plan with acceptance criteria. Output: approved plan file. Gate 1 approval before any code.
+- **implement** — Execution phase: worktree setup, per-task subagent loop, verification, CI checks, PR creation. Input: approved plan file from `plan`. Gate 2 before push.
 - **api-change** — API field design, CEL validation (field-scoped + cross-field), two-commit generate workflow, CRD tests
 
 **Testing**
@@ -159,8 +182,8 @@ All active components run in the Gardener seed cluster. Changes must not break g
 
 | Guide | Referenced from | Purpose |
 |-------|----------------|---------|
-| `verification` | `tdd`, `debug`, `feature-dev` | 5-step gate: run the command, read the output, then claim it passes — never before |
-| `receiving-review` | `feature-dev`, `review` | Anti-sycophancy process for handling upstream maintainer feedback on a PR |
+| `verification` | `tdd`, `debug`, `implement` | 5-step gate: run the command, read the output, then claim it passes — never before |
+| `receiving-review` | `implement`, `review` | Anti-sycophancy process for handling upstream maintainer feedback on a PR |
 | `tdd/testing-anti-patterns.md` | `tdd` | 5 etcd-druid-specific test anti-patterns with correct alternatives |
 
 ### Hooks
@@ -177,24 +200,26 @@ All active components run in the Gardener seed cluster. Changes must not break g
 
 | Prompt | Used by | Role |
 |--------|---------|------|
-| `implementer-prompt.md` | `feature-dev` Phase 4 | Writes code for a single task, reports status |
-| `spec-reviewer-prompt.md` | `feature-dev` Phase 4 | Verifies implementation matches acceptance criteria |
-| `code-reviewer-prompt.md` | `feature-dev` Phase 4 | Validates conventions, patterns, and quality |
+| `implementer-prompt.md` | `implement` Phase 2 | Writes code for a single task, reports status |
+| `spec-reviewer-prompt.md` | `implement` Phase 2 | Verifies implementation matches acceptance criteria |
+| `code-reviewer-prompt.md` | `implement` Phase 2 | Validates conventions, patterns, and quality |
 
 ### Skill interaction map
 
 ```
-feature-dev ──► api-change (when API types touched)
-     │
-     ├──► tdd (implementer subagents follow TDD)
-     │      └──► testing-anti-patterns.md
-     │
-     ├──► review (whole-diff review before Gate 2)
-     │      └──► receiving-review (if maintainer feedback arrives)
-     │
-     ├──► e2e (when e2e verification needed)
-     │
-     └──► verification (before every completion claim)
+plan ──► implement
+           │
+           ├──► api-change (when API types touched)
+           │
+           ├──► tdd (implementer subagents follow TDD)
+           │      └──► testing-anti-patterns.md
+           │
+           ├──► review (whole-diff review before Gate 2)
+           │      └──► receiving-review (if maintainer feedback arrives)
+           │
+           ├──► e2e (when e2e verification needed)
+           │
+           └──► verification (before every completion claim)
 
 debug ──► tdd (add regression test after fix)
    └──► review (before PR)
@@ -210,7 +235,8 @@ tdd ──► review (before PR)
 
 | Skill | Invoke | Auto-activates on | Use when |
 |-------|--------|--------------------|----------|
-| `feature-dev` | `/etcd-druid:feature-dev` | — | Picking up an issue, planning a feature or bug fix, design-to-PR |
+| `plan` | `/etcd-druid:plan` | — | Picking up an issue — design, approach selection, code plan with Gate 1 |
+| `implement` | `/etcd-druid:implement` | — | Gate 1 approved — worktree setup, subagent loop, CI verify, PR with Gate 2 |
 | `api-change` | `/etcd-druid:api-change` | `api/**/*.go` edits | Adding or modifying API fields — CEL validation, generate workflow, CRD tests |
 | `tdd` | `/etcd-druid:tdd` | `*.go` edits | Writing new tests or learning the correct test pattern |
 | `debug` | `/etcd-druid:debug` | `*.go` edits | Something is failing, broken, or behaving unexpectedly |
@@ -229,7 +255,8 @@ Each skill opens with an Iron Law — an unconditional rule stated once, with a 
 
 | Skill | Iron Law |
 |-------|----------|
-| `feature-dev` | NO CODE BEFORE GATE 1. NO PUSH BEFORE GATE 2. |
+| `plan` | NO CODE BEFORE GATE 1. |
+| `implement` | NO PUSH BEFORE GATE 2. |
 | `tdd` | NO IMPLEMENTATION CODE BEFORE A FAILING TEST. |
 | `debug` | NO FIX ATTEMPT WITHOUT A REPRODUCIBLE FAILURE FIRST. |
 | `review` | NO VERDICT WITHOUT READING THE DIFF AND docs/development/ FIRST. |
@@ -254,7 +281,7 @@ No PR is ever raised without your explicit choice. The hook only captures; you d
 
 ### Assumption surfacing before action
 
-The most common LLM coding failure is running with a wrong assumption silently. `feature-dev` Phase 1 requires Claude to state every assumption explicitly — expected behaviour, scope, which repo, whether the change is breaking — before proposing approaches. Any assumption it is not confident in must be surfaced as a question. Silent interpretation is not allowed.
+The most common LLM coding failure is running with a wrong assumption silently. `plan` Phase 1 requires Claude to state every assumption explicitly — expected behaviour, scope, which repo, whether the change is breaking — before proposing approaches. Any assumption it is not confident in must be surfaced as a question. Silent interpretation is not allowed.
 
 ### YAGNI enforcement
 
@@ -312,10 +339,11 @@ Claude never loses its domain grounding mid-session, even after compaction trunc
 | `--k8s-member-gc-duration` flag | **Removed** in etcd-backup-restore v0.42 — do not reference |
 | `PreferClose` traffic distribution | **Deprecated** — use `PreferSameZone` or `PreferSameNode` |
 | Snapshot compression | Enabled by default in etcd-backup-restore v0.40+ (`--compress-snapshots=true`) |
+| Pre-PR CI | All CI jobs must pass before Gate 2 — `make ci-checks && make test-unit` for etcd-druid, `make verify` for sidecars |
 
 ---
 
-## Current versions (as of v1.4.0)
+## Current versions (as of v1.7.0)
 
 | | etcd-druid | etcd-backup-restore | etcd-wrapper |
 |---|---|---|---|

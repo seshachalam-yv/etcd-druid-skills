@@ -1,6 +1,6 @@
 ---
 name: verification
-description: Shared verification gate — referenced by tdd, debug, and feature-dev. Not user-invocable.
+description: Shared verification gate — referenced by tdd, debug, and implement. Not user-invocable.
 user-invocable: false
 ---
 

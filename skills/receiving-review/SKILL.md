@@ -1,6 +1,6 @@
 ---
 name: receiving-review
-description: Guide for handling incoming code review feedback — referenced by feature-dev and review. Not user-invocable.
+description: Guide for handling incoming code review feedback — referenced by implement and review. Not user-invocable.
 user-invocable: false
 ---
 

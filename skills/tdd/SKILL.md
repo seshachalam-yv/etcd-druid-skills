@@ -168,4 +168,4 @@ Uses `testing.T` + Gomega with:
 
 - Test written and passing, ready for PR → invoke `/etcd-druid:review`
 - Test failing unexpectedly after Green → invoke `/etcd-druid:debug`
-- Writing tests for a feature being implemented → tests feed into `/etcd-druid:feature-dev` Phase 4
+- Writing tests for a feature being implemented → tests feed into `/etcd-druid:implement` Phase 2

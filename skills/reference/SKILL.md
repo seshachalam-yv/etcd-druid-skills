@@ -425,7 +425,8 @@ Immutable snapshots: S3 (Object Lock), ABS, GCS, OSS (WORM Lock).
 
 ## Skills Available (on-demand)
 
-- `feature-dev` — full feature development workflow with approval gates
+- `plan` — design phase: issue analysis, approach selection, code plan with approval gate (Gate 1)
+- `implement` — execution phase: worktree setup, per-task subagent loop, verification, PR creation (Gate 2)
 - `api-change` — API field design, CEL validation (field-scoped + cross-field), two-commit generate, CRD tests
 - `tdd` — TDD cycle for all three repos
 - `debug` — systematic debugging workflow

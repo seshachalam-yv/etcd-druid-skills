@@ -27,7 +27,7 @@ Standalone checklist for reviewing etcd-druid, etcd-backup-restore, and etcd-wra
 
 - Before creating a PR (self-review gate)
 - When reviewing someone else's PR
-- After implementing a feature — invoked by `feature-dev` Phase 5 before Gate 2
+- After implementing a feature — invoked by `/etcd-druid:implement` Phase 3 before Gate 2
 
 ---
 
@@ -206,6 +206,6 @@ Fill in `<type>`, `<plugin_file>`, `<section>`, `<wrong_text>`, `<proposed_fix>`
 
 ## Handoff
 
-- Review verdict is LGTM → return to `feature-dev` Phase 5 Gate 2
+- Review verdict is LGTM → return to `/etcd-druid:implement` Phase 3 Gate 2
 - Review verdict is CHANGES REQUESTED and you are the author → follow `skills/receiving-review/SKILL.md`
 - Review finds a pattern not in Known Footguns → add it to this skill's Known Footguns section
