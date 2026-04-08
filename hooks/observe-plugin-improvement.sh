@@ -68,16 +68,21 @@ write_observation() {
     if [ -f "$OBSERVATIONS_FILE" ]; then
         existing_line=$(grep -n "^\*\*File:\*\* \`${obs_file}\`" "$OBSERVATIONS_FILE" 2>/dev/null \
             | head -1 | cut -d: -f1 || true)
+        # Guard: existing_line must be a plain integer (protect awk arithmetic)
+        if ! [[ "${existing_line:-}" =~ ^[0-9]+$ ]]; then existing_line=""; fi
         if [ -n "$existing_line" ]; then
-            section_nearby=$(awk -v start="$existing_line" \
-                'NR>=start && NR<=start+5 && /^\*\*Section:\*\* '"${obs_section}"'/{found=1} END{print found+0}' \
+            # Use index() for literal string match — avoids awk regex metachar issues with obs_section
+            section_nearby=$(awk -v start="$existing_line" -v section="$obs_section" \
+                'NR>=start && NR<=start+5 && index($0, "**Section:** " section) {found=1} END{print found+0}' \
                 "$OBSERVATIONS_FILE")
             if [ "$section_nearby" = "1" ]; then
-                # Increment **Count:** field on the line after the file match
+                # Increment **Count:** field — stop at next ## OBS- header to avoid crossing entry boundary
                 local tmpfile
                 tmpfile=$(mktemp)
                 awk -v start="$existing_line" '
-                    NR >= start && /\*\*Count:\*\* [0-9]+/ && !done {
+                    NR < start { print; next }
+                    /^## OBS-/ && NR > start { done = 1 }
+                    /\*\*Count:\*\* [0-9]+/ && !done {
                         match($0, /[0-9]+/)
                         n = substr($0, RSTART, RLENGTH) + 1
                         sub(/[0-9]+/, n)
