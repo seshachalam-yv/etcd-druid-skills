@@ -115,7 +115,7 @@ etcd-druid:tdd           Use when writing new tests or learning testing patterns
 etcd-druid:debug         Use when something is failing, broken, or behaving unexpectedly — build failures, test failures, reconciliation loops, backup failures
 etcd-druid:review        Use when validating code before a PR — pre-merge checklist, self-review, pattern validation
 etcd-druid:e2e           Use for manual e2e testing — KIND cluster setup, custom image builds, sidecar image overrides, pre-PR CI validation
-etcd-druid:reference     Use for quick lookup: make targets, file paths, git workflow, branch naming
+etcd-druid:reference     Use for quick lookup: make targets, file paths, git workflow, branch naming, EtcdOpsTask state machine, druidctl, feature gates
 etcd-druid:observations  Use to review and triage captured plugin improvement findings — raise PR, skip, or dismiss each one
 ORIENTATION
 )
