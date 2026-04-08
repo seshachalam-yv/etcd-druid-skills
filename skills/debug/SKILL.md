@@ -264,6 +264,6 @@ envtest starts a real API server and etcd for integration tests. Common issues:
 ## Handoff
 
 - Root cause identified, fix implemented → apply verification gate (`skills/verification/SKILL.md`)
-- Fix implemented, needs regression test → invoke `/etcd-druid:tdd`
+- Fix implemented, needs regression test → invoke `/etcd-druid:tdd`; return here (Phase 5) once the regression test is committed and green
 - Fix verified, ready for PR → invoke `/etcd-druid:review`
 - Fix involves API change → invoke `/etcd-druid:api-change`
