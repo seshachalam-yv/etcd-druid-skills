@@ -170,7 +170,8 @@ All active components run in the Gardener seed cluster. Changes must not break g
 | `session-start` | SessionStart, WorktreeCreate, PostCompact | Injects domain orientation: component overview, active repo detection, current branch, available skills. Surfaces pending plugin observations if any exist. |
 | `guard-generated-files.sh` | PreToolUse (Edit/Write) | **Blocks** edits to generated files (`zz_generated*`, `crds/*.yaml`, `charts/crds/*`, `client/`) |
 | `check-dev-docs.sh` | PostToolUse (Edit/Write) | Reminds Claude to read `docs/development/` before editing `.go` source files |
-| `observe-plugin-improvement.sh` | Stop (async) | Pipes each response through Claude to detect plugin gaps — wrong claims, missing footguns, stale flags. Writes structured `OBS-NNN` entries to `plugin-observations.md`. |
+| `detect-correction.sh` | UserPromptSubmit (async) | Watches for user correction phrases ("that's wrong", "actually it's", "no longer exists", etc.). Sets a flag file so the Stop hook knows to run the LLM evaluator on that response. |
+| `observe-plugin-improvement.sh` | Stop (async) | Three-channel gap capture: (1) `<plugin-gap>` XML markers in responses (zero cost), (2) LLM evaluator triggered only when correction flag is set, (3) review skill writes gaps directly. Writes structured `OBS-NNN` entries to `plugin-observations.md`. |
 
 ### Subagent prompts
 

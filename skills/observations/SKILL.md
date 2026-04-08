@@ -7,68 +7,94 @@ effort: low
 
 # Plugin Observations Triage
 
-Review captured observations about the etcd-druid-skills plugin and decide what to do with each one.
-
-## How observations are captured
-
-The Stop hook (`hooks/observe-plugin-improvement.sh`) silently evaluates each response
-after it is generated. When it finds a specific, high-confidence finding that a plugin
-skill, hook, or prompt is wrong or incomplete, it writes a structured entry to
-`plugin-observations.md` in the plugin root.
-
-You are never interrupted during active work — this skill is the only entry point
-for reviewing and acting on those findings.
+Review captured plugin improvement observations and decide what to do with each one.
+Observations come from three sources: explicit `<plugin-gap>` markers Claude emits,
+user correction detection, and review-skill gap capture.
 
 ---
 
-## Process
-
-### Step 1: Read the observations file
+## Step 1: Read and pre-verify all open observations
 
 ```bash
-cat "${CLAUDE_PLUGIN_ROOT}/plugin-observations.md"
+PLUGIN_OBS="${CLAUDE_PLUGIN_ROOT}/plugin-observations.md"
+cat "$PLUGIN_OBS"
 ```
 
-If the file does not exist or has no open entries, report: "No open observations." and stop.
+If the file does not exist or has no `**Status:** open` entries: report "No open observations." and stop.
 
-### Step 2: Present each open observation
+Before showing any observation to the user, **verify it against the actual plugin file**:
 
-For each `## OBS-NNN` entry with `**Status:** open`, present it clearly:
+For each open `OBS-NNN` entry:
+
+1. Read `plugin_file` from the entry (the `**File:**` field)
+2. Read the actual file: `cat "${CLAUDE_PLUGIN_ROOT}/<plugin_file>"`
+3. Check whether `wrong_text` (the `**Wrong / Missing:**` field) is still present in the file
+   - If `wrong_text` is `MISSING` — check whether the missing content now exists
+   - If `wrong_text` is a quoted string — check whether that exact text (or close equivalent) appears in the file
+
+**Auto-resolve** without showing the user if:
+- The referenced plugin file no longer exists
+- `wrong_text` is not found in the file (already fixed, or evaluator hallucinated the reference)
+
+Mark auto-resolved entries:
+```
+**Status:** auto-resolved — wrong_text not found in current file
+```
+
+---
+
+## Step 2: Present each verified open observation
+
+For each observation that survived pre-verification, show it clearly:
 
 ```
-OBS-NNN — <type> in <plugin_file>
-Section: <plugin_section>
-Confidence: <confidence>
+─────────────────────────────────────────
+OBS-NNN | <type> | <confidence> confidence | source: <source>
+File: <plugin_file> § <plugin_section>
+
+CURRENT FILE CONTENT at that section:
+  <paste the relevant 3-5 lines from the actual file>
 
 Wrong / Missing:
   <wrong_text>
 
-Should be:
+Proposed fix:
   <correct_text>
 
-Evidence:
-  <evidence>
+Evidence that revealed this:
+  "<evidence>"
+─────────────────────────────────────────
 ```
 
-Then ask the user:
+Including the **current file content** is critical — it lets the user verify
+whether the proposed fix is actually correct before deciding.
 
-> **What would you like to do with OBS-NNN?**
-> - **R** — Raise a PR to fix this now
-> - **S** — Skip for now (keep open, review again later)
-> - **D** — Dismiss (not worth fixing, mark as resolved with no PR)
+Then ask:
+
+> **OBS-NNN: what would you like to do?**
+> - **R** — Apply fix and raise a PR
+> - **S** — Skip for now (keep open)
+> - **D** — Dismiss (not worth fixing)
 
 Wait for the user's response before moving to the next observation.
 
-### Step 3: Act on the user's choice
+---
 
-**R — Raise PR:**
+## Step 3: Act on the user's choice
 
-1. Read the referenced plugin file to confirm the issue still exists
-2. If the issue no longer exists (already fixed): tell the user, mark as resolved with note "auto-resolved — already fixed"
-3. If it still exists: apply the fix directly to the skill file
-4. Commit: `Fix <what> in <skill-name> skill`
-5. Create PR:
+### R — Apply fix and raise PR
+
+1. Read the full plugin file again (fresh read)
+2. Apply the fix from `correct_text` — use Edit tool, minimal change
+3. Verify the edit looks correct (read the changed section back)
+4. Commit:
    ```bash
+   git -C "${CLAUDE_PLUGIN_ROOT}" add <plugin_file>
+   git -C "${CLAUDE_PLUGIN_ROOT}" commit -m "Fix <what> in <skill-name> (OBS-NNN)"
+   ```
+5. Push and create PR:
+   ```bash
+   git -C "${CLAUDE_PLUGIN_ROOT}" push origin master
    gh pr create \
      --repo seshachalam-yv/etcd-druid-skills \
      --base master \
@@ -79,41 +105,46 @@ Wait for the user's response before moving to the next observation.
    **What this PR does / why we need it:**
    <correct_text from the observation>
 
-   **Discovered via:** Auto-captured plugin observation OBS-NNN
+   **Discovered via:** Plugin observation OBS-NNN (source: <source>)
 
    **Evidence:**
    > <evidence from the observation>
    EOF
    )"
    ```
-6. Mark observation as resolved in `plugin-observations.md`:
-   - Change `**Status:** open` to `**Status:** resolved — PR #NNNN`
+6. Mark resolved in `plugin-observations.md`:
+   Change `**Status:** open` → `**Status:** resolved — <PR URL>`
 
-**S — Skip:**
-Move to the next observation. The entry remains open.
+### S — Skip
 
-**D — Dismiss:**
-Mark observation as resolved in `plugin-observations.md`:
-- Change `**Status:** open` to `**Status:** dismissed`
-- Add a one-line note if the user gave a reason
+Leave status as `open`. Move to next observation.
 
-### Step 4: After all observations
+### D — Dismiss
 
-Report a summary:
+Change `**Status:** open` → `**Status:** dismissed`
+
+If the user gives a reason, add: `**Dismiss reason:** <reason>`
+
+---
+
+## Step 4: Summary after all observations
+
 ```
 Triage complete.
-  Raised: N PR(s)
-  Skipped: N (still open)
+  Auto-resolved (already fixed): N
+  Fixed and PR raised: N
+  Skipped (still open): N
   Dismissed: N
 ```
 
-If any were skipped, mention: "Run /etcd-druid:observations again when ready to revisit them."
+If any were skipped: "Run /etcd-druid:observations again when ready."
 
 ---
 
 ## Rules
 
-- Never raise a PR without user confirmation (the "R" choice is the confirmation)
-- Never modify a skill file without reading it first to confirm the issue still exists
-- Never batch-dismiss observations without showing them individually
-- If an observation references a file that no longer exists, auto-resolve it with note "file removed"
+- Never raise a PR without the user's explicit **R** choice
+- Never apply a fix without reading the current file content first
+- Never batch-dismiss — show each observation individually
+- The `correct_text` field is a **proposed fix**, not ground truth — verify it matches the current file before applying
+- If an observation's `wrong_text` is not found in the file, auto-resolve it — do not show to user

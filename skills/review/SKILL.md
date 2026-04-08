@@ -140,33 +140,49 @@ If new docs files are added or structure changes: `mkdocs.yml` and `docs/README.
 If you are the author receiving this verdict, follow `skills/receiving-review/SKILL.md` to handle the feedback.
 
 **Documentation gaps** — conventions in code not yet in docs/development/, OR mistakes found in this plugin's skills:
+
+For gaps in **repo docs** (`docs/development/`): list them inline as before.
+
+For gaps or mistakes in **this plugin's skills**: write each one directly to `plugin-observations.md` using the Bash tool:
+
+```bash
+PLUGIN_OBS="${CLAUDE_PLUGIN_ROOT}/plugin-observations.md"
+NEXT_NUM=$(grep -oE '^## OBS-[0-9]+' "$PLUGIN_OBS" 2>/dev/null | grep -oE '[0-9]+' | sort -n | tail -1 || echo "0")
+NEXT_NUM=$(printf '%03d' $((NEXT_NUM + 1)))
+
+# Create file with header if needed
+if [ ! -f "$PLUGIN_OBS" ]; then
+  printf '# Plugin Observations\n\nAuto-captured. Run `/etcd-druid:observations` to triage.\n\n---\n\n## Resolved\n\n_(none yet)_\n' > "$PLUGIN_OBS"
+fi
+
+# Insert before Resolved section
+TMPFILE=$(mktemp)
+awk -v entry="
+## OBS-${NEXT_NUM} — <type> in <plugin_file>
+
+**Date:** $(date +%Y-%m-%d)
+**Source:** review-skill
+**Type:** <wrong_claim|missing_convention|missing_footgun|unclear_workflow|stale_path_or_flag>
+**Confidence:** high
+**File:** \`<skills/name/SKILL.md>\`
+**Section:** <section heading>
+
+**Wrong / Missing:**
+> <exact wrong text, or MISSING>
+
+**Proposed fix:**
+<what it should say — specific enough to write without investigation>
+
+**Evidence:**
+> <what in the diff or docs revealed this>
+
+**Status:** open
+
+---
+" '/^## Resolved/{print entry} {print}' "$PLUGIN_OBS" > "$TMPFILE" && mv "$TMPFILE" "$PLUGIN_OBS"
 ```
-- <description of gap or mistake>
-  → docs/development/<file>.md in <repo>   (if missing from repo docs)
-  → skills/<skill>/SKILL.md in etcd-druid-skills plugin   (if skill was wrong or incomplete)
-```
 
-For each gap or mistake in the plugin, suggest a PR:
-
-```
-Plugin PR suggestion
-Title: Fix <what was wrong> in <skill name> skill
-Body:
-  /kind bug
-
-  **What this PR does / why we need it:**
-  <describe the gap or mistake discovered during this review>
-
-  **Discovered while:** <brief context — e.g. "reviewing PR #NNNN", "implementing feature X">
-
-  **Fix:** <what the skill/hook/prompt should say instead>
-
-  gh pr create \
-    --repo seshachalam-yv/etcd-druid-skills \
-    --base master \
-    --title "Fix <what> in <skill> skill" \
-    --body "..."
-```
+Fill in `<type>`, `<plugin_file>`, `<section>`, `<wrong_text>`, `<proposed_fix>`, and `<evidence>` from what you found. Run the bash block once per plugin gap found. The user will triage these via `/etcd-druid:observations`.
 
 ---
 

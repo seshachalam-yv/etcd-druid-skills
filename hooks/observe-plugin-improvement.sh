@@ -1,119 +1,264 @@
 #!/usr/bin/env bash
-# Stop hook: use Claude to evaluate whether the just-completed response reveals
-# a specific, actionable improvement to the etcd-druid-skills plugin itself.
+# Stop hook: capture plugin improvement observations from Claude's responses.
 #
-# Runs async (non-blocking). Writes observations to $PLUGIN_ROOT/plugin-observations.md.
-# Never blocks the Stop event — exits 0 always.
+# Three capture channels, cheapest first:
+#   1. <plugin-gap> XML markers — Claude emits these explicitly, zero LLM cost
+#   2. User correction signal — UserPromptSubmit hook sets a flag file
+#   3. LLM evaluator — only fires when correction signal flag is present
+#
+# Never blocks the Stop event. Exits 0 always.
+# Runs async — no session latency impact.
 
 set -uo pipefail
 
 PLUGIN_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 OBSERVATIONS_FILE="${PLUGIN_ROOT}/plugin-observations.md"
+CORRECTION_FLAG="/tmp/etcd-druid-correction-signal-${SESSION_ID:-default}"
 
-# Read Stop hook payload from stdin
+# ── Guard: prevent infinite recursion ────────────────────────────────────────
+# stop_hook_active is set to true when a Stop hook is already running.
+# Without this check, calling claude inside here would fire another Stop hook.
 PAYLOAD=$(cat)
-
-LAST_MESSAGE=$(printf '%s' "$PAYLOAD" | jq -r '.last_assistant_message // empty' 2>/dev/null || true)
-
-# Skip if message is too short to contain a plugin-level observation
-if [ -z "$LAST_MESSAGE" ] || [ "${#LAST_MESSAGE}" -lt 200 ]; then
+STOP_HOOK_ACTIVE=$(printf '%s' "$PAYLOAD" | jq -r '.stop_hook_active // false' 2>/dev/null || echo "false")
+if [ "$STOP_HOOK_ACTIVE" = "true" ]; then
     exit 0
 fi
 
-# Build the evaluation prompt — Claude evaluates whether the response reveals a plugin gap
-EVAL_PROMPT=$(cat <<'PROMPT_EOF'
-You are reviewing a Claude Code assistant response to determine whether it reveals a specific, actionable improvement to the etcd-druid-skills plugin — a Claude Code plugin that helps contributors work on etcd-druid, etcd-backup-restore, and etcd-wrapper.
+SESSION_ID=$(printf '%s' "$PAYLOAD" | jq -r '.session_id // "default"' 2>/dev/null || echo "default")
+TRANSCRIPT_PATH=$(printf '%s' "$PAYLOAD" | jq -r '.transcript_path // empty' 2>/dev/null || true)
 
-The plugin consists of:
-- skills/feature-dev/SKILL.md — feature development workflow (phases, gates, subagent loop)
+if [ -z "$TRANSCRIPT_PATH" ] || [ ! -f "$TRANSCRIPT_PATH" ]; then
+    exit 0
+fi
+
+# ── Extract last assistant message from transcript JSONL ──────────────────────
+# Transcript is JSONL. Each line is a message object.
+# Assistant messages have role="assistant" and content is an array of typed blocks.
+LAST_MESSAGE=$(grep '"role":"assistant"' "$TRANSCRIPT_PATH" 2>/dev/null | tail -1 \
+    | jq -r '(.message.content // .content // [])
+             | map(select(.type == "text"))
+             | map(.text)
+             | join("\n")' 2>/dev/null || true)
+
+# Fallback: try simpler structure variants
+if [ -z "$LAST_MESSAGE" ]; then
+    LAST_MESSAGE=$(grep '"role":"assistant"' "$TRANSCRIPT_PATH" 2>/dev/null | tail -1 \
+        | jq -r '.content // empty' 2>/dev/null || true)
+fi
+
+if [ -z "$LAST_MESSAGE" ] || [ "${#LAST_MESSAGE}" -lt 100 ]; then
+    exit 0
+fi
+
+# ── Helper: write an observation entry ───────────────────────────────────────
+write_observation() {
+    local obs_type="$1"
+    local obs_confidence="$2"
+    local obs_file="$3"
+    local obs_section="$4"
+    local obs_wrong="$5"
+    local obs_correct="$6"
+    local obs_evidence="$7"
+    local obs_source="$8"
+    local obs_date
+    obs_date=$(date +%Y-%m-%d)
+
+    # Deduplicate: skip if same file+section already has an open entry
+    if [ -f "$OBSERVATIONS_FILE" ]; then
+        if grep -q "^\*\*File:\*\* \`${obs_file}\`" "$OBSERVATIONS_FILE" 2>/dev/null; then
+            if grep -A3 "^\*\*File:\*\* \`${obs_file}\`" "$OBSERVATIONS_FILE" \
+               | grep -q "^\*\*Section:\*\* ${obs_section}"; then
+                # Same file+section already recorded — skip to avoid duplicates
+                return 0
+            fi
+        fi
+    fi
+
+    # Determine next OBS number
+    local last_num=0
+    if [ -f "$OBSERVATIONS_FILE" ]; then
+        last_num=$(grep -oE '^## OBS-[0-9]+' "$OBSERVATIONS_FILE" \
+            | grep -oE '[0-9]+' | sort -n | tail -1 2>/dev/null || echo "0")
+    fi
+    local next_num
+    next_num=$(printf '%03d' $((last_num + 1)))
+
+    # Create file with header if needed
+    if [ ! -f "$OBSERVATIONS_FILE" ]; then
+        cat > "$OBSERVATIONS_FILE" <<'HEADER'
+# Plugin Observations
+
+Auto-captured observations about the etcd-druid-skills plugin.
+Each entry is a specific, actionable finding that a contributor can act on.
+
+Run `/etcd-druid:observations` to review and triage entries.
+
+---
+
+## Resolved
+
+_(none yet)_
+HEADER
+    fi
+
+    # Build entry
+    local new_entry
+    new_entry=$(cat <<ENTRY
+
+## OBS-${next_num} — ${obs_type} in ${obs_file}
+
+**Date:** ${obs_date}
+**Source:** ${obs_source}
+**Type:** ${obs_type}
+**Confidence:** ${obs_confidence}
+**File:** \`${obs_file}\`
+**Section:** ${obs_section}
+
+**Wrong / Missing:**
+> ${obs_wrong}
+
+**Proposed fix:**
+${obs_correct}
+
+**Evidence:**
+> ${obs_evidence}
+
+**Status:** open
+
+---
+ENTRY
+)
+
+    # Insert before Resolved section
+    if grep -q '^## Resolved' "$OBSERVATIONS_FILE"; then
+        local tmpfile
+        tmpfile=$(mktemp)
+        awk -v entry="$new_entry" '/^## Resolved/{print entry} {print}' \
+            "$OBSERVATIONS_FILE" > "$tmpfile"
+        mv "$tmpfile" "$OBSERVATIONS_FILE"
+    else
+        printf '%s\n' "$new_entry" >> "$OBSERVATIONS_FILE"
+    fi
+}
+
+# ── Channel 1: <plugin-gap> XML markers ──────────────────────────────────────
+# Claude emits these explicitly when it notices a gap while working.
+# Format: <plugin-gap file="..." section="..." type="...">description</plugin-gap>
+# Zero LLM cost — just string matching.
+
+if printf '%s' "$LAST_MESSAGE" | grep -q '<plugin-gap'; then
+    # Extract each marker
+    while IFS= read -r gap_block; do
+        gap_file=$(printf '%s' "$gap_block" | grep -oP '(?<=file=")[^"]+' || true)
+        gap_section=$(printf '%s' "$gap_block" | grep -oP '(?<=section=")[^"]+' || true)
+        gap_type=$(printf '%s' "$gap_block" | grep -oP '(?<=type=")[^"]+' || "missing_convention")
+        gap_body=$(printf '%s' "$gap_block" | sed 's/<plugin-gap[^>]*>//;s|</plugin-gap>||' | xargs || true)
+
+        if [ -n "$gap_file" ] && [ -n "$gap_body" ]; then
+            write_observation \
+                "${gap_type:-missing_convention}" \
+                "high" \
+                "$gap_file" \
+                "${gap_section:-unknown}" \
+                "MISSING" \
+                "$gap_body" \
+                "$(printf '%s' "$gap_body" | head -c 200)" \
+                "explicit-marker"
+        fi
+    done < <(printf '%s' "$LAST_MESSAGE" | grep -oP '<plugin-gap[^>]*>.*?</plugin-gap>' || true)
+fi
+
+# ── Channel 2+3: correction signal + LLM evaluator ───────────────────────────
+# Only run LLM evaluation if UserPromptSubmit hook detected a correction phrase
+# in the user's preceding message. Without this gate, we'd call LLM on every turn.
+
+CORRECTION_FLAG="/tmp/etcd-druid-correction-${SESSION_ID}"
+
+if [ ! -f "$CORRECTION_FLAG" ]; then
+    exit 0
+fi
+
+# Consume the flag — one evaluation per correction signal
+rm -f "$CORRECTION_FLAG"
+
+# Build evaluation prompt
+EVAL_PROMPT=$(cat <<'PROMPT_EOF'
+You are reviewing a Claude Code assistant response to determine whether it reveals a specific, actionable improvement to the etcd-druid-skills plugin — a Claude Code plugin helping contributors work on etcd-druid, etcd-backup-restore, and etcd-wrapper.
+
+The plugin contains:
+- skills/feature-dev/SKILL.md — feature workflow, phases, gates, subagent loop
 - skills/api-change/SKILL.md — API field design, CEL validation, two-commit generate workflow
-- skills/tdd/SKILL.md — test framework per repo, TDD cycle, fake client patterns
-- skills/tdd/testing-anti-patterns.md — known anti-patterns with code examples
+- skills/tdd/SKILL.md — test frameworks per repo, TDD cycle, fake client patterns
+- skills/tdd/testing-anti-patterns.md — 5 domain-specific anti-patterns with code examples
 - skills/debug/SKILL.md — systematic debugging across three repos
 - skills/review/SKILL.md — pre-PR checklist, footguns list, verdict format
 - skills/e2e/SKILL.md — KIND cluster setup, custom image builds, sidecar overrides
-- skills/reference/SKILL.md — make targets, file paths, flags, feature gates, EtcdOpsTask
-- skills/verification/SKILL.md — verification gate referenced by tdd/debug/feature-dev
+- skills/reference/SKILL.md — make targets, file paths, flags, feature gates
+- skills/verification/SKILL.md — verification gate (5-step, cross-cutting)
 - skills/receiving-review/SKILL.md — handling incoming review feedback
-- hooks/session-start — orientation injected at session start (component system, invariants, skills list)
-- hooks/guard-generated-files.sh — PreToolUse hook blocking edits to generated files
-- hooks/check-dev-docs.sh — PostToolUse hook nudging Claude to read docs/development/
+- hooks/session-start — orientation block: component system, invariants, skills list
+- hooks/guard-generated-files.sh — blocks edits to generated files
 
-## Your task
+## Context
 
-Read the response below and answer ONE question:
+This response followed a user correction or clarification. The user said something indicating that Claude's previous response was wrong or that something was missing. Your job: determine whether the correction reveals a specific flaw in the plugin guidance that would cause future sessions to make the same mistake.
 
-Does this response contain evidence that a specific part of the plugin is WRONG, INCOMPLETE, or MISLEADING in a way that would cause future Claude sessions to make the same mistake?
+## Qualifies as a plugin observation
 
-## Rules for what qualifies
+- A make target, flag, file path, or type stated in a skill is wrong or removed
+- A skill workflow step caused Claude to go the wrong direction and the skill text is the source of the ambiguity
+- A convention exists in the codebase that no skill documents — applies across sessions, not just this task
+- A footgun was encountered not listed in skills/review/SKILL.md Known Footguns
+- The session-start orientation stated something factually wrong
+- A rationalization was used to bypass an Iron Law not covered by any rationalization table
 
-QUALIFY — plugin-level observations:
-- A skill stated that a flag, make target, file path, or type exists — and the response shows it does not (or was removed)
-- A skill said to do X in situation S — but doing X in situation S caused a problem the skill did not warn about
-- Claude encountered a convention that no skill documents, and this convention applies across sessions (not just to this task)
-- A workflow step in a skill was unclear or caused Claude to go the wrong direction — the ambiguity is in the skill text, not the task
-- A footgun was encountered that is not in skills/review/SKILL.md Known Footguns section
-- The session-start hook stated something factually wrong about the component system
-- A rationalization was used to bypass an Iron Law that no rationalization table currently covers
+## Does NOT qualify
 
-DO NOT QUALIFY — task-specific or too vague:
-- This specific PR/task/component needs X (even if X is interesting)
-- A general Go, Kubernetes, or etcd observation not tied to plugin guidance
-- Something Claude is uncertain about — "I think this might be wrong" is not enough
-- A pattern specific to one codebase location and unlikely to recur
-- A suggestion to add more content when the existing content is correct
+- Task-specific findings (this PR, this component, this bug)
+- General Go/Kubernetes/etcd observations not tied to plugin guidance
+- Uncertainty — "I think this might be wrong" is not enough
+- Patterns specific to one location and unlikely to recur
 
-## Confidence threshold
+## Confidence threshold — all three required
 
-Only output an observation if ALL THREE are true:
-1. You can name the EXACT plugin file and section that is wrong or missing
-2. You can state the EXACT wrong/missing text or guidance
-3. You can state what the CORRECT text should be, specific enough that someone could write the fix without further investigation
+1. Exact plugin file and section named
+2. Exact wrong or missing text identified
+3. Exact proposed fix stated — specific enough to write without further investigation
 
-If you cannot satisfy all three, output null.
-
-## Output format
-
-If an observation qualifies, output this JSON and nothing else:
+Output this JSON if all three are met, nothing else:
 
 {
   "type": "wrong_claim" | "missing_convention" | "missing_footgun" | "unclear_workflow" | "stale_path_or_flag" | "missing_iron_law_rationalization",
   "confidence": "high" | "medium",
-  "plugin_file": "<path relative to plugin root, e.g. skills/review/SKILL.md>",
-  "plugin_section": "<heading or section name where the issue lives>",
-  "wrong_text": "<exact text in the skill that is wrong, or MISSING if content does not exist yet>",
-  "correct_text": "<what the text should say, specific enough to write the fix>",
-  "evidence": "<the specific sentence or action in the response that revealed this — quote it directly>"
+  "plugin_file": "<path relative to plugin root>",
+  "plugin_section": "<section heading>",
+  "wrong_text": "<exact text in skill, or MISSING>",
+  "correct_text": "<proposed fix — specific enough to write>",
+  "evidence": "<quote from response that revealed this>"
 }
 
-If no observation qualifies, output exactly:
-null
-
-Do not output explanation, commentary, or multiple observations. One observation or null.
-
-## Response to evaluate
+If threshold not met, output exactly: null
 
 PROMPT_EOF
 )
 
-# Call Claude to evaluate — use --bare to skip plugin/hook overhead
-EVAL_OUTPUT=$(printf '%s\n\n%s' "$EVAL_PROMPT" "$LAST_MESSAGE" \
-    | timeout 45 claude --bare -p --output-format text 2>/dev/null || true)
+# Call Claude with --no-hooks to prevent Stop hook recursion
+# (belt-and-suspenders alongside stop_hook_active check)
+EVAL_OUTPUT=$(printf '%s\n\n## Response to evaluate\n\n%s' "$EVAL_PROMPT" "$LAST_MESSAGE" \
+    | timeout 60 claude --bare --no-hooks -p --output-format text 2>/dev/null || true)
 
-# Trim whitespace
 EVAL_OUTPUT=$(printf '%s' "$EVAL_OUTPUT" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
 
-# If output is null, empty, or non-JSON, nothing to record
 if [ -z "$EVAL_OUTPUT" ] || [ "$EVAL_OUTPUT" = "null" ]; then
     exit 0
 fi
 
-# Validate it parses as JSON with required fields
-if ! printf '%s' "$EVAL_OUTPUT" | jq -e '.type and .plugin_file and .correct_text and .evidence' >/dev/null 2>&1; then
+# Validate JSON structure
+if ! printf '%s' "$EVAL_OUTPUT" \
+   | jq -e '.type and .plugin_file and .correct_text and .evidence' >/dev/null 2>&1; then
     exit 0
 fi
 
-# Extract fields
 OBS_TYPE=$(printf '%s' "$EVAL_OUTPUT" | jq -r '.type')
 OBS_CONFIDENCE=$(printf '%s' "$EVAL_OUTPUT" | jq -r '.confidence')
 OBS_FILE=$(printf '%s' "$EVAL_OUTPUT" | jq -r '.plugin_file')
@@ -121,69 +266,15 @@ OBS_SECTION=$(printf '%s' "$EVAL_OUTPUT" | jq -r '.plugin_section')
 OBS_WRONG=$(printf '%s' "$EVAL_OUTPUT" | jq -r '.wrong_text')
 OBS_CORRECT=$(printf '%s' "$EVAL_OUTPUT" | jq -r '.correct_text')
 OBS_EVIDENCE=$(printf '%s' "$EVAL_OUTPUT" | jq -r '.evidence')
-OBS_DATE=$(date +%Y-%m-%d)
 
-# Determine next OBS number
-if [ -f "$OBSERVATIONS_FILE" ]; then
-    LAST_NUM=$(grep -oE '^## OBS-[0-9]+' "$OBSERVATIONS_FILE" | grep -oE '[0-9]+' | sort -n | tail -1 || echo "0")
-else
-    LAST_NUM=0
-fi
-NEXT_NUM=$(printf '%03d' $((LAST_NUM + 1)))
-
-# Create file with header if it doesn't exist
-if [ ! -f "$OBSERVATIONS_FILE" ]; then
-    cat > "$OBSERVATIONS_FILE" <<'HEADER_EOF'
-# Plugin Observations
-
-Auto-captured observations about the etcd-druid-skills plugin.
-Each entry is a specific, actionable finding that a contributor can act on.
-
-Review and triage periodically. When an observation is fixed (PR merged),
-move it to the Resolved section with the PR link.
-
----
-
-## Resolved
-
-_(none yet)_
-HEADER_EOF
-fi
-
-# Insert new observation before the Resolved section
-NEW_ENTRY=$(cat <<ENTRY_EOF
-
-## OBS-${NEXT_NUM} — ${OBS_TYPE} in ${OBS_FILE}
-
-**Date:** ${OBS_DATE}
-**Type:** ${OBS_TYPE}
-**Confidence:** ${OBS_CONFIDENCE}
-**File:** \`${OBS_FILE}\`
-**Section:** ${OBS_SECTION}
-
-**Wrong / Missing:**
-> ${OBS_WRONG}
-
-**Should be:**
-${OBS_CORRECT}
-
-**Evidence:**
-> ${OBS_EVIDENCE}
-
-**Status:** open
-
----
-ENTRY_EOF
-)
-
-# Insert before "## Resolved" line
-if grep -q '^## Resolved' "$OBSERVATIONS_FILE"; then
-    # Use a temp file to insert before the Resolved section
-    TMPFILE=$(mktemp)
-    awk -v entry="$NEW_ENTRY" '/^## Resolved/{print entry} {print}' "$OBSERVATIONS_FILE" > "$TMPFILE"
-    mv "$TMPFILE" "$OBSERVATIONS_FILE"
-else
-    printf '%s\n' "$NEW_ENTRY" >> "$OBSERVATIONS_FILE"
-fi
+write_observation \
+    "$OBS_TYPE" \
+    "$OBS_CONFIDENCE" \
+    "$OBS_FILE" \
+    "$OBS_SECTION" \
+    "$OBS_WRONG" \
+    "$OBS_CORRECT" \
+    "$OBS_EVIDENCE" \
+    "llm-evaluator"
 
 exit 0
