@@ -280,7 +280,36 @@ func TestValidateAdditionalAdvertisePeerUrls(t *testing.T) {
 
 ---
 
-## Step 7: PR Requirements
+## Step 7: CI Pipeline Verification (required — Gate 2 never presented with failing CI)
+
+Run all of these in order before presenting Gate 2. Any failure → dispatch fix subagent with full output.
+
+```bash
+# From worktree root
+cd <worktree-path>
+make ci-checks          # format + lint + license + api-diff (catches field naming issues)
+make test-unit          # confirms deepcopy generation is syntactically correct
+make test-integration   # runs test/it/crdvalidation/ — your CEL tests are here
+
+# From api/ module
+cd <worktree-path>/api
+make check-generate     # fails if make generate would produce a diff — means commit 2 is stale
+make check-apidiff      # fails on breaking API changes — must pass or be explicitly excepted
+```
+
+**If `make check-apidiff` fails with an unexpected breaking change:**
+The API diff tool found a field removal, rename, or type change you didn't intend. Fix the field design. If the breaking change is intentional, follow `docs/development/changing-api.md` to add it to the compatibility exception list.
+
+**If `make test-integration` fails on a CEL test:**
+- `skipCELTestsForOlderK8sVersions(t)` guard missing → add it
+- envtest K8s version < 1.29 → the skip guard handles this automatically
+- CEL rule syntax error → run `kubectl apply --dry-run=server -f api/core/v1alpha1/crds/*.yaml` against a live cluster to see the CEL parse error
+
+**Gate 2 is never presented with failing CI.** All five commands above must pass.
+
+---
+
+## Step 8: PR Requirements
 
 **Read the template first.** The PR template lives in `.github/pull_request_template.md` in the repo — read it directly and fill every section. Prow bots parse `/area` and `/kind`; wrong values or missing lines stall the review.
 
@@ -357,6 +386,6 @@ int(self.name.substring(self.name.lastIndexOf('-') + 1))
 ## Handoff
 
 After completing the API change:
-- Run `make ci-checks` from the worktree root
-- Run `make test-integration` (CRD validation tests live in the integration suite)
-- Invoke `/etcd-druid:review` for pre-PR checklist
+- CI pipeline passes (Step 7 all green) → return to `/etcd-druid:implement` Phase 3 (verify gate)
+- Debugging a failing CEL test or stale generation → invoke `/etcd-druid:debug`
+- Writing the CEL test → follow `skills/tdd/SKILL.md` (use `skipCELTestsForOlderK8sVersions(t)` guard)
