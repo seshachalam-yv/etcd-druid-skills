@@ -88,4 +88,42 @@ done <<< "$MEMORIES"
 jq -n --arg ctx "$MEMORY_BLOCK" \
     '{"continue":true,"suppressOutput":false,"hookSpecificOutput":{"hookEventName":"SessionStart","additionalContext":$ctx}}'
 
+# ── Upstream drift detection ──────────────────────────────────────────────────
+# If the working directory has an upstream remote and a docs/development/ dir,
+# check whether upstream/master has diverged from HEAD on those docs.
+# Inject a warning if it has. No-op if no upstream remote or no docs/development/.
+
+DRIFT_MSG=""
+
+if git rev-parse --git-dir >/dev/null 2>&1; then
+    REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || true)
+    DEV_DOCS="${REPO_ROOT}/docs/development"
+
+    if [ -d "$DEV_DOCS" ]; then
+        # Fetch upstream quietly (no-op if no upstream remote)
+        git fetch upstream --quiet 2>/dev/null || true
+
+        # Check if docs/development/ differs from upstream/master
+        if git rev-parse upstream/master >/dev/null 2>&1; then
+            UPSTREAM_DIFF=$(git diff HEAD..upstream/master -- docs/development/ --name-only 2>/dev/null || true)
+
+            if [ -n "$UPSTREAM_DIFF" ]; then
+                CHANGED_FILES=$(printf '%s' "$UPSTREAM_DIFF" | head -5 | tr '\n' ',' | sed 's/,$//')
+                DRIFT_MSG="Warning: docs/development/ has changed upstream since your last merge. Conventions in these files may differ from what the skills reference: ${CHANGED_FILES}. Read the updated docs before editing source files."
+            fi
+        fi
+    fi
+fi
+
+if [ -n "$DRIFT_MSG" ]; then
+    # Write drift warning as a high-confidence memory entry so it persists
+    bash "$(dirname "$0")/write-memory.sh" \
+        "$DRIFT_MSG" \
+        "upstream-drift,docs-development,conventions" \
+        "0.95" &
+
+    jq -n --arg ctx "$DRIFT_MSG" \
+        '{"continue":true,"suppressOutput":false,"hookSpecificOutput":{"hookEventName":"SessionStart","additionalContext":$ctx}}'
+fi
+
 exit 0
