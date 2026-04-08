@@ -15,7 +15,7 @@
           {
             "type": "command",
             "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/session-memory.sh\"",
-            "async": true
+            "async": false
           }
         ]
       }
@@ -29,6 +29,15 @@
             "async": false
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/session-memory.sh\"",
+            "async": false
+          }
+        ]
       }
     ],
     "PostCompact": [
@@ -37,6 +46,15 @@
           {
             "type": "command",
             "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/run-hook.sh\" session-start",
+            "async": false
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/session-memory.sh\"",
             "async": false
           }
         ]
