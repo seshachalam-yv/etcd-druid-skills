@@ -85,7 +85,10 @@ Wait for the user's response before moving to the next observation.
 ### R — Apply fix and raise PR
 
 1. Read the full plugin file again (fresh read)
-2. Apply the fix from `correct_text` — use Edit tool, minimal change
+2. Check the `**Apply:**` field in the observation:
+   - If it shows a `sed` command: run it directly in the plugin root
+   - If it shows `MULTILINE — apply manually`: use the Edit tool with `correct_text`
+   - Always verify the result by reading the changed section back
 3. Verify the edit looks correct (read the changed section back)
 4. Commit:
    ```bash

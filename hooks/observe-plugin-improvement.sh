@@ -58,8 +58,9 @@ write_observation() {
     local obs_section="$4"
     local obs_wrong="$5"
     local obs_correct="$6"
-    local obs_evidence="$7"
-    local obs_source="$8"
+    local obs_diff="$7"
+    local obs_evidence="$8"
+    local obs_source="$9"
     local obs_date
     obs_date=$(date +%Y-%m-%d)
 
@@ -120,6 +121,11 @@ HEADER
 **Proposed fix:**
 ${obs_correct}
 
+**Apply:**
+\`\`\`bash
+${obs_diff}
+\`\`\`
+
 **Evidence:**
 > ${obs_evidence}
 
@@ -163,6 +169,7 @@ if printf '%s' "$LAST_MESSAGE" | grep -q '<plugin-gap'; then
                 "${gap_section:-unknown}" \
                 "MISSING" \
                 "$gap_body" \
+                "MULTILINE — apply manually" \
                 "$(printf '%s' "$gap_body" | head -c 200)" \
                 "explicit-marker"
             # Persist to cross-session memory store
@@ -238,10 +245,14 @@ Output this JSON if all three are met, nothing else:
   "confidence": "high" | "medium",
   "plugin_file": "<path relative to plugin root>",
   "plugin_section": "<section heading>",
-  "wrong_text": "<exact text in skill, or MISSING>",
-  "correct_text": "<proposed fix — specific enough to write>",
+  "wrong_text": "<exact text in skill that is wrong, or MISSING>",
+  "correct_text": "<proposed replacement text — complete, ready to apply>",
+  "diff_apply": "<the minimal sed or awk one-liner to apply the fix, e.g.: sed -i 's/old text/new text/' skills/tdd/SKILL.md>",
   "evidence": "<quote from response that revealed this>"
 }
+
+The diff_apply field must be a single bash command that applies correct_text over wrong_text in plugin_file.
+Use sed -i for simple line replacements. If the change is multi-line, use: "MULTILINE — apply manually".
 
 If threshold not met, output exactly: null
 
@@ -271,6 +282,7 @@ OBS_FILE=$(printf '%s' "$EVAL_OUTPUT" | jq -r '.plugin_file')
 OBS_SECTION=$(printf '%s' "$EVAL_OUTPUT" | jq -r '.plugin_section')
 OBS_WRONG=$(printf '%s' "$EVAL_OUTPUT" | jq -r '.wrong_text')
 OBS_CORRECT=$(printf '%s' "$EVAL_OUTPUT" | jq -r '.correct_text')
+OBS_DIFF=$(printf '%s' "$EVAL_OUTPUT" | jq -r '.diff_apply // "MULTILINE — apply manually"')
 OBS_EVIDENCE=$(printf '%s' "$EVAL_OUTPUT" | jq -r '.evidence')
 
 write_observation \
@@ -280,6 +292,7 @@ write_observation \
     "$OBS_SECTION" \
     "$OBS_WRONG" \
     "$OBS_CORRECT" \
+    "$OBS_DIFF" \
     "$OBS_EVIDENCE" \
     "llm-evaluator"
 
