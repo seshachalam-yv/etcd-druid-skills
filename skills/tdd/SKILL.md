@@ -167,5 +167,5 @@ Uses `testing.T` + Gomega with:
 ## Handoff
 
 - Test written and passing → run `make ci-checks` first, then invoke `/etcd-druid:review`
-- Test failing unexpectedly after Green → invoke `/etcd-druid:debug`
+- Test failing unexpectedly after Green → invoke `/etcd-druid:debug`; if dispatched from debug Phase 5, return there once the regression test is committed
 - Writing tests for a feature being implemented → tests feed into `/etcd-druid:implement` Phase 2
