@@ -70,9 +70,12 @@ Agent tool (general-purpose):
     - [ ] No new conditional check on `UseEtcdWrapper` feature gate — it is GA (locked true), so `Enabled(UseEtcdWrapper)` is always true. Any NEW check is dead code; flag if introduced.
     - [ ] No reference to removed `--enable-etcd-member-gc` or `--k8s-member-gc-duration` flags (etcd-backup-restore v0.42+)
     - [ ] No use of deprecated `PreferClose` in `ClientService.TrafficDistribution` — use `PreferSameZone` or `PreferSameNode`
+    - [ ] No use of deprecated `StoreSpec` secret-based endpoint config — use `spec.backup.store.endpointOverride` (druid) / `--store-endpoint-override` (etcd-backup-restore)
     - [ ] If EtcdOpsTask controller touched: task state machine transitions are correct
           (Pending→InProgress→Succeeded/Failed/Rejected, FIFO, one active per cluster)
     - [ ] If `UpgradeEtcdVersion` feature gate used: properly gated behind featureGates.Enabled()
+    - [ ] No explicit `--compress-snapshots=true` added — snapshot compression is on by default in etcd-backup-restore v0.40+
+    - [ ] etcd-backup-restore or etcd-wrapper dependency change: `make revendor` was run (not just `go mod tidy`)
 
     ### Code quality
     - [ ] YAGNI: every new function, type, and parameter introduced by this task is actually used
