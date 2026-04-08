@@ -72,7 +72,7 @@ Commit message style: `Add unit tests for <component> (#<issue>)` — no trailin
 
 - NEVER use `time.Sleep()` — use `Eventually` / `Consistently` for async assertions
 - NEVER use gomock for component tests — use the fake client (see docs/development/)
-- NEVER use Ginkgo in etcd-druid or etcd-wrapper test files
+- NEVER use Ginkgo in etcd-druid or etcd-wrapper test files — etcd-druid migrated away from Ginkgo in v0.35; the codebase uses Go native `testing.T` + Gomega for consistency and simpler CI output
 - ALWAYS run the test before writing implementation to confirm it fails
 - ALWAYS use `t.Parallel()` in table-driven tests unless the test mutates shared state
 - If API types in `api/core/v1alpha1/` change, run `cd api && make generate` and commit
@@ -166,6 +166,6 @@ Uses `testing.T` + Gomega with:
 
 ## Handoff
 
-- Test written and passing, ready for PR → invoke `/etcd-druid:review`
+- Test written and passing → run `make ci-checks` first, then invoke `/etcd-druid:review`
 - Test failing unexpectedly after Green → invoke `/etcd-druid:debug`
 - Writing tests for a feature being implemented → tests feed into `/etcd-druid:implement` Phase 2
