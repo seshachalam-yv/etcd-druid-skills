@@ -35,6 +35,7 @@ Standalone checklist for reviewing etcd-druid, etcd-backup-restore, and etcd-wra
 
 ```bash
 git diff upstream/master...HEAD
+# If 'upstream' remote is missing: git remote add upstream https://github.com/gardener/<repo>
 ```
 
 Read every changed file. Note each category: API, component logic, tests, docs.
@@ -89,6 +90,14 @@ Core rules that apply regardless of repo:
 - No `time.Sleep()` — use `Eventually` / `Consistently`
 - No gomock in etcd-druid component tests
 - Table-driven for multiple scenarios; `t.Parallel()` in subtests
+
+**Verify tests pass locally** (run before opening PR, or confirm author ran them):
+
+| Repo | Commands |
+|---|---|
+| etcd-druid | `make test-unit` (all); `make test-integration` (if controller/component touched) |
+| etcd-backup-restore | `make test-unit`; `make test-integration` (if etcdbr logic touched) |
+| etcd-wrapper | `make test` |
 
 ## Step 8: Commit Messages
 
