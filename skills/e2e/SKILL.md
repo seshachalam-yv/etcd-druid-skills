@@ -97,10 +97,24 @@ make kind-down                  # destroys KIND cluster
 
 etcd-druid deploys etcd-backup-restore as a sidecar. The sidecar image reference comes from `internal/images/images.yaml` and is overridden at runtime via `IMAGEVECTOR_OVERWRITE`.
 
+### B0. Preconditions
+
+```bash
+cd <etcd-druid-fork>
+make kind-up   # creates cluster "etcd-druid-e2e" AND local registry on :5001 — must run first
+export KUBECONFIG=$(pwd)/hack/kind/kubeconfig
+kubectl get nodes   # verify cluster is ready before proceeding
+```
+
+The local registry on port 5001 is created by `make kind-up` in the etcd-druid fork. All `docker push localhost:5001/...` calls in B1–B3 depend on this. Run B0 before anything else.
+
 ### B1. Build etcd-backup-restore image
+
+If your change adds or updates a Go dependency (e.g., a new compression library), run `make revendor` first — etcd-backup-restore uses `vendor/` and `make docker-build` will use stale vendor files otherwise:
 
 ```bash
 cd <etcd-backup-restore-fork>
+make revendor     # only if dependencies changed
 make docker-build
 # Default tag: europe-docker.pkg.dev/gardener-project/snapshots/gardener/etcdbrctl:<VERSION>
 # Use a local tag to avoid registry conflicts:
@@ -108,14 +122,15 @@ docker tag europe-docker.pkg.dev/gardener-project/snapshots/gardener/etcdbrctl:<
            localhost:5001/etcdbrctl:dev
 ```
 
-### B2. Push to local KIND registry or load directly
+### B2. Push image to local KIND registry
 
-Option A — push to the local registry that `make kind-up` creates (port 5001):
+Use Option A (push to local registry) — it is faster than loading directly and works for both `kind load` and the registry pull path. `localhost:5001` was created by `make kind-up` in B0.
+
 ```bash
 docker push localhost:5001/etcdbrctl:dev
 ```
 
-Option B — load directly into KIND:
+Option B (direct load into KIND) — use only if the registry is unavailable:
 ```bash
 kind load docker-image localhost:5001/etcdbrctl:dev --name etcd-druid-e2e
 ```
@@ -142,17 +157,31 @@ export IMAGEVECTOR_OVERWRITE="$(cat /tmp/imagevector-override.json)"
 Then deploy etcd-druid with the override active:
 ```bash
 cd <etcd-druid-fork>
-make kind-up   # if not already running
 make NAMESPACE=etcd-druid-e2e \
      CERT_EXPIRY_DAYS=30 \
      prepare-helm-charts
+# CRITICAL: IMAGEVECTOR_OVERWRITE must be set ON the make command line, not exported beforehand.
+# Exporting it before calling make does not guarantee it is passed into the recipe environment.
 IMAGEVECTOR_OVERWRITE="$(cat /tmp/imagevector-override.json)" \
 make DRUID_E2E_TEST=true \
      ENABLE_ETCD_COMPONENT_PROTECTION_WEBHOOK=true \
      deploy
 ```
 
-### B4. Run etcd-backup-restore's own e2e suite
+### B4. Run the integrated e2e pipeline
+
+```bash
+cd <etcd-druid-fork>
+# Run the full pipeline with the override active:
+IMAGEVECTOR_OVERWRITE="$(cat /tmp/imagevector-override.json)" \
+make ci-e2e-kind \
+  PROVIDERS="none,local" \
+  RETAIN_KIND_CLUSTER=true
+```
+
+This is required before any PR — the Iron Law mandates `make ci-e2e-kind` passes. The manual `deploy` step in B3 is for iterative testing only; always run the full pipeline before raising a PR.
+
+### B5. Run etcd-backup-restore's own e2e suite
 
 etcd-backup-restore has its own independent e2e tests (not via etcd-druid):
 
