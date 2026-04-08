@@ -347,6 +347,7 @@ kubectl get etcd etcd-main -n <test-ns> -o jsonpath='{.status.lastFullBackup}'
 
 ## Handoff
 
-After manual e2e passes:
-- Invoke `/etcd-druid:review` for pre-PR checklist
+After e2e passes:
+- If invoked from `/etcd-druid:implement` Phase 3 — return there to complete the verify checklist and proceed to Gate 2
+- If invoked standalone — invoke `/etcd-druid:review` for pre-PR checklist
 - Check `.github/workflows/` in the repo to confirm which CI checks run automatically on PR open
