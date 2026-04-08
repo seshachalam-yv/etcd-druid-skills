@@ -114,6 +114,8 @@ type EtcdConfig struct {
 
 **`has()` guard:** Always wrap optional field references in `has(self.fieldName)` before dereferencing. Omitting the guard causes the rule to fail when the field is absent.
 
+**`omitempty` + `has()` interaction:** A field tagged `json:",omitempty"` is omitted from serialization when zero-valued, so `has()` returns `false` for it when absent. A field tagged without `omitempty` is serialized even when zero-valued — `has()` returns `true` even if the value is `""` or `0`. Write your `has()` guard to match the field's actual `omitempty` tag, otherwise the guard may always pass or always fail depending on zero-value behaviour.
+
 **Silent-pass failure mode:** If a test asserts that an invalid value is rejected but gets `nil` instead, the `XValidation` rule is placed on the wrong struct. A rule annotated on `EtcdConfig` can only reference `self.*` fields within `EtcdConfig` — it cannot see `self.spec.backup.*` or `self.metadata.*`. Move the rule to the innermost struct that owns all referenced fields, or to the `Etcd` root type for cross-field rules. Verify the rule was emitted in the CRD output:
 
 ```bash
