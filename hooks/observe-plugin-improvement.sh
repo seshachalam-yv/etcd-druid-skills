@@ -151,7 +151,8 @@ if printf '%s' "$LAST_MESSAGE" | grep -q '<plugin-gap'; then
     while IFS= read -r gap_block; do
         gap_file=$(printf '%s' "$gap_block" | grep -oP '(?<=file=")[^"]+' || true)
         gap_section=$(printf '%s' "$gap_block" | grep -oP '(?<=section=")[^"]+' || true)
-        gap_type=$(printf '%s' "$gap_block" | grep -oP '(?<=type=")[^"]+' || "missing_convention")
+        gap_type=$(printf '%s' "$gap_block" | grep -oP '(?<=type=")[^"]+' || true)
+        gap_type="${gap_type:-missing_convention}"
         gap_body=$(printf '%s' "$gap_block" | sed 's/<plugin-gap[^>]*>//;s|</plugin-gap>||' | xargs || true)
 
         if [ -n "$gap_file" ] && [ -n "$gap_body" ]; then
