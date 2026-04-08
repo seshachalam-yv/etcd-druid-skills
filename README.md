@@ -107,6 +107,7 @@ Type a slash command in Claude Code to activate the relevant workflow:
 /etcd-druid:api-change  I need to add a new field to EtcdSpec with CEL validation
 /etcd-druid:e2e         Run e2e tests against my custom etcd-backup-restore image
 /etcd-druid:reference   What make targets do I need to run before opening a PR?
+/etcd-druid:observations
 ```
 
 ### Let skills activate automatically
@@ -177,6 +178,7 @@ All active components run in the Gardener seed cluster. Changes must not break g
 
 **Reference**
 - **reference** — Quick lookup: make targets, file paths, source locations for all 3 repos, feature gates, CLI flags, tooling versions
+- **observations** — Triage captured plugin improvement observations; invoke when session-start flags pending observations
 
 ### Cross-cutting guides (referenced by skills, not user-invocable)
 
