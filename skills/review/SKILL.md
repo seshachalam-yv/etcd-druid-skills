@@ -215,6 +215,7 @@ Fill in `<type>`, `<plugin_file>`, `<section>`, `<wrong_text>`, `<proposed_fix>`
 
 ## Handoff
 
-- Review verdict is LGTM → return to `/etcd-druid:implement` Phase 3 Gate 2
+- Review verdict is LGTM and invoked from `/etcd-druid:implement` Phase 3 → return there for Gate 2
+- Review verdict is LGTM and invoked standalone (from `tdd` or `debug`) → work is ready to open a PR
 - Review verdict is CHANGES REQUESTED and you are the author → follow `skills/receiving-review/SKILL.md`
 - Review finds a pattern not in Known Footguns → add it to this skill's Known Footguns section
