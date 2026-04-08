@@ -35,8 +35,12 @@ if [ ! -d "$repo_root/docs/development" ]; then
 fi
 
 # Map file path to the most relevant development doc
+# *_test.go checked first — takes priority over path-based patterns
 SPECIFIC_DOC=""
 case "$FILE_PATH" in
+    *_test.go)
+        SPECIFIC_DOC="docs/development/testing.md — framework per repo (testing.T+Gomega for druid/wrapper, Ginkgo for backup-restore), fake client patterns"
+        ;;
     */internal/component/*)
         SPECIFIC_DOC="docs/development/add-new-etcd-cluster-component.md — operator interface: PreSync, Sync, TriggerDelete, GetExistingResourceNames"
         ;;
@@ -45,9 +49,6 @@ case "$FILE_PATH" in
         ;;
     */api/core/v1alpha1/*)
         SPECIFIC_DOC="docs/development/api-conventions.md — field naming, CEL validation placement, two-commit generate rule"
-        ;;
-    *_test.go)
-        SPECIFIC_DOC="docs/development/testing.md — framework per repo (testing.T+Gomega for druid/wrapper, Ginkgo for backup-restore), fake client patterns"
         ;;
     */hack/*)
         SPECIFIC_DOC="docs/development/ — check Makefile and hack/ scripts for context"
