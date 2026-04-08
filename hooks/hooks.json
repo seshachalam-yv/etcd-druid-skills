@@ -9,6 +9,15 @@
             "async": false
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/session-memory.sh\"",
+            "async": true
+          }
+        ]
       }
     ],
     "WorktreeCreate": [
