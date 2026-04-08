@@ -167,9 +167,10 @@ All active components run in the Gardener seed cluster. Changes must not break g
 
 | Hook | Event | Purpose |
 |------|-------|---------|
-| `session-start` | SessionStart, WorktreeCreate, PostCompact | Injects domain orientation: component overview, active repo detection, current branch, available skills |
+| `session-start` | SessionStart, WorktreeCreate, PostCompact | Injects domain orientation: component overview, active repo detection, current branch, available skills. Surfaces pending plugin observations if any exist. |
 | `guard-generated-files.sh` | PreToolUse (Edit/Write) | **Blocks** edits to generated files (`zz_generated*`, `crds/*.yaml`, `charts/crds/*`, `client/`) |
 | `check-dev-docs.sh` | PostToolUse (Edit/Write) | Reminds Claude to read `docs/development/` before editing `.go` source files |
+| `observe-plugin-improvement.sh` | Stop (async) | Pipes each response through Claude to detect plugin gaps — wrong claims, missing footguns, stale flags. Writes structured `OBS-NNN` entries to `plugin-observations.md`. |
 
 ### Subagent prompts
 
@@ -215,6 +216,7 @@ tdd ──► review (before PR)
 | `review` | `/etcd-druid:review` | `*.go` edits | Validating code before opening a PR |
 | `e2e` | `/etcd-druid:e2e` | — | Manual e2e testing — KIND setup, custom image builds, sidecar overrides, pre-PR CI |
 | `reference` | `/etcd-druid:reference` | — | Quick lookup: make targets, file paths, druidctl, git workflow |
+| `observations` | `/etcd-druid:observations` | — | Review captured plugin improvement findings — raise PR, skip, or dismiss |
 
 ---
 
@@ -232,6 +234,22 @@ Each skill opens with an Iron Law — an unconditional rule stated once, with a 
 | `review` | NO VERDICT WITHOUT READING THE DIFF AND docs/development/ FIRST. |
 | `verification` | NO COMPLETION CLAIMS WITHOUT FRESH VERIFICATION EVIDENCE. |
 | `receiving-review` | NO FEEDBACK IMPLEMENTATION WITHOUT INDEPENDENT VERIFICATION FIRST. |
+
+### Plugin self-improvement loop
+
+Every response is evaluated asynchronously by a Stop hook. When Claude-as-evaluator finds a specific, high-confidence finding — a wrong claim, missing footgun, stale flag, unclear workflow step — it writes a structured `OBS-NNN` entry to a local `plugin-observations.md` file.
+
+Three gates must all pass before anything is written:
+1. Exact plugin file and section identified
+2. Exact wrong or missing text stated
+3. Exact correct replacement specified — specific enough to write the fix without further investigation
+
+At the next session start, if open observations exist, you are notified. Run `/etcd-druid:observations` to review them. For each entry you choose:
+- **R** — raise a PR to fix it now (Claude reads the file, applies the fix, opens the PR)
+- **S** — skip, keep open for later
+- **D** — dismiss, not worth acting on
+
+No PR is ever raised without your explicit choice. The hook only captures; you decide.
 
 ### Assumption surfacing before action
 
