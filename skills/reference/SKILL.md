@@ -431,5 +431,6 @@ Immutable snapshots: S3 (Object Lock), ABS, GCS, OSS (WORM Lock).
 - `tdd` — TDD cycle for all three repos
 - `debug` — systematic debugging workflow
 - `review` — code review checklist
+- `observations` — triage captured plugin improvement observations; invoke when session-start flags pending observations
 - `e2e` — manual e2e testing: KIND setup, custom image builds, sidecar overrides, pre-PR CI
 - `reference` — this card
