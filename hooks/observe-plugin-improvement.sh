@@ -64,12 +64,28 @@ write_observation() {
     local obs_date
     obs_date=$(date +%Y-%m-%d)
 
-    # Deduplicate: skip if same file+section already has an open entry
+    # Deduplication: if same file+section already has an open entry, increment count and return
     if [ -f "$OBSERVATIONS_FILE" ]; then
-        if grep -q "^\*\*File:\*\* \`${obs_file}\`" "$OBSERVATIONS_FILE" 2>/dev/null; then
-            if grep -A3 "^\*\*File:\*\* \`${obs_file}\`" "$OBSERVATIONS_FILE" \
-               | grep -q "^\*\*Section:\*\* ${obs_section}"; then
-                # Same file+section already recorded — skip to avoid duplicates
+        existing_line=$(grep -n "^\*\*File:\*\* \`${obs_file}\`" "$OBSERVATIONS_FILE" 2>/dev/null \
+            | head -1 | cut -d: -f1 || true)
+        if [ -n "$existing_line" ]; then
+            section_nearby=$(awk -v start="$existing_line" \
+                'NR>=start && NR<=start+5 && /^\*\*Section:\*\* '"${obs_section}"'/{found=1} END{print found+0}' \
+                "$OBSERVATIONS_FILE")
+            if [ "$section_nearby" = "1" ]; then
+                # Increment **Count:** field on the line after the file match
+                local tmpfile
+                tmpfile=$(mktemp)
+                awk -v start="$existing_line" '
+                    NR >= start && /\*\*Count:\*\* [0-9]+/ && !done {
+                        match($0, /[0-9]+/)
+                        n = substr($0, RSTART, RLENGTH) + 1
+                        sub(/[0-9]+/, n)
+                        done = 1
+                    }
+                    { print }
+                ' "$OBSERVATIONS_FILE" > "$tmpfile"
+                mv "$tmpfile" "$OBSERVATIONS_FILE"
                 return 0
             fi
         fi
@@ -131,6 +147,7 @@ __OBS_DIFF_PLACEHOLDER__
 > ${obs_evidence}
 
 **Status:** open
+**Count:** 1
 
 ---
 ENTRY

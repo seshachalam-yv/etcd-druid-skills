@@ -20,6 +20,9 @@ PLUGIN_OBS="${CLAUDE_PLUGIN_ROOT}/plugin-observations.md"
 cat "$PLUGIN_OBS"
 ```
 
+Sort observations by **Count** (descending) before presenting — highest-frequency gaps first.
+To find counts: `grep -A1 "Status.*open" "$PLUGIN_OBS" | grep "Count"`.
+
 If the file does not exist or has no `**Status:** open` entries: report "No open observations." and stop.
 
 Before showing any observation to the user, **verify it against the actual plugin file**:
