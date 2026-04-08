@@ -118,13 +118,16 @@ If new docs files are added or structure changes: `mkdocs.yml` and `docs/README.
 
 ---
 
-## Red Flags — Stop and Re-read
+## Red Flags — Stop Before Issuing Verdict
 
-- Forming a verdict before reading the full diff
-- Skipping `docs/development/` because "I know this codebase"
-- Marking API changes LGTM without checking both commits exist
-- Missing the two-commit rule for `make generate` output
-- Skipping the Repo Differences table for a repo you don't usually work in
+| Observation | What it means |
+|---|---|
+| Diff is >500 lines or touches >5 packages | Too large for a single review — flag this to the author before proceeding |
+| API type changed but no generated files in diff | Two-commit rule violated — `cd api && make generate` was not run |
+| Test file uses `import . "github.com/onsi/ginkgo/v2"` in etcd-druid | Wrong framework — etcd-druid uses `testing.T`, not Ginkgo |
+| `time.Sleep()` in any test | Async anti-pattern — should use `Eventually`/`Consistently` |
+| `CHANGES REQUESTED` verdict without reading `docs/development/` | Iron Law violation — read the docs first |
+| New function, type, or parameter with no caller in this PR | YAGNI violation — flag it |
 
 ---
 
@@ -203,5 +206,6 @@ Fill in `<type>`, `<plugin_file>`, `<section>`, `<wrong_text>`, `<proposed_fix>`
 
 ## Handoff
 
-- LGTM → return to caller (feature-dev Gate 2, or done if standalone)
-- Plugin mistake found → output the `gh pr create` block above
+- Review verdict is LGTM → return to `feature-dev` Phase 5 Gate 2
+- Review verdict is CHANGES REQUESTED and you are the author → follow `skills/receiving-review/SKILL.md`
+- Review finds a pattern not in Known Footguns → add it to this skill's Known Footguns section

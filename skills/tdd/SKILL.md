@@ -80,15 +80,15 @@ Commit message style: `Add unit tests for <component> (#<issue>)` — no trailin
   edit generated files.
 - See `testing-anti-patterns.md` in this directory for domain-specific anti-patterns to avoid.
 
-## Red Flags
+## Red Flags — Stop and re-read the Iron Law
 
-Stop and re-read the Iron Law if you catch yourself thinking:
-
-- "I'll write the implementation first since I know what it needs to do"
-- "The test is taking too long to set up, I'll skip it for now"
-- "This test would need a fake client — too complex, I'll just run it manually"
-- "The existing test covers this close enough"
-- "I changed the implementation slightly so the old test doesn't apply"
+| Thought | Why it fails |
+|---|---|
+| "I'll write the test after, just to see if it works" | The test becomes a verification, not a specification. You've already anchored on the implementation. |
+| "This is obvious, the test would just mirror the code" | Obvious tests catch obvious regressions. Write it. |
+| "The framework is awkward here so I'll skip TDD" | That's a signal to read `docs/development/testing.md`, not to skip. |
+| "It's a refactor — behavior doesn't change" | If behavior doesn't change, the test is trivial. Write it first. |
+| "I already wrote similar tests" | You wrote tests for similar code. Write tests for this code. |
 
 ## Integration Tests (etcd-druid)
 
@@ -166,6 +166,6 @@ Uses `testing.T` + Gomega with:
 
 ## Handoff
 
-After Step 4 (all tests committed and green):
-- If opening a PR: run `make ci-checks`, then invoke `/etcd-druid:review`
-- If this was a regression fix from `/etcd-druid:debug`: return to debug Phase 5 to confirm root cause is resolved
+- Test written and passing, ready for PR → invoke `/etcd-druid:review`
+- Test failing unexpectedly after Green → invoke `/etcd-druid:debug`
+- Writing tests for a feature being implemented → tests feed into `/etcd-druid:feature-dev` Phase 4

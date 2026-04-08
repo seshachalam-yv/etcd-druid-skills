@@ -21,6 +21,22 @@ Use this skill when you hit: test failures, unexpected reconciliation behavior, 
 | "It's obviously X" | "Obviously" precedes most debugging rabbit holes |
 | "Reproducing it takes too long" | Fixing without reproduction takes longer |
 
+## Before You Start: Protect Your Working State
+
+```bash
+# If you have uncommitted changes, stash them before investigating
+git stash push -m "WIP: stashing before debug investigation"
+
+# Work on a separate branch to avoid polluting main/master
+git checkout -b debug/investigate-<short-description>
+
+# To restore after investigation:
+git stash pop
+```
+
+Never apply speculative fixes directly to your main working branch.
+Investigation often requires trying multiple approaches — do it on a throwaway branch.
+
 ## Phase 1: Read the Error Carefully
 
 Never scroll past error output.
@@ -246,6 +262,7 @@ envtest starts a real API server and etcd for integration tests. Common issues:
 
 ## Handoff
 
-After Phase 5 (fix confirmed, tests green):
-- If this was a test failure with no regression test: invoke `/etcd-druid:tdd` to add one
-- If fix is complete and PR-bound: invoke `/etcd-druid:review`
+- Root cause identified, fix implemented → apply verification gate (`skills/verification/SKILL.md`)
+- Fix implemented, needs regression test → invoke `/etcd-druid:tdd`
+- Fix verified, ready for PR → invoke `/etcd-druid:review`
+- Fix involves API change → invoke `/etcd-druid:api-change`

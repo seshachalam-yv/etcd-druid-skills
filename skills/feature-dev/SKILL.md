@@ -391,6 +391,8 @@ Parallel agents are appropriate when tasks have no shared write state:
 
 **Rule:** if both agents could write to the same file path at the same time, serialize. Otherwise, parallelize freely.
 
+**Enforcement:** You MUST dispatch spec-reviewer and code-reviewer in a single message containing two Agent tool calls — not in separate messages. Dispatching them sequentially when they are both read-only violates this rule. If you dispatched them in separate messages, you serialized unnecessarily.
+
 ---
 
 ## Multi-Repo Changes
