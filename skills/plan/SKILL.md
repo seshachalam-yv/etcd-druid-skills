@@ -36,16 +36,17 @@ When in doubt: if the task touches >5 packages or creates a new binary, it's a n
 ## Phase 1: Design
 
 1. Create tasks for all workflow phases with TaskCreate
-2. Explore upstream (read-only) to understand current state:
+2. **Read the issue first:** `gh issue view {id} --repo gardener/etcd-druid` — quote the title and acceptance criteria verbatim before doing anything else. Do not summarise from memory.
+3. Explore upstream (read-only) to understand current state:
    - Which controller, component, or API is affected?
    - Change type: API (`api/core/v1alpha1/`) | component (`internal/component/`) | controller (`internal/controller/`) | test only
    - Test scope required: unit (`make test-unit`) | integration (`make test-integration`) | both
    - **Look at previously merged PRs** *(incremental work only — skip for new sidecars)*
      (`gh pr list --state merged --repo gardener/etcd-druid`). Find 1–2 comparable PRs and read their diffs to understand how the team structures commits, names things, and what reviewers flag. This shapes your plan before the human sees it.
-3. **State your assumptions explicitly before asking anything.** Before proposing approaches, list every assumption you are making: expected behaviour, scope, which repo is affected, whether the change is breaking. Ask about any you are not confident in. Do not silently pick an interpretation and run with it.
-4. Ask clarifying questions one at a time — domain-focused
-5. Propose 2–3 approaches with trade-offs
-6. Confirm approach before writing plan
+4. **State your assumptions explicitly before asking anything.** Before proposing approaches, list every assumption you are making: expected behaviour, scope, which repo is affected, whether the change is breaking. Ask about any you are not confident in. Do not silently pick an interpretation and run with it.
+5. Ask clarifying questions one at a time — domain-focused
+6. Propose 2–3 approaches with trade-offs
+7. Confirm approach before writing plan
 
 **Change type guide:**
 
@@ -128,6 +129,8 @@ How to revert if needed.
 ## ⛔ GATE 1: Plan Approval
 
 STOP. No code. No worktree.
+
+**Who approves:** The human — by replying "approved". For etcd-steward work the plan file header marks it pre-approved; for etcd-druid work, only an explicit human reply unblocks Phase 3.
 
 Present:
 - Task list with acceptance criteria and files
