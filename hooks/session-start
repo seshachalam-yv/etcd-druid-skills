@@ -108,7 +108,8 @@ Each repo has docs/development/ with authoritative conventions, patterns, and ma
 When you find a pattern not documented there, add it as part of your work.
 
 ## Available Skills
-etcd-druid:feature-dev   Use for any development work — picking up an issue, planning features or bug fixes, adding components or API fields, design-to-PR
+etcd-druid:plan          Use at the start of any development work — issue intake, approach selection, code plan with acceptance criteria (Gate 1)
+etcd-druid:implement     Use after Gate 1 approval — worktree setup, per-task implementation, verification, PR creation (Gate 2)
 etcd-druid:api-change    Use for API field additions or modifications — CEL validation, two-commit generate workflow, CRD tests
 etcd-druid:tdd           Use when writing new tests or learning testing patterns — TDD cycle, framework selection, fake client, table-driven tests
 etcd-druid:debug         Use when something is failing, broken, or behaving unexpectedly — build failures, test failures, reconciliation loops, backup failures
@@ -177,7 +178,7 @@ PLUGIN_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 OBSERVATIONS_FILE="${PLUGIN_ROOT}/plugin-observations.md"
 pending_obs=""
 if [ -f "$OBSERVATIONS_FILE" ]; then
-    open_count=$(grep -c '^**Status:** open' "$OBSERVATIONS_FILE" 2>/dev/null || echo "0")
+    open_count=$(grep -cF '**Status:** open' "$OBSERVATIONS_FILE" 2>/dev/null || echo "0")
     if [ "$open_count" -gt 0 ]; then
         pending_obs="\\n\\n<PLUGIN_OBSERVATIONS>\\n${open_count} plugin improvement observation(s) are waiting for review.\\nRun /etcd-druid:observations to review them and decide which ones to raise as PRs.\\n</PLUGIN_OBSERVATIONS>"
     fi
