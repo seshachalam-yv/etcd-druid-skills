@@ -197,6 +197,17 @@ Gate 2 only after review returns LGTM.
 
 ---
 
+## Red Flags — Stop and Re-read the Iron Law
+
+| Thought | Why it fails |
+|---|---|
+| "All local checks pass — Gate 2 is a formality" | Gate 2 is for the human to review intent and diff, not just test results |
+| "The per-task code-reviewer already approved — skip the final review" | The code-reviewer sees one task. The final review sees the complete change as a reviewer would |
+| "CI will catch any issues after the PR is open" | CI runs after the PR is open — you block reviewers with a broken PR |
+| "I only changed one small file" | Small API type changes and generated files are highest risk |
+
+---
+
 ## ⛔ GATE 2: PR Approval
 
 STOP. No push. No `gh pr create`.

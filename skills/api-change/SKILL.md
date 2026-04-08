@@ -395,6 +395,17 @@ int(self.name.substring(self.name.lastIndexOf('-') + 1))
 
 ---
 
+## Red Flags — Stop and Re-read the Iron Law
+
+| Thought | Why it fails |
+|---|---|
+| "The CEL rule is simple — I'll add the test after" | CEL syntax errors are silent until the CRD is applied; the test is the only CI gate |
+| "I only changed one field — two commits is overkill" | Mixed hand-written + generated commits break `git bisect` and make rollback impossible |
+| "I ran `make generate` — the test is redundant" | `make generate` checks syntax; the integration test checks runtime semantics |
+| "The field is internal — no CEL validation needed" | Internal fields are still validated at admission; an untested rule may silently accept invalid input |
+
+---
+
 ## Handoff
 
 After completing the API change:
