@@ -1,0 +1,21 @@
+{
+  "name": "seshachalam-yv-etcd-druid-skills",
+  "owner": {
+    "name": "Seshachalam Yerasala Venkata"
+  },
+  "metadata": {
+    "description": "Expert skills for etcd-druid ecosystem development",
+    "version": "1.7.0"
+  },
+  "plugins": [
+    {
+      "name": "etcd-druid-skills",
+      "source": {
+        "source": "url",
+        "url": "https://github.com/seshachalam-yv/etcd-druid-skills.git"
+      },
+      "description": "Expert skills for etcd-druid development: plan/implement workflow with gated Gates, TDD, debugging, API change guidance, e2e testing, code review, and domain reference.",
+      "version": "1.7.0"
+    }
+  ]
+}
