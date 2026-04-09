@@ -56,7 +56,8 @@ digraph implement {
 
 ## Phase 1: Worktree Setup
 
-Read the plan file first. Extract: fork root, issue number, task list, branch name.
+Read the plan file first. Extract: fork root, issue number, task list.
+Branch name is derived at worktree-creation time: `ai/TASK-{id}/claude/{short-description}` — it is not in the plan file.
 
 ```bash
 cd <fork-root>

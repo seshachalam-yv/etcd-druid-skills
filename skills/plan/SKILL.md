@@ -82,6 +82,9 @@ Path: `<fork-root>/docs/plans/YYYY-MM-DD-issue-{id}-{short-description}.md`
 Link: https://github.com/gardener/etcd-druid/issues/{id}
 Summary: one sentence.
 
+## Fork Root
+Path: <absolute path to local fork, e.g. /home/user/go/src/github.com/me/etcd-druid>
+
 ## Change Type
 [ ] API change (api/core/v1alpha1/)
 [ ] New component (internal/component/)
