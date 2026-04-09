@@ -114,7 +114,7 @@ Repeat for each task:
 **c.** Show implementer report to user.
 
 **d.** Dispatch spec-reviewer — see `./spec-reviewer-prompt.md`.
-   Pass: acceptance criteria, base SHA, head SHA, worktree path.
+   Pass: acceptance criteria, implementer report, base SHA, head SHA, worktree path.
 
 **e.** Spec issues → implementer fixes → spec-reviewer re-reviews → repeat until ✅
 
