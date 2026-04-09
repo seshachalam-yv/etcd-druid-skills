@@ -40,6 +40,9 @@ Agent tool (general-purpose):
     - Logic added that goes beyond what the acceptance criteria asked for (overbuilding)
     - If the plan said "API generation needed: yes" — verify two separate commits exist
       (one for hand-written API changes, one for generated output only)
+    - Verify all commits are on the worktree branch, not on any upstream remote —
+      run `git log [base-sha]..[head-sha] --format="%H %D"` and confirm no commit
+      references `upstream/` or `gardener/` in its ref list
 
     ## Report Format
 

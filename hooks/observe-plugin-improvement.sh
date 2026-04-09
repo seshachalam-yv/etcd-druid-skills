@@ -13,7 +13,6 @@ set -uo pipefail
 
 PLUGIN_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 OBSERVATIONS_FILE="${PLUGIN_ROOT}/plugin-observations.md"
-CORRECTION_FLAG="/tmp/etcd-druid-correction-signal-${SESSION_ID:-default}"
 
 # ── Guard: prevent infinite recursion ────────────────────────────────────────
 # stop_hook_active is set to true when a Stop hook is already running.
@@ -58,17 +57,39 @@ write_observation() {
     local obs_section="$4"
     local obs_wrong="$5"
     local obs_correct="$6"
-    local obs_evidence="$7"
-    local obs_source="$8"
+    local obs_diff="$7"
+    local obs_evidence="$8"
+    local obs_source="$9"
     local obs_date
     obs_date=$(date +%Y-%m-%d)
 
-    # Deduplicate: skip if same file+section already has an open entry
+    # Deduplication: if same file+section already has an open entry, increment count and return
     if [ -f "$OBSERVATIONS_FILE" ]; then
-        if grep -q "^\*\*File:\*\* \`${obs_file}\`" "$OBSERVATIONS_FILE" 2>/dev/null; then
-            if grep -A3 "^\*\*File:\*\* \`${obs_file}\`" "$OBSERVATIONS_FILE" \
-               | grep -q "^\*\*Section:\*\* ${obs_section}"; then
-                # Same file+section already recorded — skip to avoid duplicates
+        existing_line=$(grep -n "^\*\*File:\*\* \`${obs_file}\`" "$OBSERVATIONS_FILE" 2>/dev/null \
+            | head -1 | cut -d: -f1 || true)
+        # Guard: existing_line must be a plain integer (protect awk arithmetic)
+        if ! [[ "${existing_line:-}" =~ ^[0-9]+$ ]]; then existing_line=""; fi
+        if [ -n "$existing_line" ]; then
+            # Use index() for literal string match — avoids awk regex metachar issues with obs_section
+            section_nearby=$(awk -v start="$existing_line" -v section="$obs_section" \
+                'NR>=start && NR<=start+5 && index($0, "**Section:** " section) {found=1} END{print found+0}' \
+                "$OBSERVATIONS_FILE")
+            if [ "$section_nearby" = "1" ]; then
+                # Increment **Count:** field — stop at next ## OBS- header to avoid crossing entry boundary
+                local tmpfile
+                tmpfile=$(mktemp)
+                awk -v start="$existing_line" '
+                    NR < start { print; next }
+                    /^## OBS-/ && NR > start { done = 1 }
+                    /\*\*Count:\*\* [0-9]+/ && !done {
+                        match($0, /[0-9]+/)
+                        n = substr($0, RSTART, RLENGTH) + 1
+                        sub(/[0-9]+/, n)
+                        done = 1
+                    }
+                    { print }
+                ' "$OBSERVATIONS_FILE" > "$tmpfile"
+                mv "$tmpfile" "$OBSERVATIONS_FILE"
                 return 0
             fi
         fi
@@ -101,7 +122,8 @@ _(none yet)_
 HEADER
     fi
 
-    # Build entry
+    # Build entry — obs_diff inserted via awk after heredoc to prevent shell
+    # expansion of any $(...) or `...` sequences the LLM may have emitted.
     local new_entry
     new_entry=$(cat <<ENTRY
 
@@ -120,14 +142,29 @@ HEADER
 **Proposed fix:**
 ${obs_correct}
 
+**Apply:** __OBS_DIFF_PLACEHOLDER__
+
 **Evidence:**
 > ${obs_evidence}
 
 **Status:** open
+**Count:** 1
 
 ---
 ENTRY
 )
+    # Replace placeholder with obs_diff safely — use temp file to support multi-line
+    # values and to avoid BSD awk's "newline in string" error with awk -v.
+    local diff_tmp
+    diff_tmp=$(mktemp)
+    printf '%s' "$obs_diff" > "$diff_tmp"
+    new_entry=$(printf '%s' "$new_entry" \
+        | awk -v dfile="$diff_tmp" '
+            BEGIN { while ((getline line < dfile) > 0) d = d line ORS }
+            /__OBS_DIFF_PLACEHOLDER__/ { printf "%s", d; next }
+            { print }
+        ')
+    rm -f "$diff_tmp"
 
     # Insert before Resolved section
     if grep -q '^## Resolved' "$OBSERVATIONS_FILE"; then
@@ -151,7 +188,8 @@ if printf '%s' "$LAST_MESSAGE" | grep -q '<plugin-gap'; then
     while IFS= read -r gap_block; do
         gap_file=$(printf '%s' "$gap_block" | grep -oP '(?<=file=")[^"]+' || true)
         gap_section=$(printf '%s' "$gap_block" | grep -oP '(?<=section=")[^"]+' || true)
-        gap_type=$(printf '%s' "$gap_block" | grep -oP '(?<=type=")[^"]+' || "missing_convention")
+        gap_type=$(printf '%s' "$gap_block" | grep -oP '(?<=type=")[^"]+' || true)
+        gap_type="${gap_type:-missing_convention}"
         gap_body=$(printf '%s' "$gap_block" | sed 's/<plugin-gap[^>]*>//;s|</plugin-gap>||' | xargs || true)
 
         if [ -n "$gap_file" ] && [ -n "$gap_body" ]; then
@@ -162,8 +200,14 @@ if printf '%s' "$LAST_MESSAGE" | grep -q '<plugin-gap'; then
                 "${gap_section:-unknown}" \
                 "MISSING" \
                 "$gap_body" \
+                "MULTILINE — apply manually" \
                 "$(printf '%s' "$gap_body" | head -c 200)" \
                 "explicit-marker"
+            # Persist to cross-session memory store
+            bash "${PLUGIN_ROOT}/hooks/write-memory.sh" \
+                "$(printf '%s' "$gap_body" | cut -c1-200)" \
+                "$(basename "$gap_file" .md),${gap_type:-missing_convention},etcd-druid" \
+                "0.8" &
         fi
     done < <(printf '%s' "$LAST_MESSAGE" | grep -oP '<plugin-gap[^>]*>.*?</plugin-gap>' || true)
 fi
@@ -232,10 +276,14 @@ Output this JSON if all three are met, nothing else:
   "confidence": "high" | "medium",
   "plugin_file": "<path relative to plugin root>",
   "plugin_section": "<section heading>",
-  "wrong_text": "<exact text in skill, or MISSING>",
-  "correct_text": "<proposed fix — specific enough to write>",
+  "wrong_text": "<exact text in skill that is wrong, or MISSING>",
+  "correct_text": "<proposed replacement text — complete, ready to apply>",
+  "diff_apply": "<the minimal sed or awk one-liner to apply the fix, e.g.: sed -i 's/old text/new text/' skills/tdd/SKILL.md>",
   "evidence": "<quote from response that revealed this>"
 }
+
+The diff_apply field must be a single bash command that applies correct_text over wrong_text in plugin_file.
+Use sed -i for simple line replacements. If the change is multi-line, use: "MULTILINE — apply manually".
 
 If threshold not met, output exactly: null
 
@@ -265,6 +313,9 @@ OBS_FILE=$(printf '%s' "$EVAL_OUTPUT" | jq -r '.plugin_file')
 OBS_SECTION=$(printf '%s' "$EVAL_OUTPUT" | jq -r '.plugin_section')
 OBS_WRONG=$(printf '%s' "$EVAL_OUTPUT" | jq -r '.wrong_text')
 OBS_CORRECT=$(printf '%s' "$EVAL_OUTPUT" | jq -r '.correct_text')
+OBS_DIFF=$(printf '%s' "$EVAL_OUTPUT" | jq -r '.diff_apply // "MULTILINE — apply manually"')
+# NOTE: the em-dash (—) in "MULTILINE — apply manually" above must byte-match the
+# literal at the Channel 1 call site; don't convert it to a hyphen or en-dash
 OBS_EVIDENCE=$(printf '%s' "$EVAL_OUTPUT" | jq -r '.evidence')
 
 write_observation \
@@ -274,7 +325,13 @@ write_observation \
     "$OBS_SECTION" \
     "$OBS_WRONG" \
     "$OBS_CORRECT" \
+    "$OBS_DIFF" \
     "$OBS_EVIDENCE" \
     "llm-evaluator"
+
+# Persist to cross-session memory store
+MEMORY_CONTENT=$(printf '%s' "$OBS_CORRECT" | cut -c1-200)
+MEM_TAGS="$(basename "$OBS_FILE" .md),${OBS_TYPE},etcd-druid"
+bash "${PLUGIN_ROOT}/hooks/write-memory.sh" "$MEMORY_CONTENT" "$MEM_TAGS" "0.8" &
 
 exit 0

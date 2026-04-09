@@ -34,16 +34,31 @@ if [ ! -d "$repo_root/docs/development" ]; then
     exit 0
 fi
 
-# Emit a reminder — Claude will see this as tool output context
-cat <<EOF
-{
-  "continue": true,
-  "suppressOutput": true,
-  "hookSpecificOutput": {
-    "hookEventName": "PostToolUse",
-    "additionalContext": "Reminder: before editing source files, read the relevant files in ${repo_root}/docs/development/ — they are the authoritative source for conventions, patterns, and make targets in this repo. If you discover a pattern not yet documented there, add it as part of this task."
-  }
-}
-EOF
+# Map file path to the most relevant development doc
+# *_test.go checked first — takes priority over path-based patterns
+SPECIFIC_DOC=""
+case "$FILE_PATH" in
+    *_test.go)
+        SPECIFIC_DOC="docs/development/testing.md — framework per repo (testing.T+Gomega for druid/wrapper, Ginkgo for backup-restore), fake client patterns"
+        ;;
+    */internal/component/*)
+        SPECIFIC_DOC="docs/development/add-new-etcd-cluster-component.md — operator interface: PreSync, Sync, TriggerDelete, GetExistingResourceNames"
+        ;;
+    */internal/controller/*)
+        SPECIFIC_DOC="docs/development/controllers.md — reconciler patterns and controller-runtime conventions"
+        ;;
+    */api/core/v1alpha1/*)
+        SPECIFIC_DOC="docs/development/changing-api.md — field naming, CEL validation placement, two-commit generate rule"
+        ;;
+esac
+
+if [ -n "$SPECIFIC_DOC" ]; then
+    REMINDER="Before editing ${FILE_PATH}: read ${repo_root}/${SPECIFIC_DOC}. It is the authoritative source for conventions in this area."
+else
+    REMINDER="Before editing ${FILE_PATH}: read the relevant files in ${repo_root}/docs/development/ — they are the authoritative source for conventions, patterns, and make targets in this repo."
+fi
+
+jq -n --arg ctx "$REMINDER" \
+    '{"continue":true,"suppressOutput":true,"hookSpecificOutput":{"hookEventName":"PostToolUse","additionalContext":$ctx}}'
 
 exit 0

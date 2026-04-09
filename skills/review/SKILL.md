@@ -27,7 +27,7 @@ Standalone checklist for reviewing etcd-druid, etcd-backup-restore, and etcd-wra
 
 - Before creating a PR (self-review gate)
 - When reviewing someone else's PR
-- After implementing a feature — invoked by `feature-dev` Phase 5 before Gate 2
+- After implementing a feature — invoked by `/etcd-druid:implement` Phase 3 before Gate 2
 
 ---
 
@@ -35,6 +35,7 @@ Standalone checklist for reviewing etcd-druid, etcd-backup-restore, and etcd-wra
 
 ```bash
 git diff upstream/master...HEAD
+# If 'upstream' remote is missing: git remote add upstream https://github.com/gardener/<repo>
 ```
 
 Read every changed file. Note each category: API, component logic, tests, docs.
@@ -90,6 +91,14 @@ Core rules that apply regardless of repo:
 - No gomock in etcd-druid component tests
 - Table-driven for multiple scenarios; `t.Parallel()` in subtests
 
+**Verify tests pass locally** (run before opening PR, or confirm author ran them):
+
+| Repo | Commands |
+|---|---|
+| etcd-druid | `make test-unit` (all); `make test-integration` (if controller/component touched) |
+| etcd-backup-restore | `make test-unit`; `make test-integration` (if etcdbr logic touched) |
+| etcd-wrapper | `make test` |
+
 ## Step 8: Commit Messages
 
 `Verb noun detail (#NNNN)` — sentence case, imperative, no trailing period.
@@ -118,13 +127,16 @@ If new docs files are added or structure changes: `mkdocs.yml` and `docs/README.
 
 ---
 
-## Red Flags — Stop and Re-read
+## Red Flags — Stop Before Issuing Verdict
 
-- Forming a verdict before reading the full diff
-- Skipping `docs/development/` because "I know this codebase"
-- Marking API changes LGTM without checking both commits exist
-- Missing the two-commit rule for `make generate` output
-- Skipping the Repo Differences table for a repo you don't usually work in
+| Observation | What it means |
+|---|---|
+| Diff is >500 lines or touches >5 packages | Too large for a single review — flag this to the author before proceeding |
+| API type changed but no generated files in diff | Two-commit rule violated — `cd api && make generate` was not run |
+| Test file uses `import . "github.com/onsi/ginkgo/v2"` in etcd-druid | Wrong framework — etcd-druid uses `testing.T`, not Ginkgo |
+| `time.Sleep()` in any test | Async anti-pattern — should use `Eventually`/`Consistently` |
+| `CHANGES REQUESTED` verdict without reading `docs/development/` | Iron Law violation — read the docs first |
+| New function, type, or parameter with no caller in this PR | YAGNI violation — flag it |
 
 ---
 
@@ -164,6 +176,7 @@ awk -v entry="
 **Source:** review-skill
 **Type:** <wrong_claim|missing_convention|missing_footgun|unclear_workflow|stale_path_or_flag>
 **Confidence:** high
+**Count:** 1
 **File:** \`<skills/name/SKILL.md>\`
 **Section:** <section heading>
 
@@ -172,6 +185,8 @@ awk -v entry="
 
 **Proposed fix:**
 <what it should say — specific enough to write without investigation>
+
+**Apply:** MULTILINE — apply manually
 
 **Evidence:**
 > <what in the diff or docs revealed this>
@@ -203,5 +218,7 @@ Fill in `<type>`, `<plugin_file>`, `<section>`, `<wrong_text>`, `<proposed_fix>`
 
 ## Handoff
 
-- LGTM → return to caller (feature-dev Gate 2, or done if standalone)
-- Plugin mistake found → output the `gh pr create` block above
+- Review verdict is LGTM and invoked from `/etcd-druid:implement` Phase 3 → return there for Gate 2
+- Review verdict is LGTM and invoked standalone (from `tdd` or `debug`) → work is ready to open a PR
+- Review verdict is CHANGES REQUESTED and you are the author → follow `skills/receiving-review/SKILL.md`
+- Review finds a pattern not in Known Footguns → add it to this skill's Known Footguns section

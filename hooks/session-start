@@ -108,13 +108,14 @@ Each repo has docs/development/ with authoritative conventions, patterns, and ma
 When you find a pattern not documented there, add it as part of your work.
 
 ## Available Skills
-etcd-druid:feature-dev   Use for any development work — picking up an issue, planning features or bug fixes, adding components or API fields, design-to-PR
+etcd-druid:plan          Use at the start of any development work — issue intake, approach selection, code plan with acceptance criteria (Gate 1)
+etcd-druid:implement     Use after Gate 1 approval — worktree setup, per-task implementation, verification, PR creation (Gate 2)
 etcd-druid:api-change    Use for API field additions or modifications — CEL validation, two-commit generate workflow, CRD tests
 etcd-druid:tdd           Use when writing new tests or learning testing patterns — TDD cycle, framework selection, fake client, table-driven tests
 etcd-druid:debug         Use when something is failing, broken, or behaving unexpectedly — build failures, test failures, reconciliation loops, backup failures
 etcd-druid:review        Use when validating code before a PR — pre-merge checklist, self-review, pattern validation
 etcd-druid:e2e           Use for manual e2e testing — KIND cluster setup, custom image builds, sidecar image overrides, pre-PR CI validation
-etcd-druid:reference     Use for quick lookup: make targets, file paths, git workflow, branch naming
+etcd-druid:reference     Use for quick lookup: make targets, file paths, git workflow, branch naming, EtcdOpsTask state machine, druidctl, feature gates
 etcd-druid:observations  Use to review and triage captured plugin improvement findings — raise PR, skip, or dismiss each one
 ORIENTATION
 )
@@ -177,7 +178,7 @@ PLUGIN_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 OBSERVATIONS_FILE="${PLUGIN_ROOT}/plugin-observations.md"
 pending_obs=""
 if [ -f "$OBSERVATIONS_FILE" ]; then
-    open_count=$(grep -c '^**Status:** open' "$OBSERVATIONS_FILE" 2>/dev/null || echo "0")
+    open_count=$(grep -cF '**Status:** open' "$OBSERVATIONS_FILE" 2>/dev/null || echo "0")
     if [ "$open_count" -gt 0 ]; then
         pending_obs="\\n\\n<PLUGIN_OBSERVATIONS>\\n${open_count} plugin improvement observation(s) are waiting for review.\\nRun /etcd-druid:observations to review them and decide which ones to raise as PRs.\\n</PLUGIN_OBSERVATIONS>"
     fi

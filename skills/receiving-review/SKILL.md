@@ -1,6 +1,6 @@
 ---
 name: receiving-review
-description: Guide for handling incoming code review feedback — referenced by feature-dev and review. Not user-invocable.
+description: Guide for handling incoming code review feedback — referenced by implement and review. Not user-invocable.
 user-invocable: false
 ---
 
@@ -49,6 +49,16 @@ One fix per commit. Commit message: `Address review feedback: <what was changed>
 
 Apply the verification gate (`skills/verification/SKILL.md`) after each batch of fixes.
 
+After all fixes are committed, re-run CI locally before responding:
+
+| Repo | Command |
+|------|---------|
+| etcd-druid | `make ci-checks && make test-unit` |
+| etcd-backup-restore | `make check && make test-unit` |
+| etcd-wrapper | `make check && make test` |
+
+Gate: CI must pass before posting responses to the PR thread.
+
 ### Step 5: Respond with evidence
 
 For each comment:
@@ -63,3 +73,16 @@ If a comment cannot be acted on unambiguously, stop and ask:
 > "I want to make sure I understand your feedback on [file:line]. Are you asking for [interpretation A] or [interpretation B]?"
 
 Do not guess. Do not implement the wrong thing and hope for the best.
+
+## Handoff
+
+Once all Must-fix and Should-fix comments are addressed and CI passes:
+
+1. Push the fixes: `git push origin <branch>`
+2. Re-request review on the PR: `gh pr edit <number> --add-reviewer <reviewer>`
+3. Post a top-level PR comment summarising what changed:
+   > "All feedback addressed. Summary: [list each Must/Should-fix item and the commit sha that resolved it]"
+
+If all feedback was Opinion or Unclear (nothing to implement): respond inline and do not re-request review — wait for the reviewer to continue the thread.
+
+When the PR is approved: your work is done — the maintainer (or Prow tide) will merge it.

@@ -114,6 +114,18 @@ type EtcdConfig struct {
 
 **`has()` guard:** Always wrap optional field references in `has(self.fieldName)` before dereferencing. Omitting the guard causes the rule to fail when the field is absent.
 
+**`omitempty` + `has()` interaction:** A field tagged `json:",omitempty"` is omitted from serialization when zero-valued, so `has()` returns `false` for it when absent. A field tagged without `omitempty` is serialized even when zero-valued — `has()` returns `true` even if the value is `""` or `0`. Write your `has()` guard to match the field's actual `omitempty` tag, otherwise the guard may always pass or always fail depending on zero-value behaviour.
+
+**Silent-pass failure mode:** If a test asserts that an invalid value is rejected but gets `nil` instead, the `XValidation` rule is placed on the wrong struct. A rule annotated on `EtcdConfig` can only reference `self.*` fields within `EtcdConfig` — it cannot see `self.spec.backup.*` or `self.metadata.*`. Move the rule to the innermost struct that owns all referenced fields, or to the `Etcd` root type for cross-field rules. Verify the rule was emitted in the CRD output:
+
+```bash
+kubectl apply --dry-run=server -f api/core/v1alpha1/crds/druid.gardener.cloud_etcds.yaml 2>&1 | grep -A2 "x-kubernetes-validations"
+# or dry-run without a cluster:
+grep "x-kubernetes-validations" api/core/v1alpha1/crds/druid.gardener.cloud_etcds.yaml
+```
+
+If `x-kubernetes-validations` does not appear at the path you expect, the annotation was on the wrong type — regenerate after moving it.
+
 ### 3c. Cross-field CEL (on the root `Etcd` or `EtcdSpec` type)
 
 Use when the rule references `self.metadata` OR fields from two different sub-structs:
@@ -280,7 +292,36 @@ func TestValidateAdditionalAdvertisePeerUrls(t *testing.T) {
 
 ---
 
-## Step 7: PR Requirements
+## Step 7: CI Pipeline Verification (required — Gate 2 never presented with failing CI)
+
+Run all of these in order before presenting Gate 2. Any failure → dispatch fix subagent with full output.
+
+```bash
+# From worktree root
+cd <worktree-path>
+make ci-checks          # format + lint + license + api-diff (catches field naming issues)
+make test-unit          # confirms deepcopy generation is syntactically correct
+make test-integration   # runs test/it/crdvalidation/ — your CEL tests are here
+
+# From api/ module
+cd <worktree-path>/api
+make check-generate     # fails if make generate would produce a diff — means commit 2 is stale
+make check-apidiff      # fails on breaking API changes — must pass or be explicitly excepted
+```
+
+**If `make check-apidiff` fails with an unexpected breaking change:**
+The API diff tool found a field removal, rename, or type change you didn't intend. Fix the field design. If the breaking change is intentional, follow `docs/development/changing-api.md` to add it to the compatibility exception list.
+
+**If `make test-integration` fails on a CEL test:**
+- `skipCELTestsForOlderK8sVersions(t)` guard missing → add it
+- envtest K8s version < 1.29 → the skip guard handles this automatically
+- CEL rule syntax error → run `kubectl apply --dry-run=server -f api/core/v1alpha1/crds/*.yaml` against a live cluster to see the CEL parse error
+
+**Gate 2 is never presented with failing CI.** All five commands above must pass.
+
+---
+
+## Step 8: PR Requirements
 
 **Read the template first.** The PR template lives in `.github/pull_request_template.md` in the repo — read it directly and fill every section. Prow bots parse `/area` and `/kind`; wrong values or missing lines stall the review.
 
@@ -354,9 +395,20 @@ int(self.name.substring(self.name.lastIndexOf('-') + 1))
 
 ---
 
+## Red Flags — Stop and Re-read the Iron Law
+
+| Thought | Why it fails |
+|---|---|
+| "The CEL rule is simple — I'll add the test after" | CEL syntax errors are silent until the CRD is applied; the test is the only CI gate |
+| "I only changed one field — two commits is overkill" | Mixed hand-written + generated commits break `git bisect` and make rollback impossible |
+| "I ran `make generate` — the test is redundant" | `make generate` checks syntax; the integration test checks runtime semantics |
+| "The field is internal — no CEL validation needed" | Internal fields are still validated at admission; an untested rule may silently accept invalid input |
+
+---
+
 ## Handoff
 
 After completing the API change:
-- Run `make ci-checks` from the worktree root
-- Run `make test-integration` (CRD validation tests live in the integration suite)
-- Invoke `/etcd-druid:review` for pre-PR checklist
+- CI pipeline passes (Step 7 all green) → return to `/etcd-druid:implement` Phase 3 (verify gate)
+- Debugging a failing CEL test or stale generation → invoke `/etcd-druid:debug`
+- Writing the CEL test → follow `skills/tdd/SKILL.md` (use `skipCELTestsForOlderK8sVersions(t)` guard)

@@ -21,6 +21,22 @@ Use this skill when you hit: test failures, unexpected reconciliation behavior, 
 | "It's obviously X" | "Obviously" precedes most debugging rabbit holes |
 | "Reproducing it takes too long" | Fixing without reproduction takes longer |
 
+## Before You Start: Protect Your Working State
+
+```bash
+# If you have uncommitted changes, stash them before investigating
+git stash push -m "WIP: stashing before debug investigation"
+
+# Work on a separate branch to avoid polluting main/master
+git checkout -b debug/investigate-<short-description>
+
+# To restore after investigation:
+git stash pop
+```
+
+Never apply speculative fixes directly to your main working branch.
+Investigation often requires trying multiple approaches — do it on a throwaway branch.
+
 ## Phase 1: Read the Error Carefully
 
 Never scroll past error output.
@@ -233,6 +249,7 @@ envtest starts a real API server and etcd for integration tests. Common issues:
 - **API server won't start:** Check if ports 1024-65535 range has conflicts. envtest picks random ports.
 - **CRD installation fails:** Verify CRD YAML files exist at the paths in `CRDDirectoryPaths`. Both CEL and non-CEL variants must be present.
 - **K8s version mismatch:** CEL validation tests require K8s >= 1.29. Use `skipCELTestsForOlderK8sVersions(t)` guard.
+- **CEL rule silently accepts invalid input** (test asserts rejection, got `nil`): the `XValidation` rule is placed on the wrong struct level — `self.*` can only reference fields within the struct it is annotated on. Move the rule to the innermost struct that owns all referenced fields, or to the `Etcd` root type for cross-field rules. Confirm the rule was emitted by running `kubectl apply --dry-run=server -f api/core/v1alpha1/crds/*.yaml` and checking that `x-kubernetes-validations` appears at the expected path in the output.
 - **Slow tests:** envtest startup takes 5-10s. Group related tests in the same test function to share the env.
 - **Status update conflicts:** Use retry-on-conflict when updating `.status` — see etcd-druid PR #1302 for the pattern.
 - **Cleanup:** `defer testEnv.Stop()` must always run. Leaked envtest processes block ports.
@@ -246,6 +263,7 @@ envtest starts a real API server and etcd for integration tests. Common issues:
 
 ## Handoff
 
-After Phase 5 (fix confirmed, tests green):
-- If this was a test failure with no regression test: invoke `/etcd-druid:tdd` to add one
-- If fix is complete and PR-bound: invoke `/etcd-druid:review`
+- Root cause identified, fix implemented → apply verification gate (`skills/verification/SKILL.md`)
+- Fix implemented, needs regression test → invoke `/etcd-druid:tdd`; return here (Phase 5) once the regression test is committed and green
+- Fix verified, ready for PR → invoke `/etcd-druid:review`
+- Fix involves API change → invoke `/etcd-druid:api-change`

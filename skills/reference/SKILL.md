@@ -296,8 +296,8 @@ TTL-based cleanup: `ttlSecondsAfterFinished`.
 Status state machine:
 ```
 Pending → InProgress → Succeeded
-                    ↘ Failed
-                    ↘ Rejected  (invalid task or cluster not ready)
+   ↘                 ↘ Failed
+    └────────────────→ Rejected  (invalid task or cluster not ready — can skip InProgress)
 ```
 
 LastOperationType: `Admit`, `Execution`, `Cleanup`.
@@ -425,10 +425,12 @@ Immutable snapshots: S3 (Object Lock), ABS, GCS, OSS (WORM Lock).
 
 ## Skills Available (on-demand)
 
-- `feature-dev` — full feature development workflow with approval gates
-- `api-change` — API field design, CEL validation (field-scoped + cross-field), two-commit generate, CRD tests
+- `plan` — design phase: issue analysis, approach selection, code plan with approval gate (Gate 1)
+- `implement` — execution phase: worktree setup, per-task subagent loop, verification, PR creation (Gate 2)
+- `api-change` — API field design, CEL validation (field-scoped + cross-field), two-commit generate, CRD tests, CI pipeline verification before Gate 2
 - `tdd` — TDD cycle for all three repos
 - `debug` — systematic debugging workflow
 - `review` — code review checklist
+- `observations` — triage captured plugin improvement observations; invoke when session-start flags pending observations
 - `e2e` — manual e2e testing: KIND setup, custom image builds, sidecar overrides, pre-PR CI
 - `reference` — this card

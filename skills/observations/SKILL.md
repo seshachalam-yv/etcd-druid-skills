@@ -11,6 +11,15 @@ Review captured plugin improvement observations and decide what to do with each 
 Observations come from three sources: explicit `<plugin-gap>` markers Claude emits,
 user correction detection, and review-skill gap capture.
 
+## ⛔ Iron Law
+
+**NO PR RAISED WITHOUT AN EXPLICIT USER "R" CHOICE.**
+
+| Rationalization | Why it fails |
+|---|---|
+| "The fix is obviously correct" | The user decides what gets raised, not you. Show it first. |
+| "All previous observations were accepted" | Each observation is independent. Ask for each one. |
+
 ---
 
 ## Step 1: Read and pre-verify all open observations
@@ -19,6 +28,9 @@ user correction detection, and review-skill gap capture.
 PLUGIN_OBS="${CLAUDE_PLUGIN_ROOT}/plugin-observations.md"
 cat "$PLUGIN_OBS"
 ```
+
+Sort observations by **Count** (descending) before presenting — highest-frequency gaps first.
+To find counts: `grep -A1 "Status.*open" "$PLUGIN_OBS" | grep "Count"`.
 
 If the file does not exist or has no `**Status:** open` entries: report "No open observations." and stop.
 
@@ -51,6 +63,7 @@ For each observation that survived pre-verification, show it clearly:
 ─────────────────────────────────────────
 OBS-NNN | <type> | <confidence> confidence | source: <source>
 File: <plugin_file> § <plugin_section>
+Count: <count>  ← how many times this gap was independently observed
 
 CURRENT FILE CONTENT at that section:
   <paste the relevant 3-5 lines from the actual file>
@@ -60,6 +73,8 @@ Wrong / Missing:
 
 Proposed fix:
   <correct_text>
+
+Apply: <sed command, or "MULTILINE — apply manually">
 
 Evidence that revealed this:
   "<evidence>"
@@ -85,7 +100,10 @@ Wait for the user's response before moving to the next observation.
 ### R — Apply fix and raise PR
 
 1. Read the full plugin file again (fresh read)
-2. Apply the fix from `correct_text` — use Edit tool, minimal change
+2. Check the `**Apply:**` field in the observation:
+   - If it shows a `sed` command: run it directly in the plugin root
+   - If it shows `MULTILINE — apply manually`: use the Edit tool with `correct_text`
+   - Always verify the result by reading the changed section back
 3. Verify the edit looks correct (read the changed section back)
 4. Commit:
    ```bash
@@ -148,3 +166,9 @@ If any were skipped: "Run /etcd-druid:observations again when ready."
 - Never batch-dismiss — show each observation individually
 - The `correct_text` field is a **proposed fix**, not ground truth — verify it matches the current file before applying
 - If an observation's `wrong_text` is not found in the file, auto-resolve it — do not show to user
+
+## Handoff
+
+- All observations triaged → return to whatever triggered the session (continue normal work)
+- Observations remain open (user skipped) → they will re-surface at the next session-start
+- Fix applied and PR raised → the PR is the handoff; no further action needed in this session
