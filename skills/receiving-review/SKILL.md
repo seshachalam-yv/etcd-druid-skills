@@ -85,4 +85,4 @@ Once all Must-fix and Should-fix comments are addressed and CI passes:
 
 If all feedback was Opinion or Unclear (nothing to implement): respond inline and do not re-request review — wait for the reviewer to continue the thread.
 
-When the PR is approved: return to `/etcd-druid:implement` Phase 3 to complete Gate 2 and merge.
+When the PR is approved: your work is done — the maintainer (or Prow tide) will merge it.
