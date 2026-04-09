@@ -212,6 +212,8 @@ Gate 2 only after review returns LGTM.
 
 STOP. No push. No `gh pr create`.
 
+**Who approves:** The human — by choosing A, B, C, or D. Do not self-select an option.
+
 Present:
 - PR title (imperative, sentence case, no trailing period)
 - PR body draft (see format below)
