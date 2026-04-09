@@ -72,7 +72,9 @@ Agent tool (general-purpose):
     - [ ] No use of deprecated `PreferClose` in `ClientService.TrafficDistribution` — use `PreferSameZone` or `PreferSameNode`
     - [ ] No use of deprecated `StoreSpec` secret-based endpoint config — use `spec.backup.store.endpointOverride` (druid) / `--store-endpoint-override` (etcd-backup-restore)
     - [ ] If EtcdOpsTask controller touched: task state machine transitions are correct
-          (Pending→InProgress→Succeeded/Failed/Rejected, FIFO, one active per cluster)
+          (Pending→InProgress→Succeeded/Failed/Rejected, FIFO, one active per cluster);
+          `OnDemandSnapshot` is also auto-triggered during hibernation (replicas=0) and
+          `UpgradeEtcdVersion` flow — new trigger paths must not conflict with these
     - [ ] If `UpgradeEtcdVersion` feature gate used: properly gated behind featureGates.Enabled()
     - [ ] No explicit `--compress-snapshots=true` added — snapshot compression is on by default in etcd-backup-restore v0.40+
     - [ ] etcd-backup-restore or etcd-wrapper dependency change: `make revendor` was run (not just `go mod tidy`)
