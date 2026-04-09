@@ -13,7 +13,6 @@ set -uo pipefail
 
 PLUGIN_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 OBSERVATIONS_FILE="${PLUGIN_ROOT}/plugin-observations.md"
-CORRECTION_FLAG="/tmp/etcd-druid-correction-signal-${SESSION_ID:-default}"
 
 # ── Guard: prevent infinite recursion ────────────────────────────────────────
 # stop_hook_active is set to true when a Stop hook is already running.
