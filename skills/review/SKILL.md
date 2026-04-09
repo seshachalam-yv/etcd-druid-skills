@@ -176,6 +176,7 @@ awk -v entry="
 **Source:** review-skill
 **Type:** <wrong_claim|missing_convention|missing_footgun|unclear_workflow|stale_path_or_flag>
 **Confidence:** high
+**Count:** 1
 **File:** \`<skills/name/SKILL.md>\`
 **Section:** <section heading>
 
@@ -184,6 +185,8 @@ awk -v entry="
 
 **Proposed fix:**
 <what it should say — specific enough to write without investigation>
+
+**Apply:** MULTILINE — apply manually
 
 **Evidence:**
 > <what in the diff or docs revealed this>
