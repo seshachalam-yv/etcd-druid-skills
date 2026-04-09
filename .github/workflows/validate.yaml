@@ -1,0 +1,66 @@
+name: Validate
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate plugin.json and marketplace.json are consistent
+        run: |
+          PLUGIN_VERSION=$(jq -r '.version' .claude-plugin/plugin.json)
+          MARKETPLACE_VERSION=$(jq -r '.metadata.version' .claude-plugin/marketplace.json)
+          MARKETPLACE_PLUGIN_VERSION=$(jq -r '.plugins[0].version' .claude-plugin/marketplace.json)
+
+          echo "plugin.json version:       $PLUGIN_VERSION"
+          echo "marketplace.json metadata: $MARKETPLACE_VERSION"
+          echo "marketplace.json plugin:   $MARKETPLACE_PLUGIN_VERSION"
+
+          FAIL=0
+          if [ "$PLUGIN_VERSION" != "$MARKETPLACE_VERSION" ]; then
+            echo "ERROR: plugin.json version ($PLUGIN_VERSION) != marketplace.json metadata.version ($MARKETPLACE_VERSION)"
+            FAIL=1
+          fi
+          if [ "$PLUGIN_VERSION" != "$MARKETPLACE_PLUGIN_VERSION" ]; then
+            echo "ERROR: plugin.json version ($PLUGIN_VERSION) != marketplace.json plugins[0].version ($MARKETPLACE_PLUGIN_VERSION)"
+            FAIL=1
+          fi
+          exit $FAIL
+
+      - name: Validate all skills have required frontmatter
+        run: |
+          FAIL=0
+          while IFS= read -r -d '' skill; do
+            if ! grep -q "^name:" "$skill"; then
+              echo "ERROR: $skill missing 'name:' in frontmatter"
+              FAIL=1
+            fi
+            if ! grep -q "^description:" "$skill"; then
+              echo "ERROR: $skill missing 'description:' in frontmatter"
+              FAIL=1
+            fi
+          done < <(find skills -name "SKILL.md" -print0)
+          exit $FAIL
+
+      - name: Validate hooks are executable
+        run: |
+          FAIL=0
+          for hook in hooks/*.sh hooks/session-start; do
+            [ -f "$hook" ] || continue
+            if [ ! -x "$hook" ]; then
+              echo "ERROR: $hook is not executable"
+              FAIL=1
+            fi
+          done
+          exit $FAIL
+
+      - name: Validate hooks.json is valid JSON
+        run: |
+          jq empty hooks/hooks.json && echo "hooks.json is valid JSON"

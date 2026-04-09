@@ -1,0 +1,74 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate version consistency
+        run: |
+          TAG="${GITHUB_REF_NAME}"          # e.g. v1.8.0
+          VERSION="${TAG#v}"                # e.g. 1.8.0
+
+          PLUGIN_VERSION=$(jq -r '.version' .claude-plugin/plugin.json)
+          MARKETPLACE_VERSION=$(jq -r '.metadata.version' .claude-plugin/marketplace.json)
+          MARKETPLACE_PLUGIN_VERSION=$(jq -r '.plugins[0].version' .claude-plugin/marketplace.json)
+
+          echo "Tag version:               $VERSION"
+          echo "plugin.json version:       $PLUGIN_VERSION"
+          echo "marketplace.json metadata: $MARKETPLACE_VERSION"
+          echo "marketplace.json plugin:   $MARKETPLACE_PLUGIN_VERSION"
+
+          FAIL=0
+          if [ "$PLUGIN_VERSION" != "$VERSION" ]; then
+            echo "ERROR: plugin.json version ($PLUGIN_VERSION) does not match tag ($VERSION)"
+            FAIL=1
+          fi
+          if [ "$MARKETPLACE_VERSION" != "$VERSION" ]; then
+            echo "ERROR: marketplace.json metadata.version ($MARKETPLACE_VERSION) does not match tag ($VERSION)"
+            FAIL=1
+          fi
+          if [ "$MARKETPLACE_PLUGIN_VERSION" != "$VERSION" ]; then
+            echo "ERROR: marketplace.json plugins[0].version ($MARKETPLACE_PLUGIN_VERSION) does not match tag ($VERSION)"
+            FAIL=1
+          fi
+          exit $FAIL
+
+      - name: Extract changelog entry
+        id: changelog
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          VERSION="${TAG#v}"
+
+          # Extract the section for this version from CHANGELOG.md if it exists
+          if [ -f CHANGELOG.md ]; then
+            # Extract between ## [VERSION] and the next ## heading
+            NOTES=$(awk "/^## \[?${VERSION}\]?/{found=1; next} found && /^## /{exit} found{print}" CHANGELOG.md)
+          fi
+
+          if [ -z "$NOTES" ]; then
+            NOTES="Release ${TAG}"
+          fi
+
+          # Write to file to avoid quoting issues
+          printf '%s' "$NOTES" > /tmp/release-notes.md
+          echo "notes_file=/tmp/release-notes.md" >> "$GITHUB_OUTPUT"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          body_path: ${{ steps.changelog.outputs.notes_file }}
+          draft: false
+          prerelease: ${{ contains(github.ref_name, '-') }}
