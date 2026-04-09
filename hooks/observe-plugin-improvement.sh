@@ -143,10 +143,7 @@ HEADER
 **Proposed fix:**
 ${obs_correct}
 
-**Apply:**
-\`\`\`bash
-__OBS_DIFF_PLACEHOLDER__
-\`\`\`
+**Apply:** __OBS_DIFF_PLACEHOLDER__
 
 **Evidence:**
 > ${obs_evidence}
