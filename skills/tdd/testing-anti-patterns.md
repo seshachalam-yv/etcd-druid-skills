@@ -110,3 +110,40 @@ etcd := utils.EtcdBuilderWithoutDefaults("test-ns", "etcd-main").
     WithReplicas(3).
     Build()
 ```
+
+---
+
+## Anti-Pattern 6: Table-Driven Tests Without `t.Parallel()`
+
+**What it looks like:**
+```go
+func TestMyComponent(t *testing.T) {
+    cases := []struct{ ... }{ ... }
+    for _, tc := range cases {
+        t.Run(tc.name, func(t *testing.T) {
+            // no t.Parallel()
+            result := myFunc(tc.input)
+            Expect(result).To(Equal(tc.expected))
+        })
+    }
+}
+```
+
+**Why it fails:** Without `t.Parallel()`, subtests run sequentially. This slows CI and
+masks shared-state bugs — a subtest that accidentally mutates shared state will pass
+because the next subtest has not run yet. Running in parallel exposes the race.
+
+**Correct alternative:**
+```go
+for _, tc := range cases {
+    tc := tc  // capture loop variable (required before Go 1.22)
+    t.Run(tc.name, func(t *testing.T) {
+        t.Parallel()
+        result := myFunc(tc.input)
+        Expect(result).To(Equal(tc.expected))
+    })
+}
+```
+
+Exception: omit `t.Parallel()` only when the subtest mutates shared state that cannot
+be isolated (e.g., a global registry). Document the reason with a comment.
