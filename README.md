@@ -9,6 +9,57 @@
 
 ---
 
+## Installation
+
+**Step 1 — Add the marketplace** (once per machine):
+
+In Claude Code, run:
+```
+/plugin marketplace add seshachalam-yv/etcd-druid-skills
+```
+
+**Step 2 — Install the plugin:**
+```
+/plugin install etcd-druid-skills@seshachalam-yv-etcd-druid-skills
+```
+
+Alternatively, add both to your `~/.claude/settings.json` directly:
+
+```json
+{
+  "extraKnownMarketplaces": {
+    "seshachalam-yv-etcd-druid-skills": {
+      "source": {
+        "source": "github",
+        "repo": "seshachalam-yv/etcd-druid-skills"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "etcd-druid-skills@seshachalam-yv-etcd-druid-skills": true
+  }
+}
+```
+
+### Verify installation
+
+Start a new Claude Code session in an etcd-druid, etcd-backup-restore, or etcd-wrapper checkout. You should see the orientation context injected automatically (component overview, active repo, branch info). Then try:
+
+```
+/etcd-druid:reference
+```
+
+If the reference card appears with your current git state, the plugin is working.
+
+### Update
+
+To pull the latest version of the plugin:
+```
+/plugin marketplace update seshachalam-yv-etcd-druid-skills
+```
+
+---
+
 ## What it does
 
 Without this plugin, Claude knows Go and Kubernetes but nothing specific about etcd-druid, etcd-backup-restore, or etcd-wrapper. You re-explain the operator interface, test framework rules, API generation process, and review requirements every session.
@@ -354,57 +405,6 @@ Claude never loses its domain grounding mid-session, even after compaction trunc
 | etcd | 3.5.27 | 3.5.27 | 3.5.27 |
 | golangci-lint | v2 | v2 | v2 |
 | CI | GitHub Actions | GitHub Actions | GitHub Actions |
-
----
-
-## Installation
-
-**Step 1 — Add the marketplace** (once per machine):
-
-In Claude Code, run:
-```
-/plugin marketplace add seshachalam-yv/etcd-druid-skills
-```
-
-**Step 2 — Install the plugin:**
-```
-/plugin install etcd-druid-skills@seshachalam-yv-etcd-druid-skills
-```
-
-Alternatively, add both to your `~/.claude/settings.json` directly:
-
-```json
-{
-  "extraKnownMarketplaces": {
-    "seshachalam-yv-etcd-druid-skills": {
-      "source": {
-        "source": "github",
-        "repo": "seshachalam-yv/etcd-druid-skills"
-      }
-    }
-  },
-  "enabledPlugins": {
-    "etcd-druid-skills@seshachalam-yv-etcd-druid-skills": true
-  }
-}
-```
-
-### Verify installation
-
-Start a new Claude Code session in an etcd-druid, etcd-backup-restore, or etcd-wrapper checkout. You should see the orientation context injected automatically (component overview, active repo, branch info). Then try:
-
-```
-/etcd-druid:reference
-```
-
-If the reference card appears with your current git state, the plugin is working.
-
-### Update
-
-To pull the latest version of the plugin:
-```
-/plugin marketplace update seshachalam-yv-etcd-druid-skills
-```
 
 ---
 
