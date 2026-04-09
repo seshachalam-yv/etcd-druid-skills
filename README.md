@@ -329,8 +329,34 @@ Claude never loses its domain grounding mid-session, even after compaction trunc
 
 ## Installation
 
-```bash
-claude plugin install https://github.com/seshachalam-yv/etcd-druid-skills
+**Step 1 — Add the marketplace** (once per machine):
+
+In Claude Code, run:
+```
+/plugin marketplace add seshachalam-yv/etcd-druid-skills
+```
+
+**Step 2 — Install the plugin:**
+```
+/plugin install etcd-druid-skills@seshachalam-yv-etcd-druid-skills
+```
+
+Alternatively, add both to your `~/.claude/settings.json` directly:
+
+```json
+{
+  "extraKnownMarketplaces": {
+    "seshachalam-yv-etcd-druid-skills": {
+      "source": {
+        "source": "github",
+        "repo": "seshachalam-yv/etcd-druid-skills"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "etcd-druid-skills@seshachalam-yv-etcd-druid-skills": true
+  }
+}
 ```
 
 ### Verify installation
@@ -345,8 +371,9 @@ If the reference card appears with your current git state, the plugin is working
 
 ### Update
 
-```bash
-claude plugin update etcd-druid
+To pull the latest version of the plugin:
+```
+/plugin marketplace update seshachalam-yv-etcd-druid-skills
 ```
 
 ---
