@@ -48,7 +48,7 @@ case "$FILE_PATH" in
         SPECIFIC_DOC="docs/development/controllers.md — reconciler patterns and controller-runtime conventions"
         ;;
     */api/core/v1alpha1/*)
-        SPECIFIC_DOC="docs/development/api-conventions.md — field naming, CEL validation placement, two-commit generate rule"
+        SPECIFIC_DOC="docs/development/changing-api.md — field naming, CEL validation placement, two-commit generate rule"
         ;;
 esac
 
