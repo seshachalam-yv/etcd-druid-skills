@@ -160,8 +160,8 @@ cd <etcd-druid-fork>
 make NAMESPACE=etcd-druid-e2e \
      CERT_EXPIRY_DAYS=30 \
      prepare-helm-charts
-# CRITICAL: IMAGEVECTOR_OVERWRITE must be set ON the make command line, not exported beforehand.
-# Exporting it before calling make does not guarantee it is passed into the recipe environment.
+# Pass IMAGEVECTOR_OVERWRITE inline (or export it first — both work).
+# The value must reach the deployed binary's environment via skaffold.
 IMAGEVECTOR_OVERWRITE="$(cat /tmp/imagevector-override.json)" \
 make DRUID_E2E_TEST=true \
      ENABLE_ETCD_COMPONENT_PROTECTION_WEBHOOK=true \
