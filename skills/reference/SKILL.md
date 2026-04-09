@@ -296,8 +296,8 @@ TTL-based cleanup: `ttlSecondsAfterFinished`.
 Status state machine:
 ```
 Pending → InProgress → Succeeded
-                    ↘ Failed
-                    ↘ Rejected  (invalid task or cluster not ready)
+   ↘                 ↘ Failed
+    └────────────────→ Rejected  (invalid task or cluster not ready — can skip InProgress)
 ```
 
 LastOperationType: `Admit`, `Execution`, `Cleanup`.
