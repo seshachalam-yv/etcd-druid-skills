@@ -25,6 +25,11 @@ Complete workflow for adding or modifying fields in `api/core/v1alpha1/`. Covers
 
 ## Step 1: Choose the Right File and Struct
 
+**Before writing any code:** Read the `## API Delta` section of the plan file for this task.
+This is the canonical statement of what this change should add, modify, or remove.
+Your Commit 1 diff must match every row in that table — no more, no less.
+If the plan has no `## API Delta` section, stop and ask the plan author to add one.
+
 ```
 API types:   api/core/v1alpha1/etcd.go
 OpsTask:     api/core/v1alpha1/etcdopstask.go
