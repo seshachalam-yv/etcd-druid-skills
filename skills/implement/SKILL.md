@@ -57,6 +57,11 @@ digraph implement {
 ## Phase 1: Worktree Setup
 
 Read the plan file first. Extract: fork root, issue number, task list.
+
+**API Delta check:** Scan the plan's task list. If any task's Files list includes a path containing `api/core/v1alpha1/` and the plan has no `## API Delta` section, stop and tell the user:
+> "This plan touches API types but has no `## API Delta` section. Please add one (one row per field added, modified, or removed) before I proceed."
+Do not create the worktree until the API Delta section exists.
+
 Branch name is derived at worktree-creation time: `ai/TASK-{id}/claude/{short-description}` — it is not in the plan file.
 
 ```bash
