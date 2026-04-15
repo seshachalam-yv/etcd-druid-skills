@@ -130,7 +130,18 @@ Repeat for each task:
 
 **g.** Quality issues → implementer fixes → code-reviewer re-reviews → repeat until ✅
 
-**h.** Mark task `completed` (TaskUpdate). Check off plan checkbox.
+**h.** Mark task `completed` (TaskUpdate) AND edit the plan file to flip this task's
+   checkbox from `- [ ]` to `- [x]`:
+
+   ```bash
+   # In the plan file at <fork-root>/docs/plans/<plan-file>.md
+   # Find the line: - [ ] Task N: <name>
+   # Change it to:  - [x] Task N: <name>
+   ```
+
+   Both must happen together. TaskUpdate tracks state for the current session;
+   the plan file checkbox is the durable cross-session record.
+   Do not mark a task complete in TaskUpdate without also flipping the checkbox.
 
 **i.** Next task.
 
