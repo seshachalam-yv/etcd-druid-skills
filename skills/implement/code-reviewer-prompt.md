@@ -84,9 +84,9 @@ Agent tool (general-purpose):
 
     ---
 
-    ### If you touched `internal/component/` (new or modified component)
+    ### If you touched `internal/component/` or `internal/controller/`
 
-    #### Operator interface
+    #### Operator interface (component changes only)
     - [ ] All four methods present with correct signatures (see docs/development/)
     - [ ] Component registered in internal/controller/etcd/reconciler.go
 
