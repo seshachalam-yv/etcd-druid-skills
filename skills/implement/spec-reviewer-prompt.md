@@ -31,9 +31,14 @@ Agent tool (general-purpose):
 
     1. Run: git diff [base-sha]..[head-sha] in [worktree-path]
     2. Read every changed file completely.
-    3. Check each acceptance criterion one by one against the diff:
-       - Mark it ✅ if fully implemented as specified
-       - Mark it ❌ with file:line if missing, incomplete, or implemented differently than specified
+    3. Check acceptance criteria systematically:
+       a. Locate every `#### Requirement:` block in the plan file's task section.
+          For each requirement, find its `- THEN` line and verify the assertion
+          against the actual diff: mark ✅ `file:line` if satisfied, ❌ `file:line`
+          if missing or implemented differently than specified.
+       b. For criteria written in free-form (older plan files without WHEN/THEN blocks):
+          apply the same standard — verify by reading code, not by trusting the
+          implementer's description.
 
     Also check:
     - Files changed that were NOT listed in the plan — flag each one
