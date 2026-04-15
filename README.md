@@ -9,6 +9,81 @@
 
 ---
 
+## Philosophy
+
+### Discipline through Iron Laws, not reminders
+
+Each skill opens with an Iron Law — an unconditional rule stated once, with a rationalization table. The rationalization table names the specific thoughts Claude uses to talk itself out of following the rule ("this task is too small for a plan") and explains why each one fails. This is more effective than repeating the rule as a reminder, because reminders get rationalized away.
+
+| Skill | Iron Law |
+|-------|----------|
+| `plan` | NO CODE BEFORE GATE 1. |
+| `implement` | NO PUSH BEFORE GATE 2. |
+| `tdd` | NO IMPLEMENTATION CODE BEFORE A FAILING TEST. |
+| `debug` | NO FIX ATTEMPT WITHOUT A REPRODUCIBLE FAILURE FIRST. |
+| `review` | NO VERDICT WITHOUT READING THE DIFF AND docs/development/ FIRST. |
+| `verification` | NO COMPLETION CLAIMS WITHOUT FRESH VERIFICATION EVIDENCE. |
+| `receiving-review` | NO FEEDBACK IMPLEMENTATION WITHOUT INDEPENDENT VERIFICATION FIRST. |
+
+### Plugin self-improvement loop
+
+Every response is evaluated asynchronously by a Stop hook. When Claude-as-evaluator finds a specific, high-confidence finding — a wrong claim, missing footgun, stale flag, unclear workflow step — it writes a structured `OBS-NNN` entry to a local `plugin-observations.md` file.
+
+Three gates must all pass before anything is written:
+1. Exact plugin file and section identified
+2. Exact wrong or missing text stated
+3. Exact correct replacement specified — specific enough to write the fix without further investigation
+
+At the next session start, if open observations exist, you are notified. Run `/etcd-druid:observations` to review them. For each entry you choose:
+- **R** — raise a PR to fix it now (Claude reads the file, applies the fix, opens the PR)
+- **S** — skip, keep open for later
+- **D** — dismiss, not worth acting on
+
+No PR is ever raised without your explicit choice. The hook only captures; you decide.
+
+### Assumption surfacing before action
+
+The most common LLM coding failure is running with a wrong assumption silently. `plan` Phase 1 requires Claude to state every assumption explicitly — expected behaviour, scope, which repo, whether the change is breaking — before proposing approaches. Any assumption it is not confident in must be surfaced as a question. Silent interpretation is not allowed.
+
+### YAGNI enforcement
+
+LLMs tend to overbuild: they add parameters "for future flexibility", introduce abstractions for a single call site, and implement 500 lines where 50 would do. This plugin enforces YAGNI at three gates:
+
+- **Implementer self-review**: every new function, type, and parameter must be used by this task
+- **Code-reviewer checklist**: flags anything that exists "for future use"
+- **Spec-reviewer**: flags logic added beyond what the acceptance criteria asked for
+
+### Anti-sycophancy: verification before assertion
+
+The verification gate (`skills/verification/SKILL.md`) enforces a 5-step rule that applies across all workflows:
+
+1. Identify the verification command
+2. Run it in **this message** — not a previous one
+3. Read the full output — not just the exit code
+4. Verify the claim against the output
+5. Then make the claim — with evidence
+
+This prevents Claude from asserting "tests pass" based on memory, inference, or a run from a previous message. Evidence precedes assertion — always.
+
+The same principle applies to review feedback. The `receiving-review` guide prevents sycophantic implementation — Claude must verify each maintainer suggestion against the actual code before implementing it, and must ask for clarification rather than guessing when a comment is unclear.
+
+### Generated file protection via hooks
+
+A `PreToolUse` hook automatically **blocks** any attempt to edit generated files (`zz_generated.deepcopy.go`, CRD YAMLs, `charts/crds/`, `client/`, `docs/api-reference/`). This turns the "never manually edit generated files" invariant from an instruction into an enforced constraint.
+
+### Session orientation via hooks
+
+On every session start (and after context compaction), a `SessionStart` hook injects:
+- The component overview with current versions and key packages
+- Which repo you are currently in (detected from git remote or directory name)
+- The current branch and recent commits
+- Key development docs paths for the active repo
+- The list of available skills
+
+Claude never loses its domain grounding mid-session, even after compaction truncates earlier context.
+
+---
+
 ## Installation
 
 **Step 1 — Add the marketplace** (once per machine):
@@ -297,83 +372,6 @@ tdd ──► review (before PR)
 | `e2e` | `/etcd-druid:e2e` | — | Manual e2e testing — KIND setup, custom image builds, sidecar overrides, pre-PR CI |
 | `reference` | `/etcd-druid:reference` | — | Quick lookup: make targets, file paths, druidctl, git workflow |
 | `observations` | `/etcd-druid:observations` | — | Review captured plugin improvement findings — raise PR, skip, or dismiss |
-
----
-
-## Philosophy
-
-### Discipline through Iron Laws, not reminders
-
-Each skill opens with an Iron Law — an unconditional rule stated once, with a rationalization table. The rationalization table names the specific thoughts Claude uses to talk itself out of following the rule ("this task is too small for a plan") and explains why each one fails. This is more effective than repeating the rule as a reminder, because reminders get rationalized away.
-
-| Skill | Iron Law |
-|-------|----------|
-| `plan` | NO CODE BEFORE GATE 1. |
-| `implement` | NO PUSH BEFORE GATE 2. |
-| `tdd` | NO IMPLEMENTATION CODE BEFORE A FAILING TEST. |
-| `debug` | NO FIX ATTEMPT WITHOUT A REPRODUCIBLE FAILURE FIRST. |
-| `review` | NO VERDICT WITHOUT READING THE DIFF AND docs/development/ FIRST. |
-| `verification` | NO COMPLETION CLAIMS WITHOUT FRESH VERIFICATION EVIDENCE. |
-| `receiving-review` | NO FEEDBACK IMPLEMENTATION WITHOUT INDEPENDENT VERIFICATION FIRST. |
-
-### Plugin self-improvement loop
-
-Every response is evaluated asynchronously by a Stop hook. When Claude-as-evaluator finds a specific, high-confidence finding — a wrong claim, missing footgun, stale flag, unclear workflow step — it writes a structured `OBS-NNN` entry to a local `plugin-observations.md` file.
-
-Three gates must all pass before anything is written:
-1. Exact plugin file and section identified
-2. Exact wrong or missing text stated
-3. Exact correct replacement specified — specific enough to write the fix without further investigation
-
-At the next session start, if open observations exist, you are notified. Run `/etcd-druid:observations` to review them. For each entry you choose:
-- **R** — raise a PR to fix it now (Claude reads the file, applies the fix, opens the PR)
-- **S** — skip, keep open for later
-- **D** — dismiss, not worth acting on
-
-No PR is ever raised without your explicit choice. The hook only captures; you decide.
-
-### Assumption surfacing before action
-
-The most common LLM coding failure is running with a wrong assumption silently. `plan` Phase 1 requires Claude to state every assumption explicitly — expected behaviour, scope, which repo, whether the change is breaking — before proposing approaches. Any assumption it is not confident in must be surfaced as a question. Silent interpretation is not allowed.
-
-### YAGNI enforcement
-
-LLMs tend to overbuild: they add parameters "for future flexibility", introduce abstractions for a single call site, and implement 500 lines where 50 would do. This plugin enforces YAGNI at three gates:
-
-- **Implementer self-review**: every new function, type, and parameter must be used by this task
-- **Code-reviewer checklist**: flags anything that exists "for future use"
-- **Spec-reviewer**: flags logic added beyond what the acceptance criteria asked for
-
-### Anti-sycophancy: verification before assertion
-
-The verification gate (`skills/verification/SKILL.md`) enforces a 5-step rule that applies across all workflows:
-
-1. Identify the verification command
-2. Run it in **this message** — not a previous one
-3. Read the full output — not just the exit code
-4. Verify the claim against the output
-5. Then make the claim — with evidence
-
-This prevents Claude from asserting "tests pass" based on memory, inference, or a run from a previous message. Evidence precedes assertion — always.
-
-The same principle applies to review feedback. The `receiving-review` guide prevents sycophantic implementation — Claude must verify each maintainer suggestion against the actual code before implementing it, and must ask for clarification rather than guessing when a comment is unclear.
-
-### Generated file protection via hooks
-
-A `PreToolUse` hook automatically **blocks** any attempt to edit generated files (`zz_generated.deepcopy.go`, CRD YAMLs, `charts/crds/`, `client/`, `docs/api-reference/`). This turns the "never manually edit generated files" invariant from an instruction into an enforced constraint.
-
-### Session orientation via hooks
-
-On every session start (and after context compaction), a `SessionStart` hook injects:
-- The component overview with current versions and key packages
-- Which repo you are currently in (detected from git remote or directory name)
-- The current branch and recent commits
-- Key development docs paths for the active repo
-- The list of available skills
-
-Claude never loses its domain grounding mid-session, even after compaction truncates earlier context.
-
----
 
 ## Key invariants
 
