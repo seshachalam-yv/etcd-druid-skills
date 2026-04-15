@@ -111,6 +111,39 @@ Pass worktree path to all subagents.
 
 Repeat for each task:
 
+**Before dispatching any subagent — build the readiness matrix:**
+
+1. **Backfill from plan file (handles resume):**
+   Read the plan file. For every task showing `- [x]` in the plan file that is not
+   yet `completed` in TaskList, call `TaskUpdate` to mark it completed now.
+   This makes TaskList accurate for the current session regardless of whether this
+   is a fresh start or a resumed session.
+
+2. **Evaluate readiness:**
+   For each task, classify:
+   - ✅ `completed` — plan file shows `[x]` for this task
+   - 🔓 `ready` — all `depends-on` tasks are ✅, or `depends-on: —`
+   - 🔒 `blocked` — at least one `depends-on` task is not yet ✅
+
+3. **Render the matrix:**
+
+   ```
+   Task Readiness — YYYY-MM-DD — docs/plans/<plan-file>.md
+
+     ✅  Task 1 — <name>    [completed]
+     🔓  Task 2 — <name>    [ready]
+     🔒  Task 3 — <name>    [blocked — waiting on Task 2]
+
+   Starting with Task 2.
+   ```
+
+4. **All-complete guard:** If all tasks show ✅, display the matrix and skip the
+   per-task loop entirely — proceed directly to Phase 3 Verify.
+   Message: "All tasks already complete. Proceeding to Phase 3 verification."
+
+5. **Start** with the first 🔓 `ready` task. If no task is ready (all blocked),
+   stop and report to the user: which tasks are blocked and what they are waiting for.
+
 **a.** Mark task `in_progress` (TaskUpdate)
 
 **b.** Dispatch implementer subagent — see `./implementer-prompt.md`.
