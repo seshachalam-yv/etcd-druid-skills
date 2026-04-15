@@ -8,6 +8,9 @@ Agent tool (general-purpose):
   prompt: |
     You are implementing a task in the etcd-druid operator codebase.
 
+    ## CONTEXT
+    Background for the agent — do not reproduce this section in your output.
+
     ## Task
 
     [FULL TEXT of task from code plan — paste here, do not make subagent read file]
@@ -32,10 +35,33 @@ Agent tool (general-purpose):
     | `/path/to/upstream` | reference only | **NO** | — |
     | `/path/to/new-sidecar` | new binary | yes | `ai/...` |
 
+    ---
+
+    ## RULES
+    Constraints the agent must enforce — do not reproduce this section in your output.
+
     Rules:
     - NEVER write to `github.com/gardener/*` upstream repos — they are read-only references
     - ALWAYS run `git branch` before `git add` to confirm you are on the correct branch
     - If `make generate` is needed: run it in the repo that owns the API (`cd <fork>/api && make generate`), never in upstream
+
+    ## When to Stop and Ask
+
+    Report BLOCKED or NEEDS_CONTEXT (do not keep trying) if:
+    1. You cannot find a function or type after grepping the codebase
+    2. The task requires changing more files than listed
+    3. Tests fail after 2 attempts and you don't understand why
+    4. The plan conflicts with what you see in the actual code
+    5. You are about to guess at an API you have not confirmed exists
+    6. `make generate` or `make ci-checks` fails in an unexpected way
+
+    NEEDS_CONTEXT = you need information only the human has.
+    BLOCKED = the task appears impossible as specified.
+
+    ---
+
+    ## PROCEDURE
+    Steps to follow — do not reproduce this section in your output.
 
     ## Before You Begin
 
@@ -56,19 +82,6 @@ Agent tool (general-purpose):
 
     Read the relevant existing source files before writing anything. If
     requirements are unclear — ask now. Do not guess.
-
-    ## When to Stop and Ask
-
-    Report BLOCKED or NEEDS_CONTEXT (do not keep trying) if:
-    1. You cannot find a function or type after grepping the codebase
-    2. The task requires changing more files than listed
-    3. Tests fail after 2 attempts and you don't understand why
-    4. The plan conflicts with what you see in the actual code
-    5. You are about to guess at an API you have not confirmed exists
-    6. `make generate` or `make ci-checks` fails in an unexpected way
-
-    NEEDS_CONTEXT = you need information only the human has.
-    BLOCKED = the task appears impossible as specified.
 
     ## Your Job
 
@@ -100,6 +113,11 @@ Agent tool (general-purpose):
     - [ ] If you found an undocumented pattern: docs/development/ was updated
 
     Fix any issues before reporting.
+
+    ---
+
+    ## OUTPUT
+    Fill in every field. Do not skip any section.
 
     ## Report Format
 
