@@ -308,27 +308,6 @@ All active components run in the Gardener seed cluster. Changes must not break g
 
 ## What's inside
 
-### Skills
-
-**Development workflow**
-- **plan** — Design phase: issue orientation, approach selection, code plan with acceptance criteria. Output: approved plan file. Gate 1 approval before any code.
-- **implement** — Execution phase: worktree setup, per-task subagent loop, verification, CI checks, PR creation. Input: approved plan file from `plan`. Gate 2 before push.
-- **api-change** — API field design, CEL validation (field-scoped + cross-field), two-commit generate workflow, CRD tests
-
-**Testing**
-- **tdd** — Red-Green-Refactor cycle for all three repos with framework-specific guidance (includes testing anti-patterns reference)
-- **e2e** — KIND cluster setup, custom image builds, sidecar overrides, pre-PR CI validation
-
-**Debugging**
-- **debug** — Systematic 4-phase root cause analysis with delve, log analysis, and build failure triage
-
-**Review**
-- **review** — Pre-merge checklist, convention validation, known footguns (runs as isolated read-only subagent)
-
-**Reference**
-- **reference** — Quick lookup: make targets, file paths, source locations for all 3 repos, feature gates, CLI flags, tooling versions
-- **observations** — Triage captured plugin improvement observations; invoke when session-start flags pending observations
-
 ### Cross-cutting guides (referenced by skills, not user-invocable)
 
 | Guide | Referenced from | Purpose |
@@ -357,21 +336,21 @@ All active components run in the Gardener seed cluster. Changes must not break g
 
 ---
 
-## Skills reference
+## Skills
 
 ### User-invocable
 
-| Skill | Invoke | Auto-activates on | Use when |
-|-------|--------|--------------------|----------|
-| `plan` | `/etcd-druid:plan` | — | Picking up an issue — design, approach selection, code plan with Gate 1 |
-| `implement` | `/etcd-druid:implement` | — | Gate 1 approved — worktree setup, subagent loop, CI verify, PR with Gate 2 |
-| `api-change` | `/etcd-druid:api-change` | `api/**/*.go` edits | Adding or modifying API fields — CEL validation, generate workflow, CRD tests |
-| `tdd` | `/etcd-druid:tdd` | `*.go` edits | Writing new tests or learning the correct test pattern |
-| `debug` | `/etcd-druid:debug` | `*.go` edits | Something is failing, broken, or behaving unexpectedly |
-| `review` | `/etcd-druid:review` | `*.go` edits | Validating code before opening a PR |
-| `e2e` | `/etcd-druid:e2e` | — | Manual e2e testing — KIND setup, custom image builds, sidecar overrides, pre-PR CI |
-| `reference` | `/etcd-druid:reference` | — | Quick lookup: make targets, file paths, druidctl, git workflow |
-| `observations` | `/etcd-druid:observations` | — | Review captured plugin improvement findings — raise PR, skip, or dismiss |
+| Skill | Description | Invoke | Auto-activates on | Use when |
+|-------|-------------|--------|-------------------|----------|
+| `plan` | Design phase: issue orientation, approach selection, code plan with acceptance criteria. Output: approved plan file. Gate 1 approval before any code. | `/etcd-druid:plan` | — | Picking up an issue — design, approach selection, code plan with Gate 1 |
+| `implement` | Execution phase: worktree setup, per-task subagent loop, verification, CI checks, PR creation. Input: approved plan file from `plan`. Gate 2 before push. | `/etcd-druid:implement` | — | Gate 1 approved — worktree setup, subagent loop, CI verify, PR with Gate 2 |
+| `api-change` | API field design, CEL validation (field-scoped + cross-field), two-commit generate workflow, CRD tests | `/etcd-druid:api-change` | `api/**/*.go` edits | Adding or modifying API fields — CEL validation, generate workflow, CRD tests |
+| `tdd` | Red-Green-Refactor cycle for all three repos with framework-specific guidance (includes testing anti-patterns reference) | `/etcd-druid:tdd` | `*.go` edits | Writing new tests or learning the correct test pattern |
+| `debug` | Systematic 4-phase root cause analysis with delve, log analysis, and build failure triage | `/etcd-druid:debug` | `*.go` edits | Something is failing, broken, or behaving unexpectedly |
+| `review` | Pre-merge checklist, convention validation, known footguns (runs as isolated read-only subagent) | `/etcd-druid:review` | `*.go` edits | Validating code before opening a PR |
+| `e2e` | KIND cluster setup, custom image builds, sidecar overrides, pre-PR CI validation | `/etcd-druid:e2e` | — | Manual e2e testing — KIND setup, custom image builds, sidecar overrides, pre-PR CI |
+| `reference` | Quick lookup: make targets, file paths, source locations for all 3 repos, feature gates, CLI flags, tooling versions | `/etcd-druid:reference` | — | Quick lookup: make targets, file paths, druidctl, git workflow |
+| `observations` | Triage captured plugin improvement observations; invoke when session-start flags pending observations | `/etcd-druid:observations` | — | Review captured plugin improvement findings — raise PR, skip, or dismiss |
 
 ## Key invariants
 
