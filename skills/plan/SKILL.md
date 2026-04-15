@@ -58,6 +58,7 @@ When in doubt: if the task touches >5 packages or creates a new binary, it's a n
 | Test only | `internal/component/<name>/*_test.go` or `test/it/` | No |
 
 **API change note:** For any API change, invoke `/etcd-druid:api-change` — it covers field design, field-scoped vs cross-field CEL validation, two-commit generate workflow, CRD test requirements, and `/kind api-change` PR label.
+For API changes: fill the `## API Delta` section in the plan (template below) — one row per field added, modified, or removed. This is the source of truth for what Commit 1 must contain.
 
 ---
 
@@ -96,16 +97,22 @@ Chosen approach and why. Alternatives considered.
 
 ## Tasks
 - [ ] Task 1: <name>
-      Acceptance criteria: <see format below>
+      **depends-on:** — *(fill in: Task N if this task needs another to complete first, or `—` if none)*
       Files: <list>
       Tests: unit | integration | both
       API generation: yes | no
+
+      #### Requirement: <what must be true after this task>
+      - WHEN <the observable trigger or state>
+      - THEN <specific observable outcome> (verified by `<TestName>` or `<file>:<field>:<value>`)
+
+      *(Add one Requirement block per acceptance criterion. Multiple blocks allowed.)*
 
 - [ ] Task 2: ...
 
 ### Acceptance criteria format
 
-Each criterion must be falsifiable by reading code or running a test — not by trusting the implementer's description.
+The WHEN/THEN format above is the required structure. The table below shows examples of strong vs. weak THEN clauses.
 
 | ❌ Vague — spec-reviewer cannot check | ✅ Falsifiable — spec-reviewer reads code or runs test |
 |---------------------------------------|-------------------------------------------------------|
@@ -114,6 +121,16 @@ Each criterion must be falsifiable by reading code or running a test — not by 
 | "LastRestoration is updated" | `EtcdMember.Status.LastRestoration.Status == RestorationSucceeded` after `TestRestoreFromSnapshot` |
 
 For state machine work: write the exact transition sequence for each path as a table, then name the test that verifies it. The test name IS the acceptance criterion.
+
+## API Delta *(required when Change Type includes API change; omit for non-API plans)*
+
+| Field | Change | Breaking |
+|-------|--------|---------|
+| `EtcdSpec.<FieldName>` | ADDED — optional `*<type>`, default nil | No |
+| `EtcdSpec.<FieldName>` | MODIFIED — <description of change> | No / **Yes** |
+| `EtcdSpec.<FieldName>` | REMOVED — replaced by `<new field>` | **Yes** |
+
+*Change types: ADDED, MODIFIED, REMOVED. One row per changed field. Delete this section for non-API plans.*
 
 ## PR Checklist (pre-submission)
 - [ ] make ci-checks passes
