@@ -291,51 +291,6 @@ Claude: [opens PR against upstream/master]
 
 ---
 
-## The component system
-
-```
-etcd-druid            Kubernetes operator — owns Etcd CRD, reconciles all cluster resources
-etcd-backup-restore   Sidecar — snapshots, restore, and etcd initialization
-etcd-wrapper          Sidecar — starts embedded etcd via the backup-restore HTTP API
-etcd-steward          Planned sidecar — will replace etcd-backup-restore (not yet in upstream)
-```
-
-etcd-druid, etcd-backup-restore, and etcd-wrapper are active in production. etcd-steward is a planned refactoring of etcd-backup-restore with a cleaner architecture — no upstream code exists yet. When contributing to etcd-steward, the `plan` + `implement` skills apply with the "new sidecar" classification (skip merged-PR lookup, break tasks at package boundary).
-
-All active components run in the Gardener seed cluster. Changes must not break gardenlet's reconciliation assumptions.
-
----
-
-## What's inside
-
-### Cross-cutting guides (referenced by skills, not user-invocable)
-
-| Guide | Referenced from | Purpose |
-|-------|----------------|---------|
-| `verification` | `tdd`, `debug`, `implement` | 5-step gate: run the command, read the output, then claim it passes — never before |
-| `receiving-review` | `implement`, `review` | Anti-sycophancy process for handling upstream maintainer feedback on a PR |
-| `tdd/testing-anti-patterns.md` | `tdd` | 5 etcd-druid-specific test anti-patterns with correct alternatives |
-
-### Hooks
-
-| Hook | Event | Purpose |
-|------|-------|---------|
-| `session-start` | SessionStart, WorktreeCreate, PostCompact | Injects domain orientation: component overview, active repo detection, current branch, available skills. Surfaces pending plugin observations if any exist. |
-| `guard-generated-files.sh` | PreToolUse (Edit/Write) | **Blocks** edits to generated files (`zz_generated*`, `crds/*.yaml`, `charts/crds/*`, `client/`) |
-| `check-dev-docs.sh` | PostToolUse (Edit/Write) | Reminds Claude to read `docs/development/` before editing `.go` source files |
-| `detect-correction.sh` | UserPromptSubmit (async) | Watches for user correction phrases ("that's wrong", "actually it's", "no longer exists", etc.). Sets a flag file so the Stop hook knows to run the LLM evaluator on that response. |
-| `observe-plugin-improvement.sh` | Stop (async) | Three-channel gap capture: (1) `<plugin-gap>` XML markers in responses (zero cost), (2) LLM evaluator triggered only when correction flag is set, (3) review skill writes gaps directly. Writes structured `OBS-NNN` entries to `plugin-observations.md`. |
-
-### Subagent prompts
-
-| Prompt | Used by | Role |
-|--------|---------|------|
-| `implementer-prompt.md` | `implement` Phase 2 | Writes code for a single task, reports status |
-| `spec-reviewer-prompt.md` | `implement` Phase 2 | Verifies implementation matches acceptance criteria |
-| `code-reviewer-prompt.md` | `implement` Phase 2 | Validates conventions, patterns, and quality |
-
----
-
 ## Skills
 
 ### User-invocable
@@ -351,6 +306,55 @@ All active components run in the Gardener seed cluster. Changes must not break g
 | `e2e` | KIND cluster setup, custom image builds, sidecar overrides, pre-PR CI validation | `/etcd-druid:e2e` | — | Manual e2e testing — KIND setup, custom image builds, sidecar overrides, pre-PR CI |
 | `reference` | Quick lookup: make targets, file paths, source locations for all 3 repos, feature gates, CLI flags, tooling versions | `/etcd-druid:reference` | — | Quick lookup: make targets, file paths, druidctl, git workflow |
 | `observations` | Triage captured plugin improvement observations; invoke when session-start flags pending observations | `/etcd-druid:observations` | — | Review captured plugin improvement findings — raise PR, skip, or dismiss |
+
+---
+
+## The component system
+
+```
+etcd-druid            Kubernetes operator — owns Etcd CRD, reconciles all cluster resources
+etcd-backup-restore   Sidecar — snapshots, restore, and etcd initialization
+etcd-wrapper          Sidecar — starts embedded etcd via the backup-restore HTTP API
+etcd-steward          Planned sidecar — will replace etcd-backup-restore (not yet in upstream)
+```
+
+etcd-druid, etcd-backup-restore, and etcd-wrapper are active in production. etcd-steward is a planned refactoring of etcd-backup-restore with a cleaner architecture — no upstream code exists yet. When contributing to etcd-steward, the `plan` + `implement` skills apply with the "new sidecar" classification (skip merged-PR lookup, break tasks at package boundary).
+
+All active components run in the Gardener seed cluster. Changes must not break gardenlet's reconciliation assumptions.
+
+---
+
+## Cross-cutting guides (referenced by skills, not user-invocable)
+
+| Guide | Referenced from | Purpose |
+|-------|----------------|---------|
+| `verification` | `tdd`, `debug`, `implement` | 5-step gate: run the command, read the output, then claim it passes — never before |
+| `receiving-review` | `implement`, `review` | Anti-sycophancy process for handling upstream maintainer feedback on a PR |
+| `tdd/testing-anti-patterns.md` | `tdd` | 5 etcd-druid-specific test anti-patterns with correct alternatives |
+
+---
+
+## Hooks
+
+| Hook | Event | Purpose |
+|------|-------|---------|
+| `session-start` | SessionStart, WorktreeCreate, PostCompact | Injects domain orientation: component overview, active repo detection, current branch, available skills. Surfaces pending plugin observations if any exist. |
+| `guard-generated-files.sh` | PreToolUse (Edit/Write) | **Blocks** edits to generated files (`zz_generated*`, `crds/*.yaml`, `charts/crds/*`, `client/`) |
+| `check-dev-docs.sh` | PostToolUse (Edit/Write) | Reminds Claude to read `docs/development/` before editing `.go` source files |
+| `detect-correction.sh` | UserPromptSubmit (async) | Watches for user correction phrases ("that's wrong", "actually it's", "no longer exists", etc.). Sets a flag file so the Stop hook knows to run the LLM evaluator on that response. |
+| `observe-plugin-improvement.sh` | Stop (async) | Three-channel gap capture: (1) `<plugin-gap>` XML markers in responses (zero cost), (2) LLM evaluator triggered only when correction flag is set, (3) review skill writes gaps directly. Writes structured `OBS-NNN` entries to `plugin-observations.md`. |
+
+---
+
+## Subagent prompts
+
+| Prompt | Used by | Role |
+|--------|---------|------|
+| `implementer-prompt.md` | `implement` Phase 2 | Writes code for a single task, reports status |
+| `spec-reviewer-prompt.md` | `implement` Phase 2 | Verifies implementation matches acceptance criteria |
+| `code-reviewer-prompt.md` | `implement` Phase 2 | Validates conventions, patterns, and quality |
+
+---
 
 ## Key invariants
 
