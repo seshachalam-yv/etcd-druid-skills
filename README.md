@@ -188,6 +188,29 @@ Issue / bug report
       └─ 4. PR ─────────── gh pr create
 ```
 
+### Skill interactions
+
+```
+plan ──► implement
+           │
+           ├──► api-change (when API types touched)
+           │
+           ├──► tdd (implementer subagents follow TDD)
+           │      └──► testing-anti-patterns.md
+           │
+           ├──► review (whole-diff review before Gate 2)
+           │      └──► receiving-review (if maintainer feedback arrives)
+           │
+           ├──► e2e (when e2e verification needed)
+           │
+           └──► verification (before every completion claim)
+
+debug ──► tdd (add regression test after fix)
+   └──► review (before PR)
+
+tdd ──► review (before PR)
+```
+
 ### Pre-PR CI requirement
 
 Before Gate 2, Claude verifies that all CI jobs pass for the relevant repo. For etcd-druid:
@@ -331,29 +354,6 @@ All active components run in the Gardener seed cluster. Changes must not break g
 | `implementer-prompt.md` | `implement` Phase 2 | Writes code for a single task, reports status |
 | `spec-reviewer-prompt.md` | `implement` Phase 2 | Verifies implementation matches acceptance criteria |
 | `code-reviewer-prompt.md` | `implement` Phase 2 | Validates conventions, patterns, and quality |
-
-### Skill interaction map
-
-```
-plan ──► implement
-           │
-           ├──► api-change (when API types touched)
-           │
-           ├──► tdd (implementer subagents follow TDD)
-           │      └──► testing-anti-patterns.md
-           │
-           ├──► review (whole-diff review before Gate 2)
-           │      └──► receiving-review (if maintainer feedback arrives)
-           │
-           ├──► e2e (when e2e verification needed)
-           │
-           └──► verification (before every completion claim)
-
-debug ──► tdd (add regression test after fix)
-   └──► review (before PR)
-
-tdd ──► review (before PR)
-```
 
 ---
 
