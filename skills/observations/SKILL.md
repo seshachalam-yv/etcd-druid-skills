@@ -1,6 +1,6 @@
 ---
 name: observations
-description: Use when the session-start notification mentions pending plugin observations, or when you want to review and triage captured plugin improvement findings.
+description: Use to review and triage pending plugin improvement observations. Invoke when session-start flags pending observations or when you want to check for plugin gaps.
 user-invocable: true
 effort: low
 ---

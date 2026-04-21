@@ -1,0 +1,79 @@
+{
+  "skill_name": "etcd-druid-plugin",
+  "evals": [
+    {
+      "id": 1,
+      "name": "api-change-traffic-distribution",
+      "prompt": "I need to add PreferSameZone and PreferSameNode as new allowed values for the trafficDistribution field in the Etcd CRD's clientService section. The old value PreferClose is being deprecated by Kubernetes (see kubernetes/kubernetes#130844). The field is at .spec.etcd.clientService.trafficDistribution in api/core/v1alpha1/etcd.go. I'm working in my fork of gardener/etcd-druid. Can you help me plan and implement this?",
+      "expected_output": "Should invoke /etcd-druid:plan first, identify this as an API change, reference /etcd-druid:api-change for CEL validation and two-commit workflow, create a plan with API Delta section showing the enum modification, note that examples/ need updating, and follow the two-commit rule (hand-written first, then make generate).",
+      "assertions": [
+        {"text": "Invokes or references the plan skill before writing code", "type": "workflow"},
+        {"text": "Identifies this as an API change requiring the api-change skill", "type": "workflow"},
+        {"text": "Mentions the two-commit rule (hand-written API changes first, generated output second)", "type": "convention"},
+        {"text": "Mentions updating examples/ YAML files", "type": "completeness"},
+        {"text": "Mentions cd api && make generate", "type": "convention"},
+        {"text": "Does NOT suggest manually editing CRD YAML files", "type": "safety"}
+      ],
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "feature-etcdopstask-snapshot-hibernation",
+      "prompt": "I've been assigned issue gardener/etcd-druid#445. The goal is to trigger a full snapshot via EtcdOpsTask when an etcd resource is hibernated (spec.Replicas set to 0) and also when performing an etcd version upgrade. This needs a new feature gate called UpgradeEtcdVersion. It'll touch the statefulset component, the etcd reconciler, feature gates in api/config/v1alpha1/features.go, image selection logic, helm charts, and needs both unit and integration tests. This is a large cross-cutting feature. How should I approach this?",
+      "expected_output": "Should invoke /etcd-druid:plan, classify as 'Incremental' work type, break into multiple tasks with dependencies, identify files per task, note that feature gate changes require docs/deployment/feature-gates.md update, plan for unit tests (statefulset_test.go, image_test.go) and integration tests (reconciler_test.go), and produce a plan with WHEN/THEN acceptance criteria.",
+      "assertions": [
+        {"text": "Invokes the plan skill and creates a structured plan with tasks", "type": "workflow"},
+        {"text": "Breaks the work into multiple discrete tasks with dependencies", "type": "planning"},
+        {"text": "Identifies feature gate documentation requirement (docs/deployment/feature-gates.md)", "type": "convention"},
+        {"text": "Includes both unit and integration test tasks", "type": "completeness"},
+        {"text": "Mentions WHEN/THEN or acceptance criteria format", "type": "planning"},
+        {"text": "Does NOT attempt to write code before plan approval (Gate 1)", "type": "safety"}
+      ],
+      "files": []
+    },
+    {
+      "id": 3,
+      "name": "bugfix-etcdopstask-deletion",
+      "prompt": "We have a bug in the EtcdOpsTask controller. When someone force-deletes an EtcdOpsTask (kubectl delete etcdopstask <name>) before its TTL expires, the deletion doesn't work properly — the controller doesn't handle it. The deletion reconciler at internal/controller/etcdopstask/reconcile_delete.go only handles TTL-based cleanup. Also the TTL value for pre-sync etcdopstasks in the statefulset component is too short. Can you help me debug and fix this?",
+      "expected_output": "Should invoke /etcd-druid:debug skill, follow the systematic debugging workflow (read error, reproduce, locate, hypothesize, fix), identify the specific files (reconcile_delete.go, statefulset.go), write tests first following TDD, and plan for integration tests in test/it/controller/etcdopstask/.",
+      "assertions": [
+        {"text": "Invokes the debug skill or follows systematic debugging steps", "type": "workflow"},
+        {"text": "Identifies reconcile_delete.go as the primary fix location", "type": "correctness"},
+        {"text": "Mentions writing or checking integration tests in test/it/controller/etcdopstask/", "type": "completeness"},
+        {"text": "Suggests reproducing the issue before fixing (Iron Law)", "type": "discipline"},
+        {"text": "Does NOT attempt multiple speculative fixes simultaneously", "type": "discipline"}
+      ],
+      "files": []
+    },
+    {
+      "id": 4,
+      "name": "refactor-remove-failbelowrevision",
+      "prompt": "We need to remove the failBelowRevision feature from etcd-backup-restore. It was added in PR #184 about 5 years ago and hasn't been used since. It touches the initializer (pkg/initializer/), the data validator (pkg/initializer/validator/), CLI options (cmd/options.go), the HTTP API (pkg/server/httpAPI.go), helm chart values, and integration tests. This is a breaking change. Can you help me plan the removal?",
+      "expected_output": "Should invoke /etcd-druid:plan, classify the change type, note this is etcd-backup-restore (not etcd-druid), plan to trace all usages of failBelowRevision across the codebase, note that make revendor is needed (not make tidy), plan integration test updates, and flag it as a breaking release note.",
+      "assertions": [
+        {"text": "Invokes plan skill and creates a structured removal plan", "type": "workflow"},
+        {"text": "Correctly identifies this is etcd-backup-restore, not etcd-druid", "type": "correctness"},
+        {"text": "Mentions make revendor (not make tidy) for etcd-backup-restore", "type": "convention"},
+        {"text": "Notes this requires a breaking release note", "type": "convention"},
+        {"text": "Plans to trace all usages across CLI, initializer, validator, HTTP API, and tests", "type": "completeness"},
+        {"text": "Mentions Ginkgo v2 test framework for etcd-backup-restore tests", "type": "convention"}
+      ],
+      "files": []
+    },
+    {
+      "id": 5,
+      "name": "enhancement-copy-final-snapshot-race",
+      "prompt": "During control plane migration, the backup copy operation sometimes times out even though the final snapshot was already taken and copied. Looking at the logs, what happens is: when etcd-backup-restore starts up (e.g. after shoot de-hibernation), it takes a new full snapshot that races with the final snapshot. The copy operation only checks the very latest full snapshot to see if it's the final one, but the racing snapshot may finish after the final one, pushing it out of the 'latest' position. The fix should be to check the last N full snapshots instead of just the latest. The relevant code is in pkg/snapshot/copier/copier.go and pkg/miscellaneous/miscellaneous.go. Can you help?",
+      "expected_output": "Should invoke /etcd-druid:plan, identify this as etcd-backup-restore enhancement, plan a new GetNLatestFullSnapshots function in miscellaneous.go, plan comprehensive tests for the new function, integrate into the copier, and use TDD (write test first for the new function).",
+      "assertions": [
+        {"text": "Invokes plan skill before writing implementation code", "type": "workflow"},
+        {"text": "Correctly identifies etcd-backup-restore as the target repo", "type": "correctness"},
+        {"text": "Plans to add a new utility function (like GetNLatestFullSnapshots)", "type": "correctness"},
+        {"text": "Plans test coverage for the new function", "type": "completeness"},
+        {"text": "Mentions make revendor or make verify for etcd-backup-restore CI", "type": "convention"},
+        {"text": "Does NOT suggest changes to etcd-druid when the fix is in etcd-backup-restore", "type": "safety"}
+      ],
+      "files": []
+    }
+  ]
+}

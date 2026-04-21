@@ -50,6 +50,33 @@ case "$FILE_PATH" in
     */api/core/v1alpha1/*)
         SPECIFIC_DOC="docs/development/changing-api.md — field naming, CEL validation placement, two-commit generate rule"
         ;;
+    */pkg/snapshot/snapshotter/*)
+        SPECIFIC_DOC="docs/development/tests.md — snapshotter test patterns, full/delta snapshot cycle"
+        ;;
+    */pkg/snapshot/restorer/*)
+        SPECIFIC_DOC="docs/development/tests.md — restorer test patterns, embedded etcd restore flow"
+        ;;
+    */pkg/snapstore/*)
+        SPECIFIC_DOC="docs/development/new_cp_support.md — cloud provider snapstore interface, adding new providers"
+        ;;
+    */pkg/compactor/*)
+        SPECIFIC_DOC="docs/development/tests.md — compactor patterns, embedded etcd for compaction"
+        ;;
+    */pkg/server/*)
+        SPECIFIC_DOC="docs/development/local_setup.md — HTTP server endpoints, leader forwarding"
+        ;;
+    */pkg/member/*)
+        SPECIFIC_DOC="docs/development/tests.md — member control patterns, scale-up, learner promotion"
+        ;;
+    */internal/bootstrap/*)
+        SPECIFIC_DOC="docs/development/contribution.md — bootstrap flow, BR init loop, config fetch"
+        ;;
+    */internal/app/*)
+        SPECIFIC_DOC="docs/development/testing.md — app lifecycle, embedded etcd start, readiness checks"
+        ;;
+    */internal/brclient/*)
+        SPECIFIC_DOC="docs/development/contribution.md — BR HTTP client, initialization endpoints"
+        ;;
 esac
 
 if [ -n "$SPECIFIC_DOC" ]; then

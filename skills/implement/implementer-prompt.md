@@ -21,7 +21,7 @@ Agent tool (general-purpose):
     - Worktree path (your working directory): [worktree-path]
     - Fork: [fork-root] (your local fork of github.com/<your-github-user>/etcd-druid)
     - Upstream (read-only reference): github.com/gardener/etcd-druid (check git remotes)
-    - Branch: ai/TASK-[issue-id]/claude/[short-description]
+    - Branch: feat/issue-[issue-id]/[short-description]
     - Files affected: [list from plan]
     - API generation needed: [yes | no]
 
@@ -31,9 +31,9 @@ Agent tool (general-purpose):
 
     | Repo path | Role | Write allowed? | Branch |
     |-----------|------|---------------|--------|
-    | `/path/to/fork` | fork | yes | `ai/TASK-{id}/...` |
+    | `/path/to/fork` | fork | yes | `feat/issue-{id}/...` |
     | `/path/to/upstream` | reference only | **NO** | — |
-    | `/path/to/new-sidecar` | new binary | yes | `ai/...` |
+    | `/path/to/new-sidecar` | new binary | yes | `feat/...` |
 
     ---
 

@@ -1,6 +1,6 @@
 ---
 name: debug
-description: Use when something is failing or broken in etcd-druid, etcd-backup-restore, or etcd-wrapper — test failures, reconciliation loops, backup failures, build errors. Do not use for how-to questions, feature design, or environment setup.
+description: Use when something is failing — test failures, reconciliation loops, backup errors, build failures in etcd-druid, etcd-backup-restore, or etcd-wrapper. Do not use for feature design or how-to questions.
 user-invocable: true
 effort: high
 paths: "**/*.go"

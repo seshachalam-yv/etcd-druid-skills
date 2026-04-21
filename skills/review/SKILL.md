@@ -86,9 +86,17 @@ New resource access needs a `+kubebuilder:rbac` marker in the component or recon
 
 Check `docs/development/testing.md` for the expected framework, helpers, and patterns.
 
+**Framework per repo** (using the wrong framework is a review rejection):
+
+| Repo | Framework | Notes |
+|------|-----------|-------|
+| etcd-druid | Go native `testing.T` + Gomega | No Ginkgo in new tests |
+| etcd-backup-restore | **Ginkgo v2** + Gomega + `go.uber.org/mock` | NEGATIVE: prefix for negative tests |
+| etcd-wrapper | Go native `testing.T` + Gomega | Table-driven, `zaptest.NewLogger(t)` |
+
 Core rules that apply regardless of repo:
 - No `time.Sleep()` — use `Eventually` / `Consistently`
-- No gomock in etcd-druid component tests
+- No gomock in etcd-druid component tests (use fake client instead)
 - Table-driven for multiple scenarios; `t.Parallel()` in subtests
 
 **Verify tests pass locally** (run before opening PR, or confirm author ran them):
@@ -96,8 +104,8 @@ Core rules that apply regardless of repo:
 | Repo | Commands |
 |---|---|
 | etcd-druid | `make test-unit` (all); `make test-integration` (if controller/component touched) |
-| etcd-backup-restore | `make test-unit`; `make test-integration` (if etcdbr logic touched) |
-| etcd-wrapper | `make test` |
+| etcd-backup-restore | `make revendor && make test-unit`; `make test-integration` (if etcdbr logic touched) |
+| etcd-wrapper | `make revendor && make test` |
 
 ## Step 8: Commit Messages
 
@@ -114,6 +122,29 @@ If new docs files are added or structure changes: `mkdocs.yml` and `docs/README.
 
 **PR body:** Read `.github/pull_request_template.md` and verify the draft body covers every section. Then check: do the `/area` and `/kind` labels, release note category, and checklist ticks match what a comparable merged PR used? Run `gh pr view <similar-merged-pr>` if unsure.
 
+**Gardener PR conventions (Prow-enforced):**
+
+Prow bots parse slash commands in the PR body. Missing or wrong labels stall reviews.
+
+| Command | Purpose | Examples |
+|---------|---------|---------|
+| `/area <id>` | Categorize the change area | `control-plane`, `backup`, `disaster-recovery`, `high-availability`, `testing`, `dev-productivity`, `monitoring`, `security`, `usability`, `open-source` |
+| `/kind <id>` | Classify change type | `api-change`, `bug`, `enhancement`, `cleanup`, `task`, `test`, `flake`, `technical-debt`, `regression` |
+
+Missing `/kind` causes `do-not-merge/needs-kind` label — PR cannot merge until fixed.
+
+**Release note format** (validated by `pr-release-notes-validation.yaml` CI check):
+```
+Release note:
+<category> <target_group>
+<description>
+```
+Categories: `breaking`, `noteworthy`, `feature`, `bugfix`, `doc`, `other`.
+Target groups: `user`, `operator`, `developer`, `dependency`.
+Example: `feature operator` for a new operator-facing field.
+
+**Merge method labels:** Add `/merge squash` (default) or `/merge keep-commits` if the two-commit API rule requires preserving commit history.
+
 ## Step 10: Known Footguns
 
 - `UseEtcdWrapper` feature gate is **GA, locked true** — it cannot be disabled. Any code that checks `Enabled(UseEtcdWrapper)` is dead code.
@@ -124,6 +155,13 @@ If new docs files are added or structure changes: `mkdocs.yml` and `docs/README.
 - `UpgradeEtcdVersion` feature gate is alpha — if touched, gating code must check `featureGates.Enabled(features.UpgradeEtcdVersion)`. Feature gates defined in `api/config/v1alpha1/features.go`.
 - Snapshot compression is **enabled by default** in etcd-backup-restore v0.40+ — do not add explicit `--compress-snapshots=true` unless overriding the default policy.
 - etcd-backup-restore and etcd-wrapper use **vendored dependencies** — any dependency change requires `make revendor`, not just `go mod tidy`.
+- **Container lookup must use name, not index** — when finding a container in a StatefulSet PodSpec, always `findContainerByName("etcd")` or iterate and match `.Name`. Never assume `containers[0]` is the etcd container — init containers, sidecars, or reordering break index-based lookups.
+- **Error codes use `Err` prefix (Go identifier) / `ERR_` prefix (string code)** — etcd-druid-specific error types in `internal/errors/` use Go's `Err` camelCase prefix for the identifier (e.g., `ErrCreateStatefulSet`) and an `ERR_` underscore-separated string for the error code value. Do not invent new error code styles or use bare `errors.New()` in component files.
+- **Use `*int32` / `*bool` for optional fields, not sentinels** — optional numeric fields in the API use pointer types (`*int32`, `*bool`) with `omitempty`, not sentinel values like `-1` or `0`. Sentinel values leak into CEL validation logic and cause confusing rules.
+- **CEL rules: check for redundancy between field-scoped and cross-field** — a field-scoped rule on `EtcdConfig` and a cross-field rule on `Etcd` root may enforce the same constraint. Reviewers should verify no overlap exists — redundant rules cause double-rejection error messages that confuse operators.
+- **Operator-visible names must be descriptive** — names that appear in `kubectl get` output, events, or conditions (e.g., container names, condition types) should be human-readable and descriptive. Do not use internal code identifiers or abbreviations as operator-facing names.
+- **Feature gate changes require `docs/deployment/feature-gates.md` update** — when adding, graduating, or removing a feature gate in `api/config/v1alpha1/features.go`, the documentation at `docs/deployment/feature-gates.md` must be updated in the same PR.
+- **Test assertions must exercise all test table fields** — in table-driven tests, every field in the test struct must be asserted somewhere in the test body. A field like `expectedRequeue` that exists in the table but is never checked in assertions is dead code that gives false confidence.
 
 ---
 
