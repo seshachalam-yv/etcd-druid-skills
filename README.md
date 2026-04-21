@@ -64,79 +64,58 @@ If the reference card appears with your current git state, you're set.
 
 ## The Basic Workflow
 
-```mermaid
-flowchart TB
-    Issue["Issue / Bug Report"] --> Plan["/etcd-druid:plan"]
-
-    subgraph plan ["Phase 1 — Plan"]
-        Plan --> Orient["Read issue & explore upstream"]
-        Orient --> Design["Propose 2-3 approaches"]
-        Design --> WritePlan["Write plan with WHEN/THEN criteria"]
-    end
-
-    WritePlan --> Gate1{"⛔ GATE 1\nHuman approves plan"}
-    Gate1 -- "approved" --> Implement["/etcd-druid:implement"]
-    Gate1 -- "changes" --> Design
-
-    subgraph impl ["Phase 2 — Implement"]
-        Implement --> Worktree["Create worktree + baseline tests"]
-        Worktree --> TaskLoop["Per-task subagent loop"]
-
-        subgraph loop ["For each task"]
-            TaskLoop --> Implementer["Implementer subagent\n(TDD-first)"]
-            Implementer --> SpecReview["Spec-reviewer\n(acceptance criteria)"]
-            SpecReview -- "❌ issues" --> Implementer
-            SpecReview -- "✅ pass" --> CodeReview["Code-reviewer\n(conventions)"]
-            CodeReview -- "❌ issues" --> Implementer
-            CodeReview -- "✅ pass" --> NextTask["Next task"]
-        end
-
-        NextTask --> Verify["make ci-checks\nmake test-unit\nmake test-integration"]
-        Verify --> FinalReview["/etcd-druid:review\n(whole-diff)"]
-    end
-
-    FinalReview --> Gate2{"⛔ GATE 2\nHuman approves PR"}
-    Gate2 -- "A) Create PR" --> PR["gh pr create"]
-    Gate2 -- "B) Push only" --> Push["git push"]
-    Gate2 -- "C) Changes" --> Verify
-    Gate2 -- "D) Discard" --> Cleanup["Remove worktree"]
-
-    style Gate1 fill:#dc3545,color:#fff
-    style Gate2 fill:#dc3545,color:#fff
-    style PR fill:#28a745,color:#fff
+```
+ Issue / Bug Report
+       │
+       ▼
+ ┌─────────────────────── /etcd-druid:plan ───────────────────────┐
+ │  Read issue → explore upstream → design approach → write plan  │
+ │  Plan includes: tasks, WHEN/THEN criteria, files, test scope   │
+ └────────────────────────────┬───────────────────────────────────┘
+                              │
+                    ┌─────────▼─────────┐
+                    │  ⛔ GATE 1        │  ← you review the plan
+                    │  "approved" to go │
+                    └─────────┬─────────┘
+                              │
+ ┌────────────────────── /etcd-druid:implement ───────────────────┐
+ │                                                                │
+ │  1. Create worktree + verify baseline tests                    │
+ │                                                                │
+ │  2. Per-task loop:                                             │
+ │     ┌──────────────────────────────────────────┐               │
+ │     │  Implementer ──→ Spec-reviewer ──→ Code-reviewer         │
+ │     │       ↑                    │              │              │
+ │     │       └── fix issues ──────┘──────────────┘              │
+ │     └──────────────────────────────────────────┘               │
+ │                                                                │
+ │  3. Verify: make ci-checks && make test-unit                   │
+ │  4. Final review: /etcd-druid:review (whole diff)              │
+ └────────────────────────────┬───────────────────────────────────┘
+                              │
+                    ┌─────────▼─────────┐
+                    │  ⛔ GATE 2        │  ← you review the diff
+                    │  A) Create PR     │
+                    │  B) Push only     │
+                    │  C) Make changes  │
+                    │  D) Discard       │
+                    └─────────┬─────────┘
+                              │
+                         gh pr create
 ```
 
 ### Skill Interactions
 
-```mermaid
-flowchart LR
-    plan --> implement
-    implement --> api-change
-    implement --> tdd
-    implement --> review
-    implement --> e2e
-    implement --> verification
+```
+plan ──► implement ──┬──► api-change*  ──► CEL, two-commit, CRD tests
+   │                 ├──► tdd*         ──► Red-Green-Refactor per repo
+   │                 ├──► review*      ──► 15 footguns, Prow labels
+   │                 ├──► e2e          ──► KIND, custom images, CI
+   │                 └──► verification ──► run → read → then claim
+   │
+   └──► Gate 1                 debug* ──► tdd ──► review ──► Gate 2
 
-    tdd --> |"anti-patterns"| antipatterns["testing-anti-patterns.md"]
-    review --> receiving-review
-    debug --> tdd
-    debug --> review
-
-    subgraph auto ["Auto-activates on .go edits"]
-        api-change
-        tdd
-        debug
-        review
-    end
-
-    subgraph gates ["Human gates"]
-        direction TB
-        g1["Gate 1 — plan approval"]
-        g2["Gate 2 — PR approval"]
-    end
-
-    plan --> g1
-    implement --> g2
+   * = auto-activates on .go edits
 ```
 
 The core loop is **plan → Gate 1 → implement → Gate 2 → PR**. Everything else supports it:
