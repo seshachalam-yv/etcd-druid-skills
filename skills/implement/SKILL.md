@@ -207,8 +207,8 @@ Run the full CI suite per repo — not just local tests:
 | Repo | CI command |
 |------|-----------|
 | etcd-druid | `make ci-checks && make test-unit` (+ `make test-integration` if touched) |
-| etcd-backup-restore | `make verify` |
-| etcd-wrapper | `make check && make test` |
+| etcd-backup-restore | `make revendor && make verify` (revendor is required — vendored deps) |
+| etcd-wrapper | `make revendor && make check && make test` (revendor is required — vendored deps) |
 
 If any CI job fails, dispatch a fix subagent with the full failure output. Gate 2 is never presented with failing CI.
 

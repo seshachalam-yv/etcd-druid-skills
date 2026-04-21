@@ -1,6 +1,6 @@
 ---
 name: plan
-description: Use when starting development work — picking up a GitHub issue, designing a feature or fix, writing a code plan. Creates an approved plan file for /etcd-druid:implement. Do not use for executing code or debugging.
+description: Use when starting any development work — features, enhancements, bug fixes, refactoring, or any code change that touches more than one file. Always plan before implementing, even when the fix seems obvious. Creates an approved plan file for /etcd-druid:implement.
 user-invocable: true
 effort: medium
 ---
@@ -133,9 +133,10 @@ For state machine work: write the exact transition sequence for each path as a t
 *Change types: ADDED, MODIFIED, REMOVED. One row per changed field. Delete this section for non-API plans.*
 
 ## PR Checklist (pre-submission)
-- [ ] make ci-checks passes
+- [ ] make ci-checks passes (etcd-druid) / make verify (etcd-backup-restore) / make check && make test (etcd-wrapper)
 - [ ] make test-unit passes
 - [ ] make test-integration passes (if integration touched)
+- [ ] make revendor run (etcd-backup-restore and etcd-wrapper only — required if any dependency changed)
 - [ ] E2e verification: <test name or "not required — test-only change">
 - [ ] Documentation updated in docs/ (if user-facing change)
 - [ ] examples/ updated (if API changed)

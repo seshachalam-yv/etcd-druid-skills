@@ -86,9 +86,17 @@ New resource access needs a `+kubebuilder:rbac` marker in the component or recon
 
 Check `docs/development/testing.md` for the expected framework, helpers, and patterns.
 
+**Framework per repo** (using the wrong framework is a review rejection):
+
+| Repo | Framework | Notes |
+|------|-----------|-------|
+| etcd-druid | Go native `testing.T` + Gomega | No Ginkgo in new tests |
+| etcd-backup-restore | **Ginkgo v2** + Gomega + `go.uber.org/mock` | NEGATIVE: prefix for negative tests |
+| etcd-wrapper | Go native `testing.T` + Gomega | Table-driven, `zaptest.NewLogger(t)` |
+
 Core rules that apply regardless of repo:
 - No `time.Sleep()` — use `Eventually` / `Consistently`
-- No gomock in etcd-druid component tests
+- No gomock in etcd-druid component tests (use fake client instead)
 - Table-driven for multiple scenarios; `t.Parallel()` in subtests
 
 **Verify tests pass locally** (run before opening PR, or confirm author ran them):
@@ -96,8 +104,8 @@ Core rules that apply regardless of repo:
 | Repo | Commands |
 |---|---|
 | etcd-druid | `make test-unit` (all); `make test-integration` (if controller/component touched) |
-| etcd-backup-restore | `make test-unit`; `make test-integration` (if etcdbr logic touched) |
-| etcd-wrapper | `make test` |
+| etcd-backup-restore | `make revendor && make test-unit`; `make test-integration` (if etcdbr logic touched) |
+| etcd-wrapper | `make revendor && make test` |
 
 ## Step 8: Commit Messages
 
