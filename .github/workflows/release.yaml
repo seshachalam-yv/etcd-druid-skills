@@ -44,15 +44,11 @@ jobs:
           fi
 
       - name: Install git-cliff
-        uses: orhun/git-cliff-action@v3
-        with:
-          config: cliff.toml
-          args: --version
-        continue-on-error: true
-
-      - name: Install git-cliff (fallback via cargo)
-        if: steps.install-cliff.outcome == 'failure'
-        run: cargo install git-cliff --locked
+        run: |
+          CLIFF_VERSION="2.7.0"
+          curl -sSL "https://github.com/orhun/git-cliff/releases/download/v${CLIFF_VERSION}/git-cliff-${CLIFF_VERSION}-x86_64-unknown-linux-musl.tar.gz" \
+            | tar -xz --strip-components=1 -C /usr/local/bin git-cliff-${CLIFF_VERSION}-x86_64-unknown-linux-musl/git-cliff
+          git-cliff --version
 
       - name: Bump plugin.json
         run: |
@@ -70,22 +66,18 @@ jobs:
 
       - name: Bump README.md
         run: |
-          CURRENT=$(jq -r '.version' .claude-plugin/plugin.json)
           sed -i \
             -e "s|version-[0-9][^-]*-green|version-${VERSION}-green|g" \
             -e "s|as of v[0-9][^ )]*|as of v${VERSION}|g" \
             README.md
 
       - name: Generate CHANGELOG.md
-        uses: orhun/git-cliff-action@v3
-        with:
-          config: cliff.toml
-          args: --tag "v${{ env.VERSION }}" --output CHANGELOG.md
+        run: |
+          git-cliff --config cliff.toml --tag "v${VERSION}" --output CHANGELOG.md
 
       - name: Extract release notes for this version
         id: notes
         run: |
-          VERSION="${{ env.VERSION }}"
           NOTES=$(awk "/^## \[?${VERSION}\]?/{found=1; next} found && /^## /{exit} found{print}" CHANGELOG.md)
           if [ -z "$NOTES" ]; then
             NOTES="Release v${VERSION}"
