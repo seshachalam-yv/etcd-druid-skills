@@ -3,7 +3,7 @@
 > A Claude Code plugin for contributors to the [Gardener etcd stack](https://github.com/gardener/etcd-druid). Injects domain awareness, workflow discipline, and review rigor into every AI-assisted session.
 
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-1.8.0-green.svg)](.claude-plugin/plugin.json)
+[![Version](https://img.shields.io/badge/version-0.1.0-green.svg)](.claude-plugin/plugin.json)
 [![Claude Code Plugin](https://img.shields.io/badge/Claude%20Code-Plugin-blueviolet)](https://github.com/anthropics/claude-code)
 [![Inspired by Superpowers](https://img.shields.io/badge/Inspired%20by-Superpowers-orange)](https://github.com/obra/superpowers)
 
@@ -377,7 +377,7 @@ All active components run in the Gardener seed cluster. Changes must not break g
 
 ---
 
-## Current versions (as of v1.8.0)
+## Current versions (as of v0.1.0)
 
 | | etcd-druid | etcd-backup-restore | etcd-wrapper |
 |---|---|---|---|
