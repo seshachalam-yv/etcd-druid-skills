@@ -1,9 +1,12 @@
 name: Release
 
 on:
-  push:
-    tags:
-      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to release (e.g. 0.2.0)"
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -12,63 +15,106 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
+      - name: Validate version input
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          VERSION="${VERSION#v}"
+          if ! echo "$VERSION" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9._-]+)?$'; then
+            echo "ERROR: '$VERSION' is not a valid semver (expected X.Y.Z or X.Y.Z-pre)"
+            exit 1
+          fi
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Validate version consistency
+      - name: Configure git
         run: |
-          TAG="${GITHUB_REF_NAME}"          # e.g. v1.8.0
-          VERSION="${TAG#v}"                # e.g. 1.8.0
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          PLUGIN_VERSION=$(jq -r '.version' .claude-plugin/plugin.json)
-          MARKETPLACE_VERSION=$(jq -r '.metadata.version' .claude-plugin/marketplace.json)
-          MARKETPLACE_PLUGIN_VERSION=$(jq -r '.plugins[0].version' .claude-plugin/marketplace.json)
-
-          echo "Tag version:               $VERSION"
-          echo "plugin.json version:       $PLUGIN_VERSION"
-          echo "marketplace.json metadata: $MARKETPLACE_VERSION"
-          echo "marketplace.json plugin:   $MARKETPLACE_PLUGIN_VERSION"
-
-          FAIL=0
-          if [ "$PLUGIN_VERSION" != "$VERSION" ]; then
-            echo "ERROR: plugin.json version ($PLUGIN_VERSION) does not match tag ($VERSION)"
-            FAIL=1
-          fi
-          if [ "$MARKETPLACE_VERSION" != "$VERSION" ]; then
-            echo "ERROR: marketplace.json metadata.version ($MARKETPLACE_VERSION) does not match tag ($VERSION)"
-            FAIL=1
-          fi
-          if [ "$MARKETPLACE_PLUGIN_VERSION" != "$VERSION" ]; then
-            echo "ERROR: marketplace.json plugins[0].version ($MARKETPLACE_PLUGIN_VERSION) does not match tag ($VERSION)"
-            FAIL=1
-          fi
-          exit $FAIL
-
-      - name: Extract changelog entry
-        id: changelog
+      - name: Check tag does not already exist
         run: |
-          TAG="${GITHUB_REF_NAME}"
-          VERSION="${TAG#v}"
-
-          # Extract the section for this version from CHANGELOG.md if it exists
-          if [ -f CHANGELOG.md ]; then
-            # Extract between ## [VERSION] and the next ## heading
-            NOTES=$(awk "/^## \[?${VERSION}\]?/{found=1; next} found && /^## /{exit} found{print}" CHANGELOG.md)
+          if git rev-parse "v${VERSION}" >/dev/null 2>&1; then
+            echo "ERROR: tag v${VERSION} already exists"
+            exit 1
           fi
 
+      - name: Install git-cliff
+        uses: orhun/git-cliff-action@v3
+        with:
+          config: cliff.toml
+          args: --version
+        continue-on-error: true
+
+      - name: Install git-cliff (fallback via cargo)
+        if: steps.install-cliff.outcome == 'failure'
+        run: cargo install git-cliff --locked
+
+      - name: Bump plugin.json
+        run: |
+          jq --arg v "$VERSION" '.version = $v' \
+            .claude-plugin/plugin.json > .claude-plugin/plugin.json.tmp
+          mv .claude-plugin/plugin.json.tmp .claude-plugin/plugin.json
+
+      - name: Bump marketplace.json
+        run: |
+          jq --arg v "$VERSION" '
+            .metadata.version = $v |
+            .plugins[0].version = $v
+          ' .claude-plugin/marketplace.json > .claude-plugin/marketplace.json.tmp
+          mv .claude-plugin/marketplace.json.tmp .claude-plugin/marketplace.json
+
+      - name: Bump README.md
+        run: |
+          CURRENT=$(jq -r '.version' .claude-plugin/plugin.json)
+          sed -i \
+            -e "s|version-[0-9][^-]*-green|version-${VERSION}-green|g" \
+            -e "s|as of v[0-9][^ )]*|as of v${VERSION}|g" \
+            README.md
+
+      - name: Generate CHANGELOG.md
+        uses: orhun/git-cliff-action@v3
+        with:
+          config: cliff.toml
+          args: --tag "v${{ env.VERSION }}" --output CHANGELOG.md
+
+      - name: Extract release notes for this version
+        id: notes
+        run: |
+          VERSION="${{ env.VERSION }}"
+          NOTES=$(awk "/^## \[?${VERSION}\]?/{found=1; next} found && /^## /{exit} found{print}" CHANGELOG.md)
           if [ -z "$NOTES" ]; then
-            NOTES="Release ${TAG}"
+            NOTES="Release v${VERSION}"
           fi
-
-          # Write to file to avoid quoting issues
           printf '%s' "$NOTES" > /tmp/release-notes.md
           echo "notes_file=/tmp/release-notes.md" >> "$GITHUB_OUTPUT"
+
+      - name: Commit version bump and CHANGELOG
+        run: |
+          git add \
+            .claude-plugin/plugin.json \
+            .claude-plugin/marketplace.json \
+            README.md \
+            CHANGELOG.md
+          git commit \
+            --signoff \
+            --message "chore(release): prepare v${VERSION}"
+          git push origin master
+
+      - name: Create and push tag
+        run: |
+          git tag --annotate "v${VERSION}" --message "v${VERSION}"
+          git push origin "v${VERSION}"
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.ref_name }}
-          name: ${{ github.ref_name }}
-          body_path: ${{ steps.changelog.outputs.notes_file }}
+          tag_name: "v${{ env.VERSION }}"
+          name: "v${{ env.VERSION }}"
+          body_path: ${{ steps.notes.outputs.notes_file }}
           draft: false
-          prerelease: ${{ contains(github.ref_name, '-') }}
+          prerelease: ${{ contains(github.event.inputs.version, '-') }}
