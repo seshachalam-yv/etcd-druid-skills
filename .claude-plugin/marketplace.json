@@ -5,7 +5,7 @@
   },
   "metadata": {
     "description": "Expert skills for etcd-druid ecosystem development",
-    "version": "0.1.0"
+    "version": "0.1.1"
   },
   "plugins": [
     {
@@ -15,7 +15,7 @@
         "url": "https://github.com/seshachalam-yv/etcd-druid-skills.git"
       },
       "description": "Expert skills for etcd-druid development: plan/implement workflow with gated Gates, TDD, debugging, API change guidance, e2e testing, code review, and domain reference.",
-      "version": "0.1.0"
+      "version": "0.1.1"
     }
   ]
 }

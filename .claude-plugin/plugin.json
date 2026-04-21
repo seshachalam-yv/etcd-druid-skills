@@ -1,11 +1,21 @@
 {
   "name": "etcd-druid",
   "description": "Expert skills for etcd-druid development: plan/implement workflow with gated Gates, TDD, debugging, API change guidance, e2e testing, code review, and domain reference. Inspired by the Superpowers plugin system.",
-  "version": "0.1.0",
-  "author": { "name": "Seshachalam Yerasala Venkata" },
+  "version": "0.1.1",
+  "author": {
+    "name": "Seshachalam Yerasala Venkata"
+  },
   "homepage": "https://github.com/seshachalam-yv/etcd-druid-skills",
   "repository": "https://github.com/seshachalam-yv/etcd-druid-skills",
   "license": "Apache-2.0",
-  "keywords": ["etcd-druid", "etcd-backup-restore", "etcd-wrapper", "gardener", "kubernetes", "operator", "go"],
+  "keywords": [
+    "etcd-druid",
+    "etcd-backup-restore",
+    "etcd-wrapper",
+    "gardener",
+    "kubernetes",
+    "operator",
+    "go"
+  ],
   "skills": "./skills/"
 }
