@@ -1,0 +1,57 @@
+name: Skill or Enhancement Request
+description: Suggest a new skill, hook, or improvement to an existing one
+labels: ["enhancement"]
+body:
+  - type: dropdown
+    id: type
+    attributes:
+      label: Type of request
+      options:
+        - "New skill"
+        - "New hook"
+        - "Enhancement to existing skill"
+        - "Enhancement to existing hook"
+        - "CI improvement"
+        - "Documentation"
+    validations:
+      required: true
+
+  - type: input
+    id: target
+    attributes:
+      label: Target skill or hook (if enhancing an existing one)
+      placeholder: "e.g. implement, tdd, guard-generated-files"
+    validations:
+      required: false
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or use case
+      description: What workflow pain does this address? Be specific about the scenario where current behaviour falls short.
+      placeholder: "e.g. When implementing an API change, the implement skill doesn't remind me to run `make generate` before committing..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: What should the skill or hook do differently?
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Any other approaches you thought about and why you ruled them out
+    validations:
+      required: false
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+    validations:
+      required: false

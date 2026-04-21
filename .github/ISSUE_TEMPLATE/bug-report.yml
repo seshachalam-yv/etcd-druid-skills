@@ -1,0 +1,84 @@
+name: Bug Report
+description: Report a bug in a skill, hook, or CI workflow
+labels: ["bug"]
+body:
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      description: Which skill, hook, or workflow is affected?
+      options:
+        - "Skill: plan"
+        - "Skill: implement"
+        - "Skill: tdd"
+        - "Skill: debug"
+        - "Skill: review"
+        - "Skill: api-change"
+        - "Skill: e2e"
+        - "Skill: reference"
+        - "Skill: receiving-review"
+        - "Skill: verification"
+        - "Skill: observations"
+        - "Hook: session-start"
+        - "Hook: session-memory"
+        - "Hook: guard-generated-files"
+        - "Hook: detect-correction"
+        - "Hook: observe-plugin-improvement"
+        - "Hook: check-dev-docs"
+        - "CI: validate workflow"
+        - "CI: release workflow"
+        - "Other"
+    validations:
+      required: true
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: Describe the bug. Include Claude CLI output or skill output where relevant.
+      placeholder: "e.g. The implement skill dispatched a subagent with wrong context..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      placeholder: "e.g. The subagent should have received the plan file path..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open a Claude session in an etcd-druid worktree
+        2. Invoke `/implement`
+        3. Observe...
+    validations:
+      required: true
+
+  - type: input
+    id: plugin-version
+    attributes:
+      label: Plugin version
+      placeholder: "e.g. 0.1.0 (from .claude-plugin/plugin.json)"
+    validations:
+      required: true
+
+  - type: input
+    id: claude-version
+    attributes:
+      label: Claude CLI version
+      placeholder: "Run: claude --version"
+    validations:
+      required: false
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Any other information that might help (OS, repo, branch, etc.)
+    validations:
+      required: false
