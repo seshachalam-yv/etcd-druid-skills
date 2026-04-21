@@ -105,7 +105,7 @@ Pass worktree path to all subagents.
 
 | Task type | Model |
 |-----------|-------|
-| Test-only change, single file | haiku |
+| Test-only change, single file | sonnet |
 | New component method, 2–3 files | sonnet |
 | API change, new component, multi-file, debugging | opus |
 
