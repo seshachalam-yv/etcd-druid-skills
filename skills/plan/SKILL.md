@@ -1,6 +1,6 @@
 ---
 name: plan
-description: Use at the start of any etcd-druid development work — picking up a GitHub issue, designing a feature or bug fix, choosing an approach, writing a code plan with acceptance criteria. Output is an approved plan file. Invoke implement next to execute it.
+description: Use when starting development work — picking up a GitHub issue, designing a feature or fix, writing a code plan. Creates an approved plan file for /etcd-druid:implement. Do not use for executing code or debugging.
 user-invocable: true
 effort: medium
 ---

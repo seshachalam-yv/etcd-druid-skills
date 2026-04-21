@@ -1,6 +1,6 @@
 ---
 name: api-change
-description: Use for any etcd-druid API field addition or modification — new fields, CEL validation (field-scoped and cross-field), kubebuilder markers, two-commit generate workflow, CRD tests, /kind api-change PR label. Not for controller or test-only work.
+description: Use for any etcd-druid API field addition or modification — CEL validation, kubebuilder markers, two-commit generate workflow, CRD tests. Not for controller or test-only work.
 user-invocable: true
 effort: high
 paths: "api/core/v1alpha1/*.go"

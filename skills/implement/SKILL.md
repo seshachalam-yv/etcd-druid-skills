@@ -62,7 +62,7 @@ Read the plan file first. Extract: fork root, issue number, task list.
 > "This plan touches API types but has no `## API Delta` section. Please add one (one row per field added, modified, or removed) before I proceed."
 Do not create the worktree until the API Delta section exists.
 
-Branch name is derived at worktree-creation time: `ai/TASK-{id}/claude/{short-description}` — it is not in the plan file.
+Branch name is derived at worktree-creation time: `feat/issue-{id}/{short-description}` (or `fix/issue-{id}/{short-description}` for bugfixes) — it is not in the plan file.
 
 ```bash
 cd <fork-root>
@@ -75,12 +75,12 @@ git check-ignore -q .worktrees || {
   git commit -m "Add .worktrees/ to .gitignore"
 }
 
-git worktree add .worktrees/etcd-druid-ai-TASK-{id} \
-  -b ai/TASK-{id}/claude/{short-description} upstream/master
+git worktree add .worktrees/etcd-druid-issue-{id} \
+  -b feat/issue-{id}/{short-description} upstream/master
 ```
 
-Worktree path: `<fork-root>/.worktrees/etcd-druid-ai-TASK-{id}`
-Branch: `ai/TASK-{id}/claude/{short-description}`
+Worktree path: `<fork-root>/.worktrees/etcd-druid-issue-{id}`
+Branch: `feat/issue-{id}/{short-description}` (or `fix/issue-{id}/{short-description}` for bugfixes)
 
 After creating the worktree, run setup and verify a clean baseline:
 
@@ -298,7 +298,7 @@ Handle:
 
 ```bash
 cd <worktree-path>
-git push origin ai/TASK-{id}/claude/{short-description}
+git push origin feat/issue-{id}/{short-description}
 gh pr create \
   --base master \
   --title "<approved title>" \
@@ -380,3 +380,42 @@ Some changes span multiple repos (e.g., a new API field in etcd-druid + a new fl
 6. **PR ordering.** Open the sidecar PR first (etcd-backup-restore or etcd-wrapper). Once merged and released, update the image vector in etcd-druid and open that PR.
 
 7. **Vendoring.** etcd-backup-restore and etcd-wrapper use `go mod vendor`. After any dependency change: `make revendor`. etcd-druid does NOT vendor — use `make tidy`.
+
+---
+
+## Cherry-Pick / Hotfix Workflow
+
+When a fix needs to be backported to a maintenance release branch (e.g., `hotfix-v0.35`, `hotfix-v0.36`):
+
+### When to cherry-pick
+
+- Bug fix merged to `master` that affects a released version
+- Security patch needed on an older release
+- The gardener-ci-robot creates automated cherry-pick PRs — if you see `[hotfix-vX.Y]` prefix PRs, this is the pattern
+
+### Manual cherry-pick workflow
+
+```bash
+# Ensure you have the hotfix branch
+git fetch upstream
+git checkout -b hotfix-v0.36-fix-<short-desc> upstream/hotfix-v0.36
+
+# Cherry-pick the squashed commit from master (most PRs are squash-merged)
+git cherry-pick -x <commit-sha>
+# If the commit is a merge commit (not squash-merged), use: git cherry-pick -x -m 1 <commit-sha>
+
+# Resolve conflicts if any, then verify
+make ci-checks && make test-unit
+
+# Push and create PR targeting the hotfix branch
+git push origin hotfix-v0.36-fix-<short-desc>
+gh pr create --base hotfix-v0.36 --title "[hotfix-v0.36] <original title>" --body "..."
+```
+
+### Rules
+
+- Cherry-pick PRs target the `hotfix-vX.Y` branch, NOT `master`
+- PR title must be prefixed with `[hotfix-vX.Y]`
+- The fix should already be merged to `master` first — backport, don't forward-port
+- If the cherry-pick has conflicts, resolve them and note the conflict resolution in the PR body
+- Run the same CI checks as a normal PR (`make ci-checks`, `make test-unit`)

@@ -1,6 +1,6 @@
 ---
 name: e2e
-description: Use for manual e2e testing of etcd-druid, etcd-backup-restore, or etcd-wrapper — KIND cluster setup, custom image builds, loading images, sidecar overrides, running e2e tests, and pre-PR CI validation. Not for unit/integration tests.
+description: Use for e2e testing — KIND cluster setup, custom image builds, sidecar overrides, running e2e tests, pre-PR CI validation. Not for unit or integration tests.
 user-invocable: true
 effort: high
 ---

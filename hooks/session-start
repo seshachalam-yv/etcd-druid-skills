@@ -101,7 +101,7 @@ NEVER push or create a PR without explicit human approval.
 - After API changes: two commits — hand-written change first, then `cd api && make generate` output
 - Pre-PR: make ci-checks && make test-unit && make test-integration
 - Commits: imperative sentence case, issue number at end: "Fix X (#1350)", no trailing period
-- Branch naming: ai/TASK-{issue-id}/claude/{short-description} in fork
+- Branch naming: feat/issue-{id}/{short-description} or fix/issue-{id}/{short-description} in fork
 
 ## Development Guides (read before coding or reviewing)
 Each repo has docs/development/ with authoritative conventions, patterns, and make targets.
