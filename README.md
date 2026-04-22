@@ -229,30 +229,24 @@ The core loop is **plan → Gate 1 → implement → Gate 2 → PR**. Every skil
 
 ## Philosophy
 
-### Iron Laws, not reminders
+**Iron Laws, not reminders.** Each skill opens with one unconditional rule and a table of the rationalizations that cause violations. Addressing the thought pattern ("this task is too small for a plan") is more effective than repeating the abstract principle.
 
-Each skill opens with one unconditional rule and a table of the specific rationalizations that cause violations. This is more effective than repeating rules because it addresses the actual thought patterns ("this task is too small for a plan", "I'll add the test after") rather than the abstract principle.
+**Workflow orchestrator, not code library.** Code patterns and conventions live in each repo's `docs/development/`. The plugin tells Claude where to look and when to look — it never duplicates what the repos already document.
 
-| Skill | Iron Law |
-|-------|----------|
+**Plugin self-improvement.** Every session is evaluated asynchronously. Specific gaps (wrong claim, missing footgun, stale flag) are captured as structured observations. At the next session, you triage: raise a PR, skip, or dismiss. No PR is ever raised without your explicit choice.
+
+**Assumption surfacing before action.** The `plan` skill requires Claude to state every assumption explicitly before proposing approaches. Silent interpretation is the most common AI coding failure — this prevents it.
+
+### Iron Laws
+
+| Skill | Law |
+|-------|-----|
 | plan | NO CODE BEFORE GATE 1 |
 | implement | NO PUSH BEFORE GATE 2 |
 | tdd | NO IMPLEMENTATION CODE BEFORE A FAILING TEST |
 | debug | NO FIX ATTEMPT WITHOUT A REPRODUCIBLE FAILURE FIRST |
 | review | NO VERDICT WITHOUT READING THE DIFF AND docs/development/ FIRST |
 | verification | NO COMPLETION CLAIMS WITHOUT FRESH VERIFICATION EVIDENCE |
-
-### Workflow orchestrator, not code library
-
-Code patterns and conventions live in each repo's `docs/development/`. The plugin tells Claude where to look and enforces the process — it never duplicates what the repos already document.
-
-### Plugin self-improvement
-
-Every session is evaluated asynchronously. When a specific gap is found (wrong claim, missing footgun, stale flag), it's captured as a structured observation. At the next session, you triage: raise a PR, skip, or dismiss. No PR is ever raised without your explicit choice.
-
-### Assumption surfacing
-
-The `plan` skill requires Claude to state every assumption explicitly before proposing approaches. Silent interpretation is the most common AI coding failure — this prevents it.
 
 ## Evaluation
 
