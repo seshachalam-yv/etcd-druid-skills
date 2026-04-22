@@ -261,6 +261,34 @@ envtest starts a real API server and etcd for integration tests. Common issues:
 - Multiple changes in one attempt — you can't know what worked
 - "One more quick fix" after two failures — see Phase 6
 
+---
+
+## Common Go Gotchas
+
+### Nil Interface vs Nil Concrete Value
+A nil pointer dereference on an interface method call often means the interface is not nil but holds a nil concrete value.
+
+```go
+// WRONG: if NewLocal returns (nil, err), store is NOT nil — it's (*LocalSnapStore)(nil)
+var store SnapStore
+store, err = NewLocal(path)
+if store != nil { store.List() } // PANICS — store is non-nil interface with nil value
+
+// RIGHT: use intermediate variable
+var store SnapStore
+local, err := NewLocal(path)
+if err == nil { store = local }
+```
+
+When debugging: if the crash is `nil pointer dereference` on an interface method call, check whether the interface was assigned from a function returning `(*ConcreteType, error)` — the `nil` concrete pointer makes a non-nil interface.
+
+### Container Crash Debugging in K8s
+When a pod container crashes in e2e:
+1. `kubectl logs <pod> -c <container> --previous` — get logs from the crashed container
+2. Check for Go panic stack traces — they show the exact file:line
+3. If the crash is in initialization, check whether required endpoints/services are available
+4. If the crash is intermittent, check for race conditions with `-race` flag
+
 ## Handoff
 
 - Root cause identified, fix implemented → apply verification gate (`skills/verification/SKILL.md`)

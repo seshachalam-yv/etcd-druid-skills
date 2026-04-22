@@ -345,6 +345,54 @@ kubectl get etcd etcd-main -n <test-ns> -o jsonpath='{.status.lastFullBackup}'
 
 ---
 
+## Testing with Minimal Container Images
+
+Many production container images (distroless, scratch, alpine-minimal) have no shell, no coreutils, no HTTP clients. Before writing e2e tests:
+
+1. Check what tools are available: `docker run --rm <image> ls /` — if this fails, the image is distroless
+2. For etcd operations: use `etcdctl` if available in the etcd image, otherwise use the K8s API or port-forward
+3. For HTTP endpoint testing: use port-forward + Go HTTP client, not `kubectl exec` with wget/curl
+4. For observability: use K8s pod logs API and container status checks, not shell commands
+5. For data verification: use the application's own CLI tools or API, not filesystem inspection
+
+**Common pitfalls:**
+- `etcdctl get --count-only` requires `--write-out=fields` in etcd 3.5+
+- K8s env var substitution `$(ENV_VAR)` works in container args but not in all fields
+- TCP socket probes are more reliable than exec probes in distroless images
+
+---
+
+## Custom Container Images in KIND e2e
+
+### Build Pattern (fastest iteration)
+1. Build binary for target platform: `CGO_ENABLED=0 GOOS=linux GOARCH=<arch> go build -o bin/<name>-linux ./cmd/<name>/`
+2. Create a minimal Dockerfile (no multi-stage, no go build inside Docker):
+   ```dockerfile
+   FROM gcr.io/distroless/static-debian12:nonroot
+   COPY bin/<name>-linux /<name>
+   ENTRYPOINT ["/<name>"]
+   ```
+3. Push to KIND's local registry: `docker build -t localhost:5001/<name>:dev . && docker push localhost:5001/<name>:dev`
+
+### Override Pattern (for operator-managed images)
+When the operator selects images via an image vector (like etcd-druid's `IMAGEVECTOR_OVERWRITE`):
+1. Create a ConfigMap with the override YAML
+2. Mount it as a volume on the operator deployment
+3. Set the override env var pointing to the mount path
+4. Restart the deployment to pick up changes
+
+### Test Namespace Pattern
+Each e2e test must use a unique namespace to avoid cleanup conflicts:
+```go
+name := strings.ToLower(t.Name())
+name = strings.ReplaceAll(name, "/", "-")
+name = strings.ReplaceAll(name, "_", "-")
+ns := "e2e-" + name
+if len(ns) > 63 { ns = ns[:63] }
+```
+
+---
+
 ## Handoff
 
 After e2e passes:

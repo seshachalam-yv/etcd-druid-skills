@@ -92,6 +92,18 @@ Path: <absolute path to local fork, e.g. /home/user/go/src/github.com/me/etcd-dr
 [ ] Controller change (internal/controller/)
 [ ] Test only
 
+## Feature Gate Impact Checklist *(required when the change introduces or modifies a feature gate that affects container images, args, or cross-container behavior; omit otherwise)*
+- [ ] Gate definition: `api/config/v1alpha1/features.go` — name, maturity level, default
+- [ ] Image key: `internal/common/constants.go` — new image key constant
+- [ ] Image selection: `internal/utils/image.go` — conditional logic based on gate
+- [ ] Default image: `internal/images/images.yaml` — embedded image entry
+- [ ] Container spec: `internal/component/statefulset/builder.go` — CLI args, ports, probes
+- [ ] Test image vector: `test/utils/constants.go` + `test/utils/imagevector.go`
+- [ ] Cross-container contract: verify the new image satisfies all contracts expected by other containers in the same Pod (read the consuming container's source code)
+- [ ] Readiness/liveness probes: verify probes still target a valid endpoint after the image swap
+- [ ] Pod identity mechanism: verify the new container receives pod name/namespace correctly (env vars vs flags vs downward API)
+- [ ] E2e override mechanism: document how to test with custom images (IMAGEVECTOR_OVERWRITE, local registry, ConfigMap mount)
+
 ## Design Summary
 Chosen approach and why. Alternatives considered.
 

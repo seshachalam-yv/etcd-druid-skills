@@ -483,3 +483,18 @@ All must be updated together. Check the upstream Gardener Go version policy befo
 - `observations` — triage captured plugin improvement observations; invoke when session-start flags pending observations
 - `e2e` — manual e2e testing: KIND setup, custom image builds, sidecar overrides, pre-PR CI
 - `reference` — this card
+
+---
+
+## Cross-Container Contracts
+
+When a Pod has multiple containers that communicate (e.g., etcd-wrapper ↔ sidecar, etcd ↔ backup-restore), there is an implicit HTTP/gRPC contract between them. Before modifying or replacing any container image:
+
+1. Read the consuming container's source to identify expected endpoints (check its bootstrap/initialization code for HTTP calls to the other container)
+2. Read `docs/development/` in both repos for documented contracts
+3. If no documentation exists, file an issue or add a doc in the upstream repo describing the contract
+
+**Known contracts to check:**
+- **etcd-wrapper → sidecar:** see `etcd-wrapper/internal/bootstrap/` for expected HTTP endpoints
+- **etcd container readiness probe:** may target wrapper or sidecar port — verify it matches the actual serving container
+- **Pod identity:** check whether containers expect env vars (`POD_NAME`/`POD_NAMESPACE`) vs CLI flags vs downward API

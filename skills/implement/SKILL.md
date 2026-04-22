@@ -99,6 +99,22 @@ Pass worktree path to all subagents.
 
 ---
 
+## Parallel Wave Execution
+
+For new sidecar/binary work where the plan groups tasks into dependency waves:
+
+1. Identify tasks within each wave that write to non-overlapping directories
+2. Launch those tasks as parallel agents (safe when no shared write paths)
+3. After all agents in a wave complete, run `go test -count=1 -race ./internal/... ./cmd/...` to verify the wave
+4. Only proceed to the next wave after verification passes
+5. Fix any failures immediately before continuing
+
+This reduces implementation time by ~60% for large projects (measured: 5h→2h for 17-package sidecar build).
+
+The sequential subagent loop (Phase 2 below) remains the default for incremental work where tasks are small and dependencies are tight.
+
+---
+
 ## Phase 2: Per-Task Implementation
 
 **Model selection:**
