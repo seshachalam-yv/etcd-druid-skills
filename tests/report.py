@@ -203,3 +203,41 @@ def emit_ctrf(results: list, out_path: str, run_dir: str = '') -> None:
 
     with open(out_path, 'w') as f:
         json.dump(ctrf, f, indent=2)
+
+
+def emit_highlights(results: list, out_path: str) -> None:
+    """Write HIGHLIGHTS.md — a human-readable markdown table of results."""
+    now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    passed = sum(1 for r in results if r['result'] == 'passed')
+    total  = len(results)
+    total_cost = sum(r['cost_usd'] for r in results)
+    total_s    = sum(r['duration_s'] for r in results)
+
+    lines = [
+        f'## Test Run — {now}',
+        '',
+        f'Suite: all  │  {passed}/{total} passed  │  '
+        f'total cost: ${total_cost:.2f}  │  total time: {total_s}s',
+        '',
+        '| Test | Result | Skill | Duration | Cost | Tokens |',
+        '|------|--------|-------|----------|------|--------|',
+    ]
+    for r in results:
+        icon   = '✅ PASS' if r['result'] == 'passed' else '❌ FAIL'
+        skill  = f"etcd-druid:{r['skill_invoked']}" if r['skill_invoked'] else '(none)'
+        dur    = f"{r['duration_s']}s"
+        cost   = f"${r['cost_usd']:.2f}"
+        tokens = f"{r['tokens']:,}"
+        lines.append(f"| {r['name']} | {icon} | {skill} | {dur} | {cost} | {tokens} |")
+
+    failures = [r for r in results if r['result'] != 'passed']
+    if failures:
+        lines += ['', '## Failures', '']
+        for r in failures:
+            lines.append(f"**{r['name']}** — {r['failure_message'] or 'assertion failed'}")
+            if r['log_path']:
+                lines.append(f"  Log: `{r['log_path']}`")
+            lines.append('')
+
+    with open(out_path, 'w') as f:
+        f.write('\n'.join(lines) + '\n')

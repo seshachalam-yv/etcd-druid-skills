@@ -121,6 +121,25 @@ def test_emit_ctrf():
         assert 'extra' in tests['plan-naive']
         assert tests['plan-naive']['extra']['skill_invoked'] == 'plan'
 
+def test_emit_highlights():
+    with tempfile.TemporaryDirectory() as d:
+        make_run_dir(d, [
+            ('trigger', 'plan-naive', 'plan', True, 12000, 0.04, 14),
+            ('trigger', 'api-change-naive', None, False, 9000, 0.03, 10),
+        ])
+        results = report.collect_results(d)
+        out = os.path.join(d, 'HIGHLIGHTS.md')
+        report.emit_highlights(results, out)
+        with open(out) as f:
+            md = f.read()
+        assert '## Test Run' in md
+        assert 'plan-naive' in md
+        assert 'api-change-naive' in md
+        assert 'PASS' in md
+        assert 'FAIL' in md
+        assert '## Failures' in md
+        assert 'api-change-naive' in md.split('## Failures')[1]
+
 if __name__ == '__main__':
     test_parse_skill_invoked()
     test_parse_no_skill()
@@ -129,4 +148,5 @@ if __name__ == '__main__':
     test_load_result_missing()
     test_collect_results()
     test_emit_ctrf()
+    test_emit_highlights()
     print('All tests passed.')
