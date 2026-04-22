@@ -1,23 +1,61 @@
 # etcd-druid-skills
 
-Expert development workflow for the [Gardener etcd stack](https://github.com/gardener/etcd-druid) — plan, implement, test, debug, and review with full domain awareness.
+**Ecosystem:** [etcd-druid](https://github.com/gardener/etcd-druid) · [etcd-backup-restore](https://github.com/gardener/etcd-backup-restore) · [etcd-wrapper](https://github.com/gardener/etcd-wrapper)
 
-[![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.1.1-green.svg)](.claude-plugin/plugin.json)
-[![Plugin Pass Rate](https://img.shields.io/badge/eval%20pass%20rate-96%25-brightgreen.svg)](docs/evaluation.md)
-[![Inspired by Superpowers](https://img.shields.io/badge/Inspired%20by-Superpowers-orange)](https://github.com/obra/superpowers)
+<p>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-blue.svg" alt="License"></a>
+  <a href=".claude-plugin/plugin.json"><img src="https://img.shields.io/badge/version-0.1.1-green.svg" alt="Version"></a>
+  <a href="docs/evaluation.md"><img src="https://img.shields.io/badge/eval%20pass%20rate-96%25-brightgreen.svg" alt="Eval Pass Rate"></a>
+  <a href="https://github.com/obra/superpowers"><img src="https://img.shields.io/badge/Inspired%20by-Superpowers-orange" alt="Inspired by Superpowers"></a>
+</p>
 
-## How it works
+A Claude Code plugin that makes your AI coding agent a capable etcd-druid contributor — not just a code writer, but a workflow-following engineer who knows the two-commit rule, picks the right test framework per repo, protects generated files, and won't push without your approval.
 
-When you start a Claude Code session in an etcd-druid, etcd-backup-restore, or etcd-wrapper checkout, the plugin activates automatically. It knows which repo you're in, what branch you're on, and what conventions that repo expects.
+Without this plugin, an LLM working in etcd-druid makes the same mistakes every new contributor makes: editing `zz_generated_*` files, using the wrong test framework, skipping `make revendor`, placing CEL validation in the wrong file, jumping straight to code without a plan. This plugin encodes 15+ known footguns and a gated plan → implement → review workflow so those mistakes never reach your PR.
 
-Ask it to implement a feature, and it doesn't jump straight into code. It reads the GitHub issue, explores the upstream codebase, writes a structured plan with acceptance criteria, and waits for your approval before touching a single file. That's Gate 1.
+When you start a session in any etcd-druid, etcd-backup-restore, or etcd-wrapper checkout, the plugin auto-detects the repo, reads the relevant `docs/development/` guide, and activates the right skills — no configuration required.
 
-After you say "go", it creates an isolated worktree and works through each task using subagents — an implementer writes the code (TDD-first), a spec-reviewer checks it against the plan, and a code-reviewer validates conventions. When everything passes, it runs the full CI suite, drafts a PR body matching the team's Prow label conventions, and presents it for your final approval. That's Gate 2.
+## Without vs. With This Plugin
 
-It does this because the Gardener etcd ecosystem has specific rules that a general-purpose LLM doesn't know: the two-commit rule for API changes, Ginkgo v2 for etcd-backup-restore tests but Go native for etcd-druid, `make revendor` for vendored repos, CEL validation placement rules, 15+ known footguns that trip up every new contributor. The plugin encodes all of this so you don't have to re-explain it every session.
+<table>
+<tr>
+<th>Generic Claude on an API change task</th>
+<th>With etcd-druid-skills</th>
+</tr>
+<tr>
+<td>
 
-And because skills trigger automatically, you don't need to do anything special. Your coding agent just knows etcd-druid.
+- Edits `zz_generated_deepcopy.go` directly
+- Uses `gomega` in etcd-druid unit tests (wrong — Go native + Gomega only in specific pattern)
+- Forgets `make generate` after adding a field
+- Skips CEL validation entirely
+- Opens a PR without `release-note` Prow label
+- No plan written; jumps straight to implementation
+
+</td>
+<td>
+
+- **Blocks** edits to any `zz_generated_*` file via hook
+- Reads `docs/development/` for the repo before touching any file
+- Follows the **two-commit rule**: one commit adds the field, a second runs `make generate`
+- Places CEL validation in the correct file with field-scoped + cross-field rules
+- Drafts PR body with `release-note` block and correct Prow labels
+- Writes a plan with WHEN/THEN acceptance criteria; waits for Gate 1 before any code
+
+</td>
+</tr>
+</table>
+
+## Requirements
+
+| Requirement | Minimum |
+|-------------|---------|
+| Claude Code | 1.x (any version with plugin support) |
+| Claude model | `claude-sonnet-4-5` or newer (Haiku floor was raised; Opus recommended for `plan` and `implement`) |
+| Repos supported | `gardener/etcd-druid`, `gardener/etcd-backup-restore`, `gardener/etcd-wrapper` |
+| OS | macOS, Linux (anywhere Claude Code runs) |
+
+The plugin auto-detects which repo you are in at session start. It does not modify any repo files — all changes are in your Claude Code session context.
 
 ## Installation
 
@@ -28,7 +66,8 @@ And because skills trigger automatically, you don't need to do anything special.
 /plugin install etcd-druid-skills@seshachalam-yv-etcd-druid-skills
 ```
 
-### Manual (settings.json)
+<details>
+<summary><strong>Manual install (settings.json)</strong></summary>
 
 ```json
 {
@@ -46,6 +85,8 @@ And because skills trigger automatically, you don't need to do anything special.
 }
 ```
 
+</details>
+
 ### Verify
 
 Start a session in an etcd-druid checkout. You should see the orientation context (component overview, active repo, branch info). Then:
@@ -62,7 +103,7 @@ If the reference card appears with your current git state, you're set.
 /plugin marketplace update seshachalam-yv-etcd-druid-skills
 ```
 
-## The Basic Workflow
+## Workflow
 
 ```
  Issue / Bug Report
@@ -118,79 +159,61 @@ plan ──► implement ──┬──► api-change*  ──► CEL, two-comm
    * = auto-activates on .go edits
 ```
 
-The core loop is **plan → Gate 1 → implement → Gate 2 → PR**. Everything else supports it:
+The core loop is **plan → Gate 1 → implement → Gate 2 → PR**. Every skill supports a phase of this loop.
 
-- **api-change** activates when API types are touched — CEL validation, two-commit generate workflow, CRD tests
-- **tdd** activates when tests are written — correct framework per repo, Red-Green-Refactor
-- **debug** activates when something breaks — systematic root cause, reproduce before fix
-- **review** runs before Gate 2 — full-diff review against `docs/development/` conventions
-
-## What's Inside
-
-### Skills (9 user-invocable)
+### Skills
 
 **Planning & Execution**
-- **plan** — Issue intake, approach selection, code plan with WHEN/THEN acceptance criteria. Gate 1.
-- **implement** — Worktree setup, per-task subagent loop (implementer → spec-reviewer → code-reviewer), CI verification, PR creation. Gate 2.
+
+| Skill | Invoke | Description |
+|-------|--------|-------------|
+| [plan](skills/plan/SKILL.md) | `/etcd-druid:plan` | Issue intake → approach selection → code plan with WHEN/THEN acceptance criteria. Outputs an approved plan file. **Gate 1** blocks all code until you approve. |
+| [implement](skills/implement/SKILL.md) | `/etcd-druid:implement` | Worktree setup → per-task subagent loop (implementer → spec-reviewer → code-reviewer) → CI verify → PR draft. **Gate 2** blocks push until you approve. |
 
 **Domain-Specific**
-- **api-change** — Field design, CEL validation (field-scoped + cross-field), kubebuilder markers, two-commit generate workflow, CRD integration tests
-- **tdd** — Framework per repo (Go native for druid/wrapper, Ginkgo v2 for backup-restore), fake client patterns, testing anti-patterns
-- **debug** — 6-phase root cause analysis, Delve debugging, per-repo log analysis, build failure triage tables
-- **e2e** — KIND cluster setup, custom sidecar image builds, IMAGEVECTOR_OVERWRITE, pre-PR CI
 
-**Quality**
-- **review** — 10-step checklist, 15 known footguns, Gardener PR conventions (Prow labels, release notes), repo-specific framework validation
-- **reference** — Make targets, file paths, feature gates, CLI flags, dependency management, cherry-pick workflow
-- **observations** — Triage plugin self-improvement findings. Choose: raise PR, skip, or dismiss.
+| Skill | Invoke | Auto-activates | Description |
+|-------|--------|----------------|-------------|
+| [api-change](skills/api-change/SKILL.md) | `/etcd-druid:api-change` | `api/**/*.go` edits | Field design, CEL validation (field-scoped + cross-field), kubebuilder markers, two-commit generate workflow, CRD integration tests |
+| [tdd](skills/tdd/SKILL.md) | `/etcd-druid:tdd` | `*.go` edits | Red-Green-Refactor per repo; correct framework (Go native for druid/wrapper, Ginkgo v2 for backup-restore); fake client patterns; testing anti-patterns |
+| [debug](skills/debug/SKILL.md) | `/etcd-druid:debug` | `*.go` edits | 6-phase root cause analysis, Delve, per-repo log analysis, build failure triage |
+| [e2e](skills/e2e/SKILL.md) | `/etcd-druid:e2e` | — | KIND cluster setup, custom sidecar image builds, IMAGEVECTOR_OVERWRITE, pre-PR CI |
 
-### Cross-Cutting (referenced by skills, not user-invocable)
+**Quality & Reference**
 
-- **verification** — 5-step evidence gate: run command → read output → then claim it passes
-- **receiving-review** — Handle maintainer feedback without sycophancy: verify before implementing
+| Skill | Invoke | Auto-activates | Description |
+|-------|--------|----------------|-------------|
+| [review](skills/review/SKILL.md) | `/etcd-druid:review` | `*.go` edits | 10-step checklist, 15 known footguns, Prow labels, release notes; runs as an isolated read-only subagent |
+| [reference](skills/reference/SKILL.md) | `/etcd-druid:reference` | — | Make targets, file paths, feature gates, CLI flags, dependency management, cherry-pick workflow |
+| [observations](skills/observations/SKILL.md) | `/etcd-druid:observations` | — | Triage plugin self-improvement findings: raise PR, skip, or dismiss |
 
-### Subagent Prompts
+**Cross-cutting (referenced by skills, not directly invocable)**
 
-- **implementer-prompt.md** — Task implementation with TDD, self-review checklist
-- **spec-reviewer-prompt.md** — Verify implementation matches acceptance criteria
-- **code-reviewer-prompt.md** — Validate conventions, patterns, quality
-
-### Hooks (5 active)
-
-| Hook | When | What |
-|------|------|------|
-| **session-start** | Session start, worktree create, post-compaction | Injects domain orientation, detects active repo, surfaces pending observations |
-| **guard-generated-files** | Before Edit/Write | **Blocks** edits to generated files (`zz_generated*`, CRDs, `client/`) |
-| **check-dev-docs** | After Edit/Write | Reminds to read the relevant `docs/development/` guide for the file being edited |
-| **detect-correction** | User message submitted | Watches for correction phrases to trigger the plugin self-improvement evaluator |
-| **observe-plugin-improvement** | Session end | Captures high-confidence plugin gaps as structured observations |
+| Skill | Referenced by | Description |
+|-------|--------------|-------------|
+| [verification](skills/verification/SKILL.md) | tdd, debug, implement, review | 5-step evidence gate: run command → read output → then claim it passes. Prevents false completion claims. |
+| [receiving-review](skills/receiving-review/SKILL.md) | implement, review | Handle maintainer feedback without sycophancy: verify before implementing suggestions. |
 
 ## Philosophy
 
-### Iron Laws, not reminders
+**Iron Laws, not reminders.** Each skill opens with one unconditional rule and a table of the rationalizations that cause violations. Addressing the thought pattern ("this task is too small for a plan") is more effective than repeating the abstract principle.
 
-Each skill opens with one unconditional rule and a table of the specific rationalizations that cause violations. This is more effective than repeating rules because it addresses the actual thought patterns ("this task is too small for a plan", "I'll add the test after") rather than the abstract principle.
+**Workflow orchestrator, not code library.** Code patterns and conventions live in each repo's `docs/development/`. The plugin tells Claude where to look and when to look — it never duplicates what the repos already document.
 
-| Skill | Iron Law |
-|-------|----------|
+**Plugin self-improvement.** Every session is evaluated asynchronously. Specific gaps (wrong claim, missing footgun, stale flag) are captured as structured observations. At the next session, you triage: raise a PR, skip, or dismiss. No PR is ever raised without your explicit choice.
+
+**Assumption surfacing before action.** The `plan` skill requires Claude to state every assumption explicitly before proposing approaches. Silent interpretation is the most common AI coding failure — this prevents it.
+
+### Iron Laws
+
+| Skill | Law |
+|-------|-----|
 | plan | NO CODE BEFORE GATE 1 |
 | implement | NO PUSH BEFORE GATE 2 |
 | tdd | NO IMPLEMENTATION CODE BEFORE A FAILING TEST |
 | debug | NO FIX ATTEMPT WITHOUT A REPRODUCIBLE FAILURE FIRST |
 | review | NO VERDICT WITHOUT READING THE DIFF AND docs/development/ FIRST |
 | verification | NO COMPLETION CLAIMS WITHOUT FRESH VERIFICATION EVIDENCE |
-
-### Workflow orchestrator, not code library
-
-Code patterns and conventions live in each repo's `docs/development/`. The plugin tells Claude where to look and enforces the process — it never duplicates what the repos already document.
-
-### Plugin self-improvement
-
-Every session is evaluated asynchronously. When a specific gap is found (wrong claim, missing footgun, stale flag), it's captured as a structured observation. At the next session, you triage: raise a PR, skip, or dismiss. No PR is ever raised without your explicit choice.
-
-### Assumption surfacing
-
-The `plan` skill requires Claude to state every assumption explicitly before proposing approaches. Silent interpretation is the most common AI coding failure — this prevents it.
 
 ## Evaluation
 
@@ -223,6 +246,23 @@ All three run in the Gardener seed cluster. The plugin knows each repo's testing
 | Dependencies | `make tidy` | `make revendor` (vendored) | `make revendor` (vendored) |
 | CI command | `make ci-checks` | `make verify` | `make check && make test` |
 | Logging | logr | logrus | zap |
+
+## Compatibility
+
+| Plugin version | etcd-druid | etcd-backup-restore | etcd-wrapper | Claude Code |
+|----------------|-----------|---------------------|--------------|-------------|
+| `0.1.x` | `v0.22+` | `v0.30+` | `v0.7+` | Any version with plugin support |
+
+The plugin targets the current `master` branch of each repo. For older release branches, skills still apply but some make targets and file paths may differ — consult that branch's `docs/development/`.
+
+## Getting Help
+
+1. **Check the reference skill first** — `/etcd-druid:reference` covers make targets, file paths, flags, and git workflow for all three repos.
+2. **Review the evaluation guide** — [`docs/evaluation.md`](docs/evaluation.md) explains how the plugin is tested and how to reproduce results.
+3. **Search existing issues** — [github.com/seshachalam-yv/etcd-druid-skills/issues](https://github.com/seshachalam-yv/etcd-druid-skills/issues)
+4. **Open a new issue** — include the skill name, what you expected, and what actually happened.
+
+For questions about the underlying etcd ecosystem (not the plugin), the best places are the [Gardener community page](https://gardener.cloud/community/) and the respective repo's GitHub Discussions.
 
 ## Contributing
 
