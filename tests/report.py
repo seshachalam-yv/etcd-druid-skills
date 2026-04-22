@@ -108,3 +108,98 @@ def load_result(test_dir: str) -> dict:
         }
     with open(p) as f:
         return json.load(f)
+
+
+def collect_results(run_dir: str) -> list:
+    """Walk <run_dir>/<suite>/<test>/ and return one dict per test case.
+
+    Each dict has:
+        name, suite, result, failure_message, duration_s,
+        skill_invoked, tokens, cost_usd, tools_used, log_path
+    """
+    run_path = Path(run_dir)
+    rows = []
+    for suite_dir in sorted(run_path.iterdir()):
+        if not suite_dir.is_dir():
+            continue
+        suite = suite_dir.name
+        if suite not in ('trigger', 'compliance'):
+            continue
+        for test_dir in sorted(suite_dir.iterdir()):
+            if not test_dir.is_dir():
+                continue
+            log = test_dir / 'claude-output.json'
+            transcript = parse_transcript(str(log)) if log.exists() else {
+                'skill_invoked': None, 'tokens': 0, 'cost_usd': 0.0, 'tools_used': []
+            }
+            result = load_result(str(test_dir))
+            rows.append({
+                'name':            result.get('name', test_dir.name),
+                'suite':           suite,
+                'result':          result.get('result', 'other'),
+                'failure_message': result.get('failure_message'),
+                'duration_s':      result.get('duration_s', 0),
+                'skill_invoked':   transcript['skill_invoked'],
+                'tokens':          transcript['tokens'],
+                'cost_usd':        transcript['cost_usd'],
+                'tools_used':      transcript['tools_used'],
+                'log_path':        str(log) if log.exists() else None,
+            })
+    return rows
+
+
+def emit_ctrf(results: list, out_path: str, run_dir: str = '') -> None:
+    """Write CTRF 1.0.0 summary.json to out_path."""
+    now_ms = int(time.time() * 1000)
+
+    status_map = {'passed': 'passed', 'failed': 'failed',
+                  'skipped': 'skipped', 'pending': 'pending', 'other': 'other'}
+
+    summary = {
+        'tests':   len(results),
+        'passed':  sum(1 for r in results if r['result'] == 'passed'),
+        'failed':  sum(1 for r in results if r['result'] == 'failed'),
+        'skipped': sum(1 for r in results if r['result'] == 'skipped'),
+        'pending': sum(1 for r in results if r['result'] == 'pending'),
+        'other':   sum(1 for r in results if r['result'] not in ('passed','failed','skipped','pending')),
+        'start':   now_ms - sum(r['duration_s'] for r in results) * 1000,
+        'stop':    now_ms,
+    }
+
+    tests = []
+    for r in results:
+        entry = {
+            'name':     r['name'],
+            'status':   status_map.get(r['result'], 'other'),
+            'duration': r['duration_s'] * 1000,
+            'suite':    [r['suite']],
+            'tags':     ['skill-trigger' if r['suite'] == 'trigger' else 'iron-law'],
+        }
+        if r['failure_message']:
+            entry['message'] = r['failure_message']
+        if r['skill_invoked']:
+            entry['ai'] = f"skill etcd-druid:{r['skill_invoked']} invoked correctly"
+        elif r['result'] == 'failed':
+            entry['ai'] = 'Claude answered directly without loading skill'
+        entry['extra'] = {
+            k: v for k, v in {
+                'skill_invoked': r['skill_invoked'],
+                'cost_usd':      round(r['cost_usd'], 4),
+                'tokens':        r['tokens'],
+                'log_path':      r['log_path'],
+            }.items() if v is not None
+        }
+        tests.append(entry)
+
+    ctrf = {
+        'reportFormat': 'CTRF',
+        'specVersion':  '1.0.0',
+        'results': {
+            'tool':    {'name': 'etcd-druid-skills-eval'},
+            'summary': summary,
+            'tests':   tests,
+        }
+    }
+
+    with open(out_path, 'w') as f:
+        json.dump(ctrf, f, indent=2)
