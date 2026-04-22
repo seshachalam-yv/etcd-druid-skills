@@ -89,3 +89,22 @@ def parse_transcript(jsonl_path: str) -> dict:
         'cost_usd': cost_usd,
         'tools_used': tools_seen,
     }
+
+
+def load_result(test_dir: str) -> dict:
+    """Load the result.json sidecar written by a runner script.
+
+    Returns a dict with keys: result, failure_message, duration_s, suite, name.
+    If result.json is missing, returns status 'other' with a diagnostic message.
+    """
+    p = Path(test_dir) / 'result.json'
+    if not p.exists():
+        return {
+            'result': 'other',
+            'failure_message': f'result.json missing in {test_dir}',
+            'duration_s': 0,
+            'suite': Path(test_dir).parent.name,
+            'name': Path(test_dir).name,
+        }
+    with open(p) as f:
+        return json.load(f)

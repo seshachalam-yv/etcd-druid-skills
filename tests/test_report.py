@@ -54,8 +54,26 @@ def test_parse_tokens():
         assert result['tokens'] == 5300
         assert abs(result['cost_usd'] - (5000 * 3 / 1e6 + 300 * 15 / 1e6)) < 0.0001
 
+def test_load_result_pass():
+    with tempfile.TemporaryDirectory() as d:
+        r = {'result': 'passed', 'failure_message': None,
+             'duration_s': 14, 'suite': 'trigger', 'name': 'plan-naive'}
+        with open(os.path.join(d, 'result.json'), 'w') as f:
+            json.dump(r, f)
+        loaded = report.load_result(d)
+        assert loaded['result'] == 'passed'
+        assert loaded['duration_s'] == 14
+
+def test_load_result_missing():
+    with tempfile.TemporaryDirectory() as d:
+        loaded = report.load_result(d)
+        assert loaded['result'] == 'other'
+        assert 'result.json missing' in loaded['failure_message']
+
 if __name__ == '__main__':
     test_parse_skill_invoked()
     test_parse_no_skill()
     test_parse_tokens()
+    test_load_result_pass()
+    test_load_result_missing()
     print('All tests passed.')
