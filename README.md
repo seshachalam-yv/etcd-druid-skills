@@ -103,7 +103,7 @@ If the reference card appears with your current git state, you're set.
 /plugin marketplace update seshachalam-yv-etcd-druid-skills
 ```
 
-## The Basic Workflow
+## Workflow
 
 ```
  Issue / Bug Report
@@ -159,12 +159,33 @@ plan ──► implement ──┬──► api-change*  ──► CEL, two-comm
    * = auto-activates on .go edits
 ```
 
-The core loop is **plan → Gate 1 → implement → Gate 2 → PR**. Everything else supports it:
+The core loop is **plan → Gate 1 → implement → Gate 2 → PR**. Every skill supports a phase of this loop.
 
-- **api-change** activates when API types are touched — CEL validation, two-commit generate workflow, CRD tests
-- **tdd** activates when tests are written — correct framework per repo, Red-Green-Refactor
-- **debug** activates when something breaks — systematic root cause, reproduce before fix
-- **review** runs before Gate 2 — full-diff review against `docs/development/` conventions
+### Skills
+
+**Planning & Execution**
+
+| Skill | Invoke | Description |
+|-------|--------|-------------|
+| [plan](skills/plan/SKILL.md) | `/etcd-druid:plan` | Issue intake → approach selection → code plan with WHEN/THEN acceptance criteria. Outputs an approved plan file. **Gate 1** blocks all code until you approve. |
+| [implement](skills/implement/SKILL.md) | `/etcd-druid:implement` | Worktree setup → per-task subagent loop (implementer → spec-reviewer → code-reviewer) → CI verify → PR draft. **Gate 2** blocks push until you approve. |
+
+**Domain-Specific**
+
+| Skill | Invoke | Auto-activates | Description |
+|-------|--------|----------------|-------------|
+| [api-change](skills/api-change/SKILL.md) | `/etcd-druid:api-change` | `api/**/*.go` edits | Field design, CEL validation (field-scoped + cross-field), kubebuilder markers, two-commit generate workflow, CRD integration tests |
+| [tdd](skills/tdd/SKILL.md) | `/etcd-druid:tdd` | `*.go` edits | Red-Green-Refactor per repo; correct framework (Go native for druid/wrapper, Ginkgo v2 for backup-restore); fake client patterns; testing anti-patterns |
+| [debug](skills/debug/SKILL.md) | `/etcd-druid:debug` | `*.go` edits | 6-phase root cause analysis, Delve, per-repo log analysis, build failure triage |
+| [e2e](skills/e2e/SKILL.md) | `/etcd-druid:e2e` | — | KIND cluster setup, custom sidecar image builds, IMAGEVECTOR_OVERWRITE, pre-PR CI |
+
+**Quality & Reference**
+
+| Skill | Invoke | Auto-activates | Description |
+|-------|--------|----------------|-------------|
+| [review](skills/review/SKILL.md) | `/etcd-druid:review` | `*.go` edits | 10-step checklist, 15 known footguns, Prow labels, release notes; runs as an isolated read-only subagent |
+| [reference](skills/reference/SKILL.md) | `/etcd-druid:reference` | — | Make targets, file paths, feature gates, CLI flags, dependency management, cherry-pick workflow |
+| [observations](skills/observations/SKILL.md) | `/etcd-druid:observations` | — | Triage plugin self-improvement findings: raise PR, skip, or dismiss |
 
 ## What's Inside
 
