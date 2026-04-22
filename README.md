@@ -15,6 +15,37 @@ Without this plugin, an LLM working in etcd-druid makes the same mistakes every 
 
 When you start a session in any etcd-druid, etcd-backup-restore, or etcd-wrapper checkout, the plugin auto-detects the repo, reads the relevant `docs/development/` guide, and activates the right skills — no configuration required.
 
+## Without vs. With This Plugin
+
+<table>
+<tr>
+<th>Generic Claude on an API change task</th>
+<th>With etcd-druid-skills</th>
+</tr>
+<tr>
+<td>
+
+- Edits `zz_generated_deepcopy.go` directly
+- Uses `gomega` in etcd-druid unit tests (wrong — Go native + Gomega only in specific pattern)
+- Forgets `make generate` after adding a field
+- Skips CEL validation entirely
+- Opens a PR without `release-note` Prow label
+- No plan written; jumps straight to implementation
+
+</td>
+<td>
+
+- **Blocks** edits to any `zz_generated_*` file via hook
+- Reads `docs/development/` for the repo before touching any file
+- Follows the **two-commit rule**: one commit adds the field, a second runs `make generate`
+- Places CEL validation in the correct file with field-scoped + cross-field rules
+- Drafts PR body with `release-note` block and correct Prow labels
+- Writes a plan with WHEN/THEN acceptance criteria; waits for Gate 1 before any code
+
+</td>
+</tr>
+</table>
+
 ## Installation
 
 ### Claude Code (Marketplace)
