@@ -359,6 +359,22 @@ Defined in `api/config/v1alpha1/features.go`. Configured via `OperatorConfigurat
 
 ---
 
+## Cross-Container Contracts
+
+When adding a new container image (via a feature gate or otherwise), verify the contract with every container it shares a Pod with. The source of truth is the consuming container's bootstrap/init code — not the docs, which can lag.
+
+| Contract point | Where to verify |
+|----------------|-----------------|
+| Endpoints the new container must expose | Read the consuming container's HTTP client source (e.g., `internal/brclient/brclient.go` in etcd-wrapper) |
+| Readiness/liveness probe paths | `internal/component/statefulset/builder.go` in etcd-druid — probes are hardcoded here |
+| Pod identity (name, namespace) | Check whether the container reads these from env vars (`MY_POD_NAME`, `MY_POD_NAMESPACE`) vs CLI flags vs downward API — all three patterns exist |
+| TLS config shared between containers | Check `OperatorConfiguration` and the StatefulSet builder for how certs are mounted and passed |
+| Init container ordering | Check `StatefulSet.Spec.InitContainers` in the StatefulSet builder — wrong ordering causes bootstrap deadlock |
+
+Read `docs/concepts/bootstrap.md` in etcd-wrapper for the lifecycle diagram before touching any container that participates in the init sequence.
+
+---
+
 ## etcd-backup-restore Flags — Key Changes
 
 | Flag | Status | Version | Notes |

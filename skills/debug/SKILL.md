@@ -261,6 +261,26 @@ envtest starts a real API server and etcd for integration tests. Common issues:
 - Multiple changes in one attempt — you can't know what worked
 - "One more quick fix" after two failures — see Phase 6
 
+---
+
+## Common Go Gotchas
+
+### Nil interface vs nil concrete value
+
+A nil pointer dereference on an interface method call often means the interface variable is non-nil but holds a nil concrete value. This happens when a function returns `(*ConcreteType, error)` and the concrete pointer is `nil` on the error path — assigning that result directly to an interface variable produces a non-nil interface that panics on any method call.
+
+Fix: only assign to the interface variable inside an `if err == nil` block, using an intermediate concrete variable. See the Go specification section on [Interface values](https://go.dev/ref/spec#Interface_types) for the underlying rule.
+
+When debugging: if `panic: runtime error: invalid memory address or nil pointer dereference` occurs on an interface method call and the nil guard passes, check whether the interface was assigned from a function returning a pointer type — the pointer being nil does not make the interface nil.
+
+### Container crash debugging in Kubernetes
+
+When a Pod container crashes in e2e:
+1. `kubectl logs <pod> -c <container> --previous` — get logs from the crashed instance
+2. Go panic stack traces show the exact `file:line` — read them fully before changing any code
+3. If the crash is in initialisation, check whether required endpoints or services are reachable before the container starts
+4. If the crash is intermittent, add `-race` to your test binary or run `go test -count=1 -race ./...` locally before concluding it is a logic bug
+
 ## Handoff
 
 - Root cause identified, fix implemented → apply verification gate (`skills/verification/SKILL.md`)
