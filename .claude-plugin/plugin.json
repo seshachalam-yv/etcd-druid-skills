@@ -8,6 +8,7 @@
   "homepage": "https://github.com/seshachalam-yv/etcd-druid-skills",
   "repository": "https://github.com/seshachalam-yv/etcd-druid-skills",
   "license": "Apache-2.0",
+  "icon": "../docs/icon.svg",
   "keywords": [
     "etcd-druid",
     "etcd-backup-restore",
