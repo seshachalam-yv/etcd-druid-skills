@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.0] - 2026-04-22
+
+### Documentation
+- *(readme)* Add Gardener-style logo with amber lightning bolt (#9) ([853d7ee](https://github.com/seshachalam-yv/etcd-druid-skills/commit/853d7eedd109c062d7b75797f79e4e782ed2fe97))
+- *(readme)* Add Gardener-style logo with amber lightning bolt (#8) ([8dddd6a](https://github.com/seshachalam-yv/etcd-druid-skills/commit/8dddd6a3b3294da2a7a2d4062f0ea94f6c11e2db))
+- *(readme)* Full redesign to industry-standard quality (#6) ([94996a4](https://github.com/seshachalam-yv/etcd-druid-skills/commit/94996a4e67eb6478dd045a5c4e84549810738546))
+- Replace Mermaid diagrams with compact ASCII workflow art ([2297713](https://github.com/seshachalam-yv/etcd-druid-skills/commit/2297713b2c7bf7062f00bc9bbae2548466aa301a))
+- Add Mermaid workflow and skill interaction diagrams to README ([4debd2f](https://github.com/seshachalam-yv/etcd-druid-skills/commit/4debd2f2138c236209d50497beea87b951347045))
+- Rewrite README to match plugin ecosystem conventions ([6676cb1](https://github.com/seshachalam-yv/etcd-druid-skills/commit/6676cb1c537a059e2c926af00f6fedc8bd8afa83))
+- Add evaluation guide, test definitions, and results ([2f704fe](https://github.com/seshachalam-yv/etcd-druid-skills/commit/2f704fee709d40efce788a48398295ffd7c8a78d))
+
+
+### Features
+- *(skills)* Skill improvements from obs-001 through obs-006 (#4) ([1d58e74](https://github.com/seshachalam-yv/etcd-druid-skills/commit/1d58e7499e6576c11c2a881d463c01341cc10d81))
+- Improve plugin based on upstream PR evaluation ([a4c3544](https://github.com/seshachalam-yv/etcd-druid-skills/commit/a4c354483fd43215bf1aacb4da6ad1501ce505e6))
+
+
+### Fixes
+- Address gaps found in evaluation iteration 1 ([f32e939](https://github.com/seshachalam-yv/etcd-druid-skills/commit/f32e93973ac4dfa81cd69ed5256228d4f4499f3b))
+
+
 ## [0.1.1] - 2026-04-21
 
 ### CI / Infrastructure
