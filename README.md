@@ -187,46 +187,6 @@ The core loop is **plan → Gate 1 → implement → Gate 2 → PR**. Every skil
 | [reference](skills/reference/SKILL.md) | `/etcd-druid:reference` | — | Make targets, file paths, feature gates, CLI flags, dependency management, cherry-pick workflow |
 | [observations](skills/observations/SKILL.md) | `/etcd-druid:observations` | — | Triage plugin self-improvement findings: raise PR, skip, or dismiss |
 
-## What's Inside
-
-### Skills (9 user-invocable)
-
-**Planning & Execution**
-- **plan** — Issue intake, approach selection, code plan with WHEN/THEN acceptance criteria. Gate 1.
-- **implement** — Worktree setup, per-task subagent loop (implementer → spec-reviewer → code-reviewer), CI verification, PR creation. Gate 2.
-
-**Domain-Specific**
-- **api-change** — Field design, CEL validation (field-scoped + cross-field), kubebuilder markers, two-commit generate workflow, CRD integration tests
-- **tdd** — Framework per repo (Go native for druid/wrapper, Ginkgo v2 for backup-restore), fake client patterns, testing anti-patterns
-- **debug** — 6-phase root cause analysis, Delve debugging, per-repo log analysis, build failure triage tables
-- **e2e** — KIND cluster setup, custom sidecar image builds, IMAGEVECTOR_OVERWRITE, pre-PR CI
-
-**Quality**
-- **review** — 10-step checklist, 15 known footguns, Gardener PR conventions (Prow labels, release notes), repo-specific framework validation
-- **reference** — Make targets, file paths, feature gates, CLI flags, dependency management, cherry-pick workflow
-- **observations** — Triage plugin self-improvement findings. Choose: raise PR, skip, or dismiss.
-
-### Cross-Cutting (referenced by skills, not user-invocable)
-
-- **verification** — 5-step evidence gate: run command → read output → then claim it passes
-- **receiving-review** — Handle maintainer feedback without sycophancy: verify before implementing
-
-### Subagent Prompts
-
-- **implementer-prompt.md** — Task implementation with TDD, self-review checklist
-- **spec-reviewer-prompt.md** — Verify implementation matches acceptance criteria
-- **code-reviewer-prompt.md** — Validate conventions, patterns, quality
-
-### Hooks (5 active)
-
-| Hook | When | What |
-|------|------|------|
-| **session-start** | Session start, worktree create, post-compaction | Injects domain orientation, detects active repo, surfaces pending observations |
-| **guard-generated-files** | Before Edit/Write | **Blocks** edits to generated files (`zz_generated*`, CRDs, `client/`) |
-| **check-dev-docs** | After Edit/Write | Reminds to read the relevant `docs/development/` guide for the file being edited |
-| **detect-correction** | User message submitted | Watches for correction phrases to trigger the plugin self-improvement evaluator |
-| **observe-plugin-improvement** | Session end | Captures high-confidence plugin gaps as structured observations |
-
 ## Philosophy
 
 **Iron Laws, not reminders.** Each skill opens with one unconditional rule and a table of the rationalizations that cause violations. Addressing the thought pattern ("this task is too small for a plan") is more effective than repeating the abstract principle.
