@@ -140,6 +140,30 @@ def test_emit_highlights():
         assert '## Failures' in md
         assert 'api-change-naive' in md.split('## Failures')[1]
 
+import xml.etree.ElementTree as ET
+
+def test_emit_junit():
+    with tempfile.TemporaryDirectory() as d:
+        make_run_dir(d, [
+            ('trigger', 'plan-naive', 'plan', True, 12000, 0.04, 14),
+            ('trigger', 'api-change-naive', None, False, 9000, 0.03, 10),
+        ])
+        results = report.collect_results(d)
+        out = os.path.join(d, 'report.xml')
+        report.emit_junit(results, out)
+        tree = ET.parse(out)
+        root = tree.getroot()
+        assert root.tag == 'testsuites'
+        suites = list(root)
+        assert len(suites) >= 1
+        all_cases = [c for s in suites for c in s if c.tag == 'testcase']
+        names = [c.get('name') for c in all_cases]
+        assert 'plan-naive' in names
+        assert 'api-change-naive' in names
+        failures = [c for c in all_cases if c.find('failure') is not None]
+        assert len(failures) == 1
+        assert failures[0].get('name') == 'api-change-naive'
+
 if __name__ == '__main__':
     test_parse_skill_invoked()
     test_parse_no_skill()
@@ -149,4 +173,5 @@ if __name__ == '__main__':
     test_collect_results()
     test_emit_ctrf()
     test_emit_highlights()
+    test_emit_junit()
     print('All tests passed.')

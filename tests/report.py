@@ -241,3 +241,120 @@ def emit_highlights(results: list, out_path: str) -> None:
 
     with open(out_path, 'w') as f:
         f.write('\n'.join(lines) + '\n')
+
+
+def emit_junit(results: list, out_path: str) -> None:
+    """Write JUnit XML report.xml."""
+    by_suite = defaultdict(list)
+    for r in results:
+        by_suite[r['suite']].append(r)
+
+    testsuites = ET.Element('testsuites')
+    for suite_name, cases in sorted(by_suite.items()):
+        failures = sum(1 for c in cases if c['result'] == 'failed')
+        ts = ET.SubElement(testsuites, 'testsuite',
+                           name=suite_name,
+                           tests=str(len(cases)),
+                           failures=str(failures),
+                           time=str(sum(c['duration_s'] for c in cases)))
+        for c in cases:
+            tc = ET.SubElement(ts, 'testcase',
+                               name=c['name'],
+                               classname=suite_name,
+                               time=str(c['duration_s']))
+            if c['result'] == 'failed':
+                fail = ET.SubElement(tc, 'failure',
+                                     message=c['failure_message'] or 'assertion failed')
+                fail.text = c['failure_message'] or ''
+    tree = ET.ElementTree(testsuites)
+    ET.indent(tree, space='  ')
+    tree.write(out_path, xml_declaration=True, encoding='utf-8')
+
+
+def print_rich_table(results: list) -> None:
+    """Print a rich-formatted results table to stdout."""
+    try:
+        from rich.console import Console
+        from rich.table import Table
+        from rich import box
+    except ImportError:
+        for r in results:
+            icon = 'PASS' if r['result'] == 'passed' else 'FAIL'
+            print(f"  {icon}  {r['name']:<30}  {r['skill_invoked'] or '(none)':<20}  "
+                  f"{r['duration_s']}s  ${r['cost_usd']:.3f}")
+        return
+
+    console = Console()
+    table = Table(title='Eval Results', box=box.ROUNDED, show_lines=False)
+    table.add_column('Test',     style='white',   no_wrap=True)
+    table.add_column('Result',   justify='center')
+    table.add_column('Suite',    style='dim')
+    table.add_column('Skill',    style='cyan')
+    table.add_column('Duration', justify='right', style='dim')
+    table.add_column('Cost',     justify='right', style='dim')
+    table.add_column('Tokens',   justify='right', style='dim')
+
+    for r in results:
+        icon  = '[green]✅ PASS[/]' if r['result'] == 'passed' else '[red]❌ FAIL[/]'
+        skill = f"etcd-druid:{r['skill_invoked']}" if r['skill_invoked'] else '[dim](none)[/]'
+        table.add_row(
+            r['name'], icon, r['suite'], skill,
+            f"{r['duration_s']}s", f"${r['cost_usd']:.3f}", f"{r['tokens']:,}"
+        )
+
+    console.print(table)
+
+    failures = [r for r in results if r['result'] != 'passed']
+    if failures:
+        console.print('\n[bold red]Failures:[/]')
+        for r in failures:
+            console.print(f"  [red]{r['name']}[/] — {r['failure_message'] or 'assertion failed'}")
+            if r['log_path']:
+                console.print(f"    Log: {r['log_path']}", style='dim')
+
+
+def main():
+    if len(sys.argv) < 2:
+        print('Usage: report.py <run-dir>', file=sys.stderr)
+        sys.exit(1)
+
+    run_dir = sys.argv[1]
+    if not Path(run_dir).is_dir():
+        print(f'Error: {run_dir} is not a directory', file=sys.stderr)
+        sys.exit(1)
+
+    results = collect_results(run_dir)
+    if not results:
+        print(f'No test results found in {run_dir}', file=sys.stderr)
+        sys.exit(1)
+
+    print_rich_table(results)
+
+    summary_path    = os.path.join(run_dir, 'summary.json')
+    highlights_path = os.path.join(run_dir, 'HIGHLIGHTS.md')
+    junit_path      = os.path.join(run_dir, 'report.xml')
+
+    emit_ctrf(results, summary_path, run_dir=run_dir)
+    emit_highlights(results, highlights_path)
+    emit_junit(results, junit_path)
+
+    passed = sum(1 for r in results if r['result'] == 'passed')
+    total  = len(results)
+    total_cost = sum(r['cost_usd'] for r in results)
+    print(f'\nResults: {passed}/{total} passed  |  cost: ${total_cost:.2f}')
+    print(f'  summary.json  → {summary_path}')
+    print(f'  HIGHLIGHTS.md → {highlights_path}')
+    print(f'  report.xml    → {junit_path}')
+
+    step_summary = os.environ.get('GITHUB_STEP_SUMMARY')
+    if step_summary:
+        with open(highlights_path) as f:
+            md = f.read()
+        with open(step_summary, 'a') as f:
+            f.write(md)
+
+    sys.exit(0 if passed == total else 1)
+
+
+if __name__ == '__main__':
+    main()
