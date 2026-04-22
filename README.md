@@ -46,6 +46,17 @@ When you start a session in any etcd-druid, etcd-backup-restore, or etcd-wrapper
 </tr>
 </table>
 
+## Requirements
+
+| Requirement | Minimum |
+|-------------|---------|
+| Claude Code | 1.x (any version with plugin support) |
+| Claude model | `claude-sonnet-4-5` or newer (Haiku floor was raised; Opus recommended for `plan` and `implement`) |
+| Repos supported | `gardener/etcd-druid`, `gardener/etcd-backup-restore`, `gardener/etcd-wrapper` |
+| OS | macOS, Linux (anywhere Claude Code runs) |
+
+The plugin auto-detects which repo you are in at session start. It does not modify any repo files — all changes are in your Claude Code session context.
+
 ## Installation
 
 ### Claude Code (Marketplace)
