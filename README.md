@@ -280,6 +280,23 @@ All three run in the Gardener seed cluster. The plugin knows each repo's testing
 | CI command | `make ci-checks` | `make verify` | `make check && make test` |
 | Logging | logr | logrus | zap |
 
+## Compatibility
+
+| Plugin version | etcd-druid | etcd-backup-restore | etcd-wrapper | Claude Code |
+|----------------|-----------|---------------------|--------------|-------------|
+| `0.1.x` | `v0.22+` | `v0.30+` | `v0.7+` | Any version with plugin support |
+
+The plugin targets the current `master` branch of each repo. For older release branches, skills still apply but some make targets and file paths may differ — consult that branch's `docs/development/`.
+
+## Getting Help
+
+1. **Check the reference skill first** — `/etcd-druid:reference` covers make targets, file paths, flags, and git workflow for all three repos.
+2. **Review the evaluation guide** — [`docs/evaluation.md`](docs/evaluation.md) explains how the plugin is tested and how to reproduce results.
+3. **Search existing issues** — [github.com/seshachalam-yv/etcd-druid-skills/issues](https://github.com/seshachalam-yv/etcd-druid-skills/issues)
+4. **Open a new issue** — include the skill name, what you expected, and what actually happened.
+
+For questions about the underlying etcd ecosystem (not the plugin), the best places are the [Gardener Slack](https://gardener.cloud/community/community-calls/) and the respective repo's GitHub Discussions.
+
 ## Contributing
 
 **Skill workflow fixes:** Edit `skills/<name>/SKILL.md` and open a PR against this repo.
