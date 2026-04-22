@@ -1,0 +1,108 @@
+name: eval
+
+on:
+  pull_request:
+    paths:
+      - 'skills/**'
+      - 'hooks/**'
+      - 'tests/**'
+  workflow_dispatch:
+    inputs:
+      suite:
+        description: 'Which suite to run'
+        required: false
+        default: 'trigger'
+        type: choice
+        options:
+          - trigger
+          - compliance
+          - all
+
+jobs:
+  trigger-tests:
+    name: Trigger accuracy tests
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'pull_request' || inputs.suite == 'trigger' || inputs.suite == 'all' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install claude CLI
+        run: npm install -g @anthropic-ai/claude-code
+
+      - name: Install Python deps
+        run: pip install rich
+
+      - name: Authenticate
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: echo "ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY" >> $GITHUB_ENV
+
+      - name: Run trigger tests
+        run: bash tests/trigger/run-all.sh
+
+      - name: Write step summary
+        if: always()
+        run: |
+          LATEST=$(ls -td /tmp/etcd-druid-skills-tests/*/ 2>/dev/null | head -1)
+          if [ -f "$LATEST/HIGHLIGHTS.md" ]; then
+            cat "$LATEST/HIGHLIGHTS.md" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Publish CTRF test results
+        if: always()
+        uses: ctrf-io/github-test-reporter@v1
+        with:
+          report-path: /tmp/etcd-druid-skills-tests/*/summary.json
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload transcripts and reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trigger-results
+          path: /tmp/etcd-druid-skills-tests/
+
+  compliance-tests:
+    name: Iron Law compliance tests
+    runs-on: ubuntu-latest
+    if: ${{ inputs.suite == 'compliance' || inputs.suite == 'all' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install claude CLI
+        run: npm install -g @anthropic-ai/claude-code
+
+      - name: Install Python deps
+        run: pip install rich
+
+      - name: Authenticate
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: echo "ANTHROPIC_API_KEY=$ANTHROPIC_API_KEY" >> $GITHUB_ENV
+
+      - name: Run compliance tests
+        run: bash tests/compliance/run-all.sh
+
+      - name: Write step summary
+        if: always()
+        run: |
+          LATEST=$(ls -td /tmp/etcd-druid-skills-tests/*/ 2>/dev/null | head -1)
+          if [ -f "$LATEST/HIGHLIGHTS.md" ]; then
+            cat "$LATEST/HIGHLIGHTS.md" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Publish CTRF test results
+        if: always()
+        uses: ctrf-io/github-test-reporter@v1
+        with:
+          report-path: /tmp/etcd-druid-skills-tests/*/summary.json
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload transcripts and reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: compliance-results
+          path: /tmp/etcd-druid-skills-tests/
