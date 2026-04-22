@@ -66,7 +66,8 @@ The plugin auto-detects which repo you are in at session start. It does not modi
 /plugin install etcd-druid-skills@seshachalam-yv-etcd-druid-skills
 ```
 
-### Manual (settings.json)
+<details>
+<summary><strong>Manual install (settings.json)</strong></summary>
 
 ```json
 {
@@ -83,6 +84,8 @@ The plugin auto-detects which repo you are in at session start. It does not modi
   }
 }
 ```
+
+</details>
 
 ### Verify
 
