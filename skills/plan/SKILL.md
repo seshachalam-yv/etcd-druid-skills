@@ -92,6 +92,22 @@ Path: <absolute path to local fork, e.g. /home/user/go/src/github.com/me/etcd-dr
 [ ] Controller change (internal/controller/)
 [ ] Test only
 
+## Feature Gate Impact Checklist *(required when the change introduces or modifies a feature gate that affects container images, args, or cross-container behaviour; omit otherwise)*
+
+Follow the pattern of existing gates — search for `UseEtcdWrapper` or `UpgradeEtcdVersion` across the codebase to find every touch point. The full lifecycle (Alpha → Beta → GA) is documented in `docs/deployment/feature-gates.md` in the etcd-druid repo.
+
+- [ ] Gate definition: `api/config/v1alpha1/features.go` — name, maturity level, default
+- [ ] Image key constant: `internal/common/constants.go`
+- [ ] Image selection logic: `internal/utils/image.go`
+- [ ] Default image entry: `internal/images/images.yaml`
+- [ ] Container spec (args, ports, probes): `internal/component/statefulset/builder.go`
+- [ ] Test image vector: `test/utils/constants.go` + `test/utils/imagevector.go`
+- [ ] Helm chart values: `charts/values.yaml` — add operator config toggle if applicable
+- [ ] Cross-container contract: verify the new image satisfies every endpoint expected by other containers in the same Pod (read the consuming container's bootstrap/init source — not just the docs)
+- [ ] Readiness/liveness probes: confirm probes still target a valid endpoint after the image swap
+- [ ] Pod identity: confirm the new container receives pod name/namespace correctly (env vars vs CLI flags vs downward API)
+- [ ] E2e override: document how to test with a custom image build (`IMAGEVECTOR_OVERWRITE`, local KIND registry, ConfigMap mount)
+
 ## Design Summary
 Chosen approach and why. Alternatives considered.
 
