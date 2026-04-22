@@ -1,4 +1,6 @@
-# etcd-druid-skills
+<p align="center">
+  <img src="docs/logo.svg" alt="etcd-druid-skills" width="560">
+</p>
 
 **Ecosystem:** [etcd-druid](https://github.com/gardener/etcd-druid) · [etcd-backup-restore](https://github.com/gardener/etcd-backup-restore) · [etcd-wrapper](https://github.com/gardener/etcd-wrapper)
 
