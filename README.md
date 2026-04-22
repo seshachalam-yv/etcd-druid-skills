@@ -1,23 +1,19 @@
 # etcd-druid-skills
 
-Expert development workflow for the [Gardener etcd stack](https://github.com/gardener/etcd-druid) — plan, implement, test, debug, and review with full domain awareness.
+**Ecosystem:** [etcd-druid](https://github.com/gardener/etcd-druid) · [etcd-backup-restore](https://github.com/gardener/etcd-backup-restore) · [etcd-wrapper](https://github.com/gardener/etcd-wrapper)
 
-[![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.1.1-green.svg)](.claude-plugin/plugin.json)
-[![Plugin Pass Rate](https://img.shields.io/badge/eval%20pass%20rate-96%25-brightgreen.svg)](docs/evaluation.md)
-[![Inspired by Superpowers](https://img.shields.io/badge/Inspired%20by-Superpowers-orange)](https://github.com/obra/superpowers)
+<p>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-blue.svg" alt="License"></a>
+  <a href=".claude-plugin/plugin.json"><img src="https://img.shields.io/badge/version-0.1.1-green.svg" alt="Version"></a>
+  <a href="docs/evaluation.md"><img src="https://img.shields.io/badge/eval%20pass%20rate-96%25-brightgreen.svg" alt="Eval Pass Rate"></a>
+  <a href="https://github.com/obra/superpowers"><img src="https://img.shields.io/badge/Inspired%20by-Superpowers-orange" alt="Inspired by Superpowers"></a>
+</p>
 
-## How it works
+A Claude Code plugin that makes your AI coding agent a capable etcd-druid contributor — not just a code writer, but a workflow-following engineer who knows the two-commit rule, picks the right test framework per repo, protects generated files, and won't push without your approval.
 
-When you start a Claude Code session in an etcd-druid, etcd-backup-restore, or etcd-wrapper checkout, the plugin activates automatically. It knows which repo you're in, what branch you're on, and what conventions that repo expects.
+Without this plugin, an LLM working in etcd-druid makes the same mistakes every new contributor makes: editing `zz_generated_*` files, using the wrong test framework, skipping `make revendor`, placing CEL validation in the wrong file, jumping straight to code without a plan. This plugin encodes 15+ known footguns and a gated plan → implement → review workflow so those mistakes never reach your PR.
 
-Ask it to implement a feature, and it doesn't jump straight into code. It reads the GitHub issue, explores the upstream codebase, writes a structured plan with acceptance criteria, and waits for your approval before touching a single file. That's Gate 1.
-
-After you say "go", it creates an isolated worktree and works through each task using subagents — an implementer writes the code (TDD-first), a spec-reviewer checks it against the plan, and a code-reviewer validates conventions. When everything passes, it runs the full CI suite, drafts a PR body matching the team's Prow label conventions, and presents it for your final approval. That's Gate 2.
-
-It does this because the Gardener etcd ecosystem has specific rules that a general-purpose LLM doesn't know: the two-commit rule for API changes, Ginkgo v2 for etcd-backup-restore tests but Go native for etcd-druid, `make revendor` for vendored repos, CEL validation placement rules, 15+ known footguns that trip up every new contributor. The plugin encodes all of this so you don't have to re-explain it every session.
-
-And because skills trigger automatically, you don't need to do anything special. Your coding agent just knows etcd-druid.
+When you start a session in any etcd-druid, etcd-backup-restore, or etcd-wrapper checkout, the plugin auto-detects the repo, reads the relevant `docs/development/` guide, and activates the right skills — no configuration required.
 
 ## Installation
 
