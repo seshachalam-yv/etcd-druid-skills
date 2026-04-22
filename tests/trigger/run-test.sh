@@ -81,17 +81,21 @@ echo ""
 echo "Result: $passed passed, $failed failed  |  Log: $LOG_FILE"
 
 # Write sidecar for report.py
-START_TIME="${START_TIME:-$SECONDS}"
-python3 -c "
-import json
+_DURATION=$((SECONDS - START_TIME))
+_RESULT=$([ $failed -eq 0 ] && echo "passed" || echo "failed")
+_MSG=$([ $failed -eq 0 ] && echo "" || echo "trigger assertion failed — check log")
+CASE_NAME="$CASE_NAME" OUTPUT_DIR="$OUTPUT_DIR" _DURATION="$_DURATION" \
+  _RESULT="$_RESULT" _MSG="$_MSG" \
+  python3 -c "
+import json, os
 r = {
-    'name': '${CASE_NAME}',
-    'suite': 'trigger',
-    'result': 'passed' if ${failed} == 0 else 'failed',
-    'failure_message': None if ${failed} == 0 else 'trigger assertion failed — check log',
-    'duration_s': $((SECONDS - START_TIME)),
+    'name':            os.environ['CASE_NAME'],
+    'suite':           'trigger',
+    'result':          os.environ['_RESULT'],
+    'failure_message': os.environ['_MSG'] or None,
+    'duration_s':      int(os.environ['_DURATION']),
 }
-with open('${OUTPUT_DIR}/result.json', 'w') as f:
+with open(os.path.join(os.environ['OUTPUT_DIR'], 'result.json'), 'w') as f:
     json.dump(r, f)
 " 2>/dev/null || true
 
