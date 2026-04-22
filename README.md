@@ -187,6 +187,13 @@ The core loop is **plan → Gate 1 → implement → Gate 2 → PR**. Every skil
 | [reference](skills/reference/SKILL.md) | `/etcd-druid:reference` | — | Make targets, file paths, feature gates, CLI flags, dependency management, cherry-pick workflow |
 | [observations](skills/observations/SKILL.md) | `/etcd-druid:observations` | — | Triage plugin self-improvement findings: raise PR, skip, or dismiss |
 
+**Cross-cutting (referenced by skills, not directly invocable)**
+
+| Skill | Referenced by | Description |
+|-------|--------------|-------------|
+| [verification](skills/verification/SKILL.md) | tdd, debug, implement, review | 5-step evidence gate: run command → read output → then claim it passes. Prevents false completion claims. |
+| [receiving-review](skills/receiving-review/SKILL.md) | implement, review | Handle maintainer feedback without sycophancy: verify before implementing suggestions. |
+
 ## Philosophy
 
 **Iron Laws, not reminders.** Each skill opens with one unconditional rule and a table of the rationalizations that cause violations. Addressing the thought pattern ("this task is too small for a plan") is more effective than repeating the abstract principle.
@@ -255,7 +262,7 @@ The plugin targets the current `master` branch of each repo. For older release b
 3. **Search existing issues** — [github.com/seshachalam-yv/etcd-druid-skills/issues](https://github.com/seshachalam-yv/etcd-druid-skills/issues)
 4. **Open a new issue** — include the skill name, what you expected, and what actually happened.
 
-For questions about the underlying etcd ecosystem (not the plugin), the best places are the [Gardener Slack](https://gardener.cloud/community/community-calls/) and the respective repo's GitHub Discussions.
+For questions about the underlying etcd ecosystem (not the plugin), the best places are the [Gardener community page](https://gardener.cloud/community/) and the respective repo's GitHub Discussions.
 
 ## Contributing
 
