@@ -22,6 +22,18 @@ Covers three scenarios: (A) test etcd-druid changes, (B) test custom etcd-backup
 
 ---
 
+## Read the Docs First
+
+Each repo has its own e2e testing guide. Read the relevant guide before running anything locally — it contains repo-specific setup, provider prerequisites, and known quirks that are not duplicated here.
+
+| Repo | Doc path | Gist |
+|------|----------|------|
+| etcd-druid | `docs/development/running-e2e-tests.md` | KIND setup, skaffold deploy, provider flags (`PROVIDERS="none,local"`), kubeconfig location, how to run targeted tests |
+| etcd-backup-restore | `docs/development/tests.md` | Integration tests with real etcd, e2e with Localstack/FakeGCS/Azurite, perf tests, how to run with `-tags integration` |
+| etcd-wrapper | `docs/development/testing.md` | Unit test patterns (testing.T + Gomega), table-driven tests, coverage; no standalone e2e — tested via etcd-druid e2e |
+
+The CI pipeline file (`.github/workflows/`) for each repo is the authoritative list of what runs on a PR. Read it before raising a PR to know exactly which jobs must pass.
+
 ## Prerequisites
 
 Before starting, verify you have the tools:
