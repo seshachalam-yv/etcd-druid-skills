@@ -360,73 +360,72 @@ code{font-family:var(--mono);background:rgba(0,200,150,.06);padding:2px 7px;bord
     <div class="iterm-bar"><div class="td r"></div><div class="td y"></div><div class="td g"></div><span>Claude Code CLI</span></div>
     <div class="iterm-tabs">
       <div class="iterm-tab active" data-scene="0" onclick="switchScene(0)">Install</div>
-      <div class="iterm-tab" data-scene="1" onclick="switchScene(1)">Plan a task</div>
-      <div class="iterm-tab" data-scene="2" onclick="switchScene(2)">Reference</div>
+      <div class="iterm-tab" data-scene="1" onclick="switchScene(1)">Plan — issue #1230</div>
+      <div class="iterm-tab" data-scene="2" onclick="switchScene(2)">Plan output</div>
     </div>
     <div class="iterm-body" id="iterm-body">
 
       <!-- Scene 0: Install -->
       <div class="iterm-scene active" id="scene-0">
-        <div class="iterm-line"><span class="dim"># Install the plugin</span></div>
         <div class="iterm-line"><span class="prompt">❯ </span><span class="cmd">/plugin marketplace add</span> <span class="arg">seshachalam-yv/etcd-druid-skills</span></div>
-        <div class="iterm-line"><span class="ok">✓ Marketplace added</span></div>
+        <div class="iterm-line"><span class="out">  Successfully added marketplace: seshachalam-yv-etcd-druid-skills</span></div>
         <div class="iterm-line"><br></div>
         <div class="iterm-line"><span class="prompt">❯ </span><span class="cmd">/plugin install</span> <span class="arg">etcd-druid-skills@seshachalam-yv-etcd-druid-skills</span></div>
-        <div class="iterm-line"><span class="ok">✓ Installed etcd-druid-skills (11 skills, 7 hooks)</span></div>
+        <div class="iterm-line"><span class="ok">  ✓ Installed etcd-druid. Run /reload-plugins to apply.</span></div>
         <div class="iterm-line"><br></div>
         <div class="iterm-line"><span class="prompt">❯ </span><span class="cmd">/reload-plugins</span></div>
-        <div class="iterm-line"><span class="ok">✓ Reloaded: 6 plugins · 11 skills · 7 hooks · 3 subagents</span></div>
+        <div class="iterm-line"><span class="out">  Reloaded: 3 plugins · 3 skills · 5 agents · 11 hooks · 1 plugin LSP server</span></div>
         <div class="iterm-line"><br></div>
-        <div class="iterm-line"><span class="dim"># Ready to go. Try /etcd-druid:reference or /etcd-druid:plan</span></div>
+        <div class="iterm-line"><span class="dim">  (kind-etcd-druid-e2e|default) → etcd-druid claude-sonnet-latest</span></div>
       </div>
 
       <!-- Scene 1: Plan -->
       <div class="iterm-scene" id="scene-1">
         <div class="iterm-line"><span class="prompt">❯ </span><span class="cmd">/etcd-druid:plan</span> <span class="arg">https://github.com/gardener/etcd-druid/issues/1230</span></div>
         <div class="iterm-line"><br></div>
-        <div class="iterm-line"><span class="hl">🔍 Analyzing issue #1230...</span></div>
-        <div class="iterm-line"><span class="out">  Reading acceptance criteria and linked discussions</span></div>
+        <div class="iterm-line"><span class="hl">● I'll start by reading the issue and exploring the codebase to create a solid plan.</span></div>
+        <div class="iterm-line"><span class="out">● Creating planning tasks and reading the issue simultaneously.</span></div>
+        <div class="iterm-line"><span class="dim">  Ran 1 shell command</span></div>
         <div class="iterm-line"><br></div>
-        <div class="iterm-line"><span class="hl">📚 Researching codebase...</span></div>
-        <div class="iterm-line"><span class="out">  Found 3 related PRs: #1215, #1198, #1180</span></div>
-        <div class="iterm-line"><span class="out">  Checked code reviews for recurring feedback patterns</span></div>
-        <div class="iterm-line"><span class="out">  Read docs/development/api-changes.md</span></div>
+        <div class="iterm-line"><span class="out">● Now let me explore the codebase and look at comparable PRs in parallel.</span></div>
+        <div class="iterm-line"><span class="dim">  Searched for 16 patterns, read 18 files, listed 4 directories, ran 7 shell commands</span></div>
         <div class="iterm-line"><br></div>
-        <div class="iterm-line"><span class="hl">💡 Proposing approaches...</span></div>
-        <div class="iterm-line"><span class="out">  <span class="ok">A)</span> Direct controller modification — 3 files, 2 tests</span></div>
-        <div class="iterm-line"><span class="out">  <span class="ok">B)</span> New reconciler with feature gate — 5 files, 4 tests <span class="warn">← recommended</span></span></div>
+        <div class="iterm-line"><span class="out">● Now I have a thorough understanding. Let me look at a few more details.</span></div>
+        <div class="iterm-line"><span class="dim">  Searched for 2 patterns, read 2 files, listed 2 directories, ran 1 shell command</span></div>
         <div class="iterm-line"><br></div>
-        <div class="iterm-line"><span class="hl">📝 Writing plan...</span></div>
-        <div class="iterm-line"><span class="out">  Tasks: 5 with WHEN/THEN acceptance criteria</span></div>
-        <div class="iterm-line"><span class="out">  Test scope: unit + integration + e2e</span></div>
-        <div class="iterm-line"><span class="out">  API Delta: 1 new field, CEL validation required</span></div>
+        <div class="iterm-line"><span class="hl">● Now let me write the plan file.</span></div>
+        <div class="iterm-line"><span class="ok">● Write(docs/plans/2026-04-23-issue-1230-quorum-loss-recovery-task.md)</span></div>
+        <div class="iterm-line"><span class="dim">  Wrote 157 lines to docs/plans/...</span></div>
         <div class="iterm-line"><br></div>
-        <div class="iterm-line"><span class="warn">⛔ GATE 1 — Review the plan above. Type "approved" to proceed.</span></div>
+        <div class="iterm-line"><span class="hl">## Plan Summary — 5 tasks:</span></div>
+        <div class="iterm-line"><span class="out">  1. Add QuorumLossRecovery API field + CRD</span></div>
+        <div class="iterm-line"><span class="out">  2. Implement handler + register it</span></div>
+        <div class="iterm-line"><span class="out">  3. Integration test for full lifecycle</span></div>
+        <div class="iterm-line"><span class="out">  4. Usage docs + example</span></div>
+        <div class="iterm-line"><span class="out">  5. RBAC markers for new k8s operations</span></div>
         <div class="iterm-line"><br></div>
-        <div class="iterm-line"><span class="prompt">❯ </span><span class="ok">approved</span></div>
-        <div class="iterm-line"><span class="ok">✓ Gate 1 approved — starting implementation in isolated worktree...</span></div>
+        <div class="iterm-line"><span class="warn">⛔ GATE 1 — Reply "approved" to proceed, or tell me what to change.</span></div>
       </div>
 
-      <!-- Scene 2: Reference -->
+      <!-- Scene 2: Plan Output -->
       <div class="iterm-scene" id="scene-2">
-        <div class="iterm-line"><span class="prompt">❯ </span><span class="cmd">/etcd-druid:reference</span> <span class="arg">how to add an API field</span></div>
+        <div class="iterm-line"><span class="hl">## Assumptions (stated before proposing):</span></div>
         <div class="iterm-line"><br></div>
-        <div class="iterm-line"><span class="hl">┌─────────────────────────────────────────┐</span></div>
-        <div class="iterm-line"><span class="hl">│  API Field Addition — Quick Reference   │</span></div>
-        <div class="iterm-line"><span class="hl">└─────────────────────────────────────────┘</span></div>
+        <div class="iterm-line"><span class="out">  1. <span class="ok">No config fields needed</span> — .spec.config.quorumLossRecovery is empty struct</span></div>
+        <div class="iterm-line"><span class="out">  2. <span class="ok">Single-member etcds rejected</span> — backup-restore handles those</span></div>
+        <div class="iterm-line"><span class="out">  3. <span class="ok">"Quorum loss" = etcd not ready</span> — manual trigger, handler verifies</span></div>
+        <div class="iterm-line"><span class="out">  4. <span class="warn">E2e tests not required for initial PR</span> — follow-up like OnDemandSnapshot</span></div>
+        <div class="iterm-line"><span class="out">  5. <span class="ok">ConfigMap patch</span> writes single-member initial-cluster</span></div>
         <div class="iterm-line"><br></div>
-        <div class="iterm-line"><span class="out">  <span class="ok">1.</span> Add field to <span class="arg">api/core/v1alpha1/types_etcd.go</span></span></div>
-        <div class="iterm-line"><span class="out">  <span class="ok">2.</span> Add CEL validation in <span class="arg">api/core/v1alpha1/etcd_validation.go</span></span></div>
-        <div class="iterm-line"><span class="out">  <span class="ok">3.</span> Commit #1: field + validation (hand-written only)</span></div>
-        <div class="iterm-line"><span class="out">  <span class="ok">4.</span> Run: <span class="cmd">make generate</span></span></div>
-        <div class="iterm-line"><span class="out">  <span class="ok">5.</span> Commit #2: generated files only</span></div>
-        <div class="iterm-line"><span class="out">  <span class="ok">6.</span> Run: <span class="cmd">make ci-checks && make test-unit</span></span></div>
+        <div class="iterm-line"><span class="hl">## New RBAC the handler needs:</span></div>
+        <div class="iterm-line"><span class="out">  • apps/statefulsets: get, update, patch</span></div>
+        <div class="iterm-line"><span class="out">  • ""/persistentvolumeclaims: get, list, delete</span></div>
+        <div class="iterm-line"><span class="out">  • ""/configmaps: get, patch</span></div>
+        <div class="iterm-line"><span class="out">  • coordination.k8s.io/leases: get, list, delete</span></div>
+        <div class="iterm-line"><span class="out">  • druid.gardener.cloud/etcds: get, update, patch</span></div>
         <div class="iterm-line"><br></div>
-        <div class="iterm-line"><span class="warn">⚠️  Two-commit rule: NEVER mix hand-written and generated code</span></div>
-        <div class="iterm-line"><br></div>
-        <div class="iterm-line"><span class="dim">  Test framework: Go native + Gomega (NOT Ginkgo)</span></div>
-        <div class="iterm-line"><span class="dim">  Dependencies: make tidy (NOT make revendor)</span></div>
-        <div class="iterm-line"><span class="dim">  CEL: has() guard on every optional field</span></div>
+        <div class="iterm-line"><span class="dim">  Code plan written to docs/plans/2026-04-23-issue-1230-quorum-loss-recovery-task.md</span></div>
+        <div class="iterm-line"><span class="warn">  Reply "approved" to proceed, or tell me what to change.</span></div>
       </div>
 
     </div>
