@@ -45,12 +45,11 @@ code{font-family:var(--mono);background:rgba(0,200,150,.06);padding:2px 7px;bord
 .nk .gh-btn{padding:6px 14px;border-radius:8px;border:1px solid rgba(0,200,150,.2);color:var(--g);font-weight:600;font-size:.82em;transition:all .2s}
 .nk .gh-btn:hover{border-color:var(--g);background:rgba(0,200,150,.06)}
 
-/* Hero logo shrinks and fades as scroll progresses */
-.hero-logo{margin-bottom:16px;position:relative;width:160px;height:200px;display:flex;align-items:center;justify-content:center;transition:opacity .3s,transform .3s}
-.hero-logo.shrunk{opacity:0;transform:scale(.5) translateY(-40px)}
-/* Brand name fades out on scroll */
-.hero-brand{font-size:clamp(36px,6vw,56px);font-weight:800;color:var(--bright);letter-spacing:-.03em;margin-bottom:8px;font-style:italic;transition:opacity .3s,transform .3s}
-.hero-brand.shrunk{opacity:0;transform:translateY(-20px)}
+/* Hero logo and brand — just fade out, don't move */
+.hero-logo{margin-bottom:16px;position:relative;width:160px;height:200px;display:flex;align-items:center;justify-content:center;transition:opacity .4s}
+.hero-logo.shrunk{opacity:.3}
+.hero-brand{font-size:clamp(36px,6vw,56px);font-weight:800;color:var(--bright);letter-spacing:-.03em;margin-bottom:8px;font-style:italic;transition:opacity .4s}
+.hero-brand.shrunk{opacity:.3}
 .hero-logo .hex-fill{fill:#009F76;opacity:.5;animation:hexChg 6s ease-in-out infinite}
 @keyframes hexChg{0%,30%{opacity:.5;filter:brightness(.8)}40%{opacity:1;filter:brightness(1.4)}50%,100%{opacity:1;filter:brightness(1)}}
 /* Facets light up in cascade */
