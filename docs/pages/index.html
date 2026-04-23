@@ -43,7 +43,7 @@ code{font-family:var(--mono);background:rgba(0,200,150,.06);padding:2px 7px;bord
 [data-stagger].vis{opacity:1;transform:none;transition-delay:calc(var(--s,0) * 100ms)}
 
 /* ═══ HERO ═══ */
-.hero{text-align:center;padding:120px 0 0;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative}
+.hero{text-align:center;padding:60px 0 0;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative}
 .hero-eyebrow{font-size:clamp(12px,1.3vw,16px);font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--g);margin-bottom:20px;padding:5px 14px;background:rgba(0,200,150,.08);border:1px solid rgba(0,200,150,.15);border-radius:8px;display:inline-block}
 .hero-h{font-size:clamp(44px,8vw,88px);font-weight:800;line-height:1.05;letter-spacing:-.04em;color:var(--bright);max-width:900px}
 .hero-h .acc{background:linear-gradient(135deg,#f0f4ff 0%,var(--g) 52%,var(--amber) 100%);background-size:200% 200%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:gradShift 6s ease infinite}
@@ -53,8 +53,8 @@ code{font-family:var(--mono);background:rgba(0,200,150,.06);padding:2px 7px;bord
 .btn{display:inline-block;padding:14px 30px;border-radius:980px;font-weight:600;font-size:.88em;transition:all .25s}
 .btn-fill{background:linear-gradient(135deg,var(--g),var(--gd));color:#fff;border:none;box-shadow:0 4px 20px rgba(0,200,150,.2)}.btn-fill:hover{background:linear-gradient(135deg,#33dba8,var(--g));transform:scale(1.03);text-decoration:none;color:#fff;box-shadow:0 8px 30px rgba(0,200,150,.3)}
 .btn-line{color:var(--g);border:1px solid rgba(0,200,150,.25)}.btn-line:hover{border-color:var(--g);text-decoration:none;box-shadow:0 4px 20px rgba(0,200,150,.1)}
-.hero-logo{margin-bottom:28px}
-.hero-logo img{max-width:480px;width:100%}
+.hero-logo{margin-bottom:20px}
+.hero-logo img{max-width:280px;width:100%}
 .hero-scroll{margin-top:40px;color:var(--dim);font-size:.75em;letter-spacing:.1em;text-transform:uppercase;animation:bob 2s ease-in-out infinite}
 @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}
 
@@ -65,32 +65,34 @@ code{font-family:var(--mono);background:rgba(0,200,150,.06);padding:2px 7px;bord
 .counter-n{font-family:var(--mono);font-size:clamp(32px,5vw,56px);font-weight:800;color:var(--bright);line-height:1}
 .counter-l{font-size:.7em;color:var(--dim);margin-top:8px;text-transform:uppercase;letter-spacing:1.5px;font-weight:500}
 
-/* ═══ INTERACTIVE TERMINAL ═══ */
-.iterm{background:rgba(10,15,26,.85);backdrop-filter:blur(14px);border:1px solid var(--border);border-radius:16px;overflow:hidden;max-width:760px;margin:40px auto 0;position:relative}
-.iterm::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gd),var(--amber),transparent)}
-.iterm-bar{padding:10px 16px;background:rgba(255,255,255,.02);border-bottom:1px solid var(--border);display:flex;gap:6px;align-items:center}
-.iterm-bar span{color:var(--dim);font-size:.72em;font-family:var(--mono);margin-left:auto}
-.iterm-body{padding:20px 24px;font-family:var(--mono);font-size:.82em;line-height:1.8;min-height:320px;position:relative}
+/* ═══ INTERACTIVE TERMINAL (Claude Code CLI style) ═══ */
+.iterm{background:#1a1a2e;border:1px solid #2a2a40;border-radius:12px;overflow:hidden;max-width:760px;margin:40px auto 0;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.iterm::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,#d97706,transparent)}
+.iterm-bar{padding:8px 16px;background:#12121f;border-bottom:1px solid #2a2a40;display:flex;gap:6px;align-items:center}
+.iterm-bar .claude-icon{width:18px;height:18px;border-radius:4px;background:linear-gradient(135deg,#d97706,#ea580c);display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;font-weight:800}
+.iterm-bar span{color:#6b7280;font-size:.72em;font-family:var(--mono);margin-left:8px}
+.iterm-bar .bar-right{margin-left:auto;display:flex;align-items:center;gap:12px;font-size:.68em;color:#4b5563;font-family:var(--mono)}
+.iterm-bar .status-dot{width:6px;height:6px;border-radius:50%;background:#22c55e;display:inline-block}
+.iterm-body{padding:16px 20px;font-family:var(--mono);font-size:.8em;line-height:1.75;min-height:340px;position:relative;background:#0f0f1a}
 .iterm-line{opacity:0;transform:translateY(4px);transition:opacity .3s,transform .3s}
 .iterm-line.vis{opacity:1;transform:none}
-.iterm-line .prompt{color:var(--g)}
-.iterm-line .cmd{color:var(--green)}
-.iterm-line .arg{color:var(--blue)}
-.iterm-line .out{color:var(--text)}
-.iterm-line .ok{color:var(--green)}
-.iterm-line .warn{color:var(--amber)}
-.iterm-line .hl{color:var(--bright);font-weight:600}
-.iterm-line .dim{color:var(--dim)}
-.iterm-cursor{display:inline-block;width:8px;height:16px;background:var(--g);animation:curBlink 1s step-end infinite;vertical-align:middle;margin-left:2px}
+.iterm-line .prompt{color:#d97706}
+.iterm-line .cmd{color:#22c55e}
+.iterm-line .arg{color:#60a5fa}
+.iterm-line .out{color:#9ca3af}
+.iterm-line .ok{color:#22c55e}
+.iterm-line .warn{color:#eab308}
+.iterm-line .hl{color:#e5e7eb;font-weight:600}
+.iterm-line .dim{color:#4b5563}
+.iterm-cursor{display:inline-block;width:7px;height:14px;background:#d97706;animation:curBlink 1s step-end infinite;vertical-align:middle;margin-left:2px}
 @keyframes curBlink{0%,100%{opacity:1}50%{opacity:0}}
-.iterm-tabs{display:flex;gap:0;padding:0 16px;border-bottom:1px solid var(--border)}
-.iterm-tab{padding:8px 16px;font-size:.72em;font-family:var(--mono);color:var(--dim);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s}
-.iterm-tab.active{color:var(--g);border-bottom-color:var(--g)}
-.iterm-tab:hover{color:var(--bright)}
+.iterm-tabs{display:flex;gap:0;padding:0 16px;background:#12121f;border-bottom:1px solid #2a2a40}
+.iterm-tab{padding:8px 16px;font-size:.7em;font-family:var(--mono);color:#6b7280;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s}
+.iterm-tab.active{color:#d97706;border-bottom-color:#d97706}
+.iterm-tab:hover{color:#e5e7eb}
 .iterm-scene{display:none}.iterm-scene.active{display:block}
-/* Progress bar */
-.iterm-progress{height:2px;background:var(--bg2);border-radius:1px;margin:8px 0;overflow:hidden}
-.iterm-progress-fill{height:100%;background:linear-gradient(90deg,var(--g),var(--amber));width:0;transition:width .3s;border-radius:1px}
+.iterm-footer{padding:6px 16px;background:#12121f;border-top:1px solid #2a2a40;display:flex;justify-content:space-between;font-size:.65em;font-family:var(--mono);color:#4b5563}
+.iterm-footer .ctx{color:#22c55e}
 
 /* ═══ INSTALL CODE ═══ */
 .code-sec{padding:100px 0}
@@ -326,12 +328,7 @@ code{font-family:var(--mono);background:rgba(0,200,150,.06);padding:2px 7px;bord
 <div class="aurora"><div class="ab a"></div><div class="ab b"></div></div>
 <div class="grain"></div>
 
-<nav class="nav">
-<div class="ni">
-  <div class="nl"><img src="docs/icon.svg" alt=""><span>etcd-druid-skills</span></div>
-  <div class="nk"><a href="#workflow">Workflow</a><a href="#data">Data</a><a href="#skills">Skills</a><a href="#eval">Results</a><a href="https://github.com/seshachalam-yv/etcd-druid-skills">GitHub</a></div>
-</div>
-</nav>
+<!-- nav removed -->
 
 <div class="wrap">
 
@@ -357,7 +354,11 @@ code{font-family:var(--mono);background:rgba(0,200,150,.06);padding:2px 7px;bord
   <div class="sec-eyebrow" data-stagger style="--s:0">See it in action</div>
   <div class="sec-h" data-stagger style="--s:1;text-align:center">Three commands.<br>Then watch it work.</div>
   <div class="iterm" data-stagger style="--s:2" id="iterm">
-    <div class="iterm-bar"><div class="td r"></div><div class="td y"></div><div class="td g"></div><span>Claude Code CLI</span></div>
+    <div class="iterm-bar">
+      <div class="claude-icon">✦</div>
+      <span>Claude Code v2.1</span>
+      <div class="bar-right"><span class="status-dot"></span> claude-sonnet-latest · etcd-druid</div>
+    </div>
     <div class="iterm-tabs">
       <div class="iterm-tab active" data-scene="0" onclick="switchScene(0)">Install</div>
       <div class="iterm-tab" data-scene="1" onclick="switchScene(1)">Plan — issue #1230</div>
@@ -428,6 +429,10 @@ code{font-family:var(--mono);background:rgba(0,200,150,.06);padding:2px 7px;bord
         <div class="iterm-line"><span class="warn">  Reply "approved" to proceed, or tell me what to change.</span></div>
       </div>
 
+    </div>
+    <div class="iterm-footer">
+      <span>❯ <span class="iterm-cursor"></span></span>
+      <span><span class="ctx">(kind-etcd-druid-e2e|default)</span> → etcd-druid <span style="color:#d97706">claude-sonnet-latest</span></span>
     </div>
   </div>
 </section>
@@ -873,8 +878,7 @@ const flowObs=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting){
 }})},{threshold:.1});
 document.querySelectorAll('#aflow').forEach(el=>flowObs.observe(el));
 
-// Nav hide
-let ly=0;window.addEventListener('scroll',()=>{const y=scrollY;document.querySelector('.nav').style.transform=y>ly&&y>100?'translateY(-100%)':'translateY(0)';ly=y},{passive:true});
+// Nav removed
 
 // Skills data
 const sk={
