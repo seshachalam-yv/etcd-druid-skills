@@ -1,45 +1,35 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 120" width="560" height="120">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 110" width="520" height="110">
   <defs>
-    <!-- Gardener interior facet gradients -->
     <linearGradient id="fa" x1="12%" y1="-18%" x2="88%" y2="84%"><stop offset="0%" stop-color="#fff" stop-opacity=".92"/><stop offset="100%" stop-color="#439246"/></linearGradient>
     <linearGradient id="fb" x1="50%" y1="5%" x2="148%" y2="175%"><stop offset="0%" stop-color="#fff" stop-opacity=".80"/><stop offset="100%" stop-color="#439246"/></linearGradient>
     <linearGradient id="fc" x1="19%" y1="-9%" x2="82%" y2="77%"><stop offset="0%" stop-color="#fff" stop-opacity=".92"/><stop offset="100%" stop-color="#439246"/></linearGradient>
     <linearGradient id="fd" x1="57%" y1="26%" x2="137%" y2="158%"><stop offset="0%" stop-color="#fff" stop-opacity=".80"/><stop offset="100%" stop-color="#439246"/></linearGradient>
-    <!-- Amber lightning bolt gradient -->
     <linearGradient id="blt" x1="30%" y1="0%" x2="70%" y2="100%"><stop offset="0%" stop-color="#ffe680"/><stop offset="45%" stop-color="#ffb300"/><stop offset="100%" stop-color="#e67e00"/></linearGradient>
-    <!-- Amber bolt for wordmark -->
-    <linearGradient id="wblt" x1="30%" y1="0%" x2="70%" y2="100%"><stop offset="0%" stop-color="#ffe680"/><stop offset="45%" stop-color="#ffb300"/><stop offset="100%" stop-color="#e67e00"/></linearGradient>
-    <!-- Hex clip path (authentic Gardener irregular polygon, scaled) -->
+    <linearGradient id="tg" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#009F76"/><stop offset="100%" stop-color="#00c896"/></linearGradient>
     <clipPath id="hx"><path d="M40.8,2 L73.8,15.6 L76,18.6 L84.2,52.8 L82.9,56.8 L62.8,83.6 L59.3,85.3 L25.8,85.3 L22.3,83.6 L2.2,56.8 L0.9,52.8 L9.1,18.6 L11.3,15.6 Z"/></clipPath>
-    <!-- Glow filter -->
     <filter id="glo" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="1.8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
   </defs>
 
-  <!-- Hex icon (vertically centered in 120px canvas) -->
-  <g transform="translate(10,16)">
-    <!-- Gardener hex shell: #009F76 solid fill -->
+  <!-- Hex icon -->
+  <g transform="translate(8,12)">
     <path d="M40.8,2 L73.8,15.6 L76,18.6 L84.2,52.8 L82.9,56.8 L62.8,83.6 L59.3,85.3 L25.8,85.3 L22.3,83.6 L2.2,56.8 L0.9,52.8 L9.1,18.6 L11.3,15.6 Z" fill="#009F76"/>
-    <!-- Shadow overlay (Gardener-style diagonal) -->
     <polygon points="-6,54 21,24 51,59 17,92" fill="#000" opacity=".24" clip-path="url(#hx)"/>
-    <!-- Interior facets (authentic Gardener 3D gem motif) -->
     <path d="M55,39 C54.5,40.3 53.6,41.6 52.7,42.1 L44.8,47 C43.3,47.9 41,47.9 39.5,47 L31.6,42.1 C30.1,41.1 29.1,39 29.1,37.3 L29.1,27.7 C29.1,27 29.3,26.2 29.7,25.5 Z" fill="url(#fa)"/>
     <path d="M54.3,25.6 C54.7,26.3 54.8,27.2 54.8,27.8 L54.8,37.6 C54.8,39.3 53.5,41.5 52.2,42.3 L44.3,47.1 C42.8,48 40.5,48 39,47.1 L31.1,42.3 C30.4,41.8 29.7,41 29.3,40.2 Z" fill="url(#fb)"/>
     <path d="M63.5,57.8 C62.9,58.9 62.1,60 61.2,60.5 L47.2,68.6 C45.5,69.5 42.8,69.5 41.1,68.6 L27.1,60.5 C25.4,59.6 24.3,57.3 24.3,55.7 L24.3,40 C24.3,39.2 24.6,38.2 25,37.4 Z" fill="url(#fc)"/>
     <path d="M63.4,37.5 C63.9,38.3 64.1,39 64.1,39.8 L64.1,55.8 C64.1,57.4 62.9,59.6 61.2,60.5 L47.2,68.6 C45.5,69.5 42.8,69.5 41.1,68.6 L27.1,60.5 C26.3,60.1 25.7,59.3 25.2,58.5 Z" fill="url(#fd)"/>
-    <!-- Amber lightning bolt (bottom-right of hex interior) -->
     <polygon points="57,48 49,64 55,64 52,79 65,60 58,60" fill="url(#blt)" filter="url(#glo)"/>
   </g>
 
-  <!-- Divider -->
-  <line x1="112" y1="20" x2="112" y2="100" stroke="#009F76" stroke-width="1" opacity=".18"/>
+  <!-- Divider — gradient line -->
+  <line x1="106" y1="18" x2="106" y2="94" stroke="url(#tg)" stroke-width="1.5" opacity=".2"/>
 
-  <!-- Wordmark line 1: "etcd-druid" -->
-  <text x="130" y="46" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif" font-size="30" font-weight="800" fill="#009F76" letter-spacing="-0.5">etcd-druid</text>
+  <!-- "etcd-druid" — bold, single line -->
+  <text x="124" y="50" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif" font-size="32" font-weight="800" fill="url(#tg)" letter-spacing="-0.5">etcd-druid</text>
 
-  <!-- Wordmark line 2: amber bolt + "kills" -->
-  <polygon points="133,56 126,70 132,70 129,81 139,67 133,67" fill="url(#wblt)" filter="url(#glo)"/>
-  <text x="143" y="77" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif" font-size="20" font-weight="300" fill="#439246" letter-spacing="4">kills</text>
+  <!-- "skills" — lighter weight, tracking, same line height -->
+  <text x="126" y="76" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif" font-size="18" font-weight="400" fill="#439246" letter-spacing="6">skills</text>
 
   <!-- Tagline -->
-  <text x="130" y="100" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif" font-size="10.5" fill="#3a8a5c" letter-spacing="0.2">AI-powered development workflow  ·  Claude Code plugin</text>
+  <text x="124" y="98" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif" font-size="10" fill="#2d7a52" letter-spacing="0.3">Agentic development workflow  ·  Claude Code plugin</text>
 </svg>
