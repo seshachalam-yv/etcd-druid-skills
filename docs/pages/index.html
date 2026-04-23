@@ -546,8 +546,8 @@ code{font-family:var(--mono);background:rgba(0,200,150,.06);padding:2px 7px;bord
       <div class="dash-big">6</div>
       <div class="dash-sub">Steps before any code is written</div>
       <div class="mini-tl">
-        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">Read issue & acceptance criteria</span></div>
-        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">Explore codebase & related PRs</span></div>
+        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">Read issue &amp; acceptance criteria</span></div>
+        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">Explore codebase &amp; 973+ merged PRs</span></div>
         <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">State assumptions explicitly</span></div>
         <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">Propose 2-3 approaches</span></div>
         <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">Write WHEN/THEN criteria</span></div>
@@ -555,52 +555,50 @@ code{font-family:var(--mono);background:rgba(0,200,150,.06);padding:2px 7px;bord
       </div>
     </div>
 
-    <!-- Card 2: Eval donut -->
+    <!-- Card 2: Ecosystem scope -->
     <div class="dash" data-stagger style="--s:1">
-      <div class="dash-header"><h4>Convention Compliance</h4><span class="dash-badge blue">Eval</span></div>
+      <div class="dash-header"><h4>Ecosystem Coverage</h4><span class="dash-badge blue">3 Repos</span></div>
       <div class="donut-wrap">
         <div class="donut" id="donut1">
           <svg viewBox="0 0 80 80"><circle class="track" cx="40" cy="40" r="34"/><circle class="fill" cx="40" cy="40" r="34" style="--pct:0.96"/></svg>
           <div class="donut-center">96%</div>
         </div>
         <div class="donut-legend">
-          <span><span class="dot g"></span>Plugin: 96%</span>
+          <span><span class="dot g"></span>Plugin: 96% eval</span>
           <span><span class="dot d"></span>Baseline: 52%</span>
           <span style="margin-top:6px;color:var(--green);font-weight:600">+44pp lift</span>
         </div>
       </div>
     </div>
 
-    <!-- Card 3: Research depth -->
+    <!-- Card 3: Plugin architecture -->
     <div class="dash" data-stagger style="--s:2">
-      <div class="dash-header"><h4>Research Depth</h4><span class="dash-badge amber">Auto</span></div>
-      <div class="dash-big">5</div>
-      <div class="dash-sub">Sources analyzed per task</div>
+      <div class="dash-header"><h4>Plugin Architecture</h4><span class="dash-badge amber">v0.2.0</span></div>
+      <div class="dash-big">11</div>
+      <div class="dash-sub">Skills · 7 hooks · 3 subagents</div>
       <div class="mini-bars" id="research-bars">
-        <div class="mini-bar" style="height:85%"></div>
-        <div class="mini-bar" style="height:70%"></div>
-        <div class="mini-bar" style="height:95%"></div>
-        <div class="mini-bar" style="height:60%"></div>
-        <div class="mini-bar" style="height:75%"></div>
+        <div class="mini-bar" style="height:100%"></div>
+        <div class="mini-bar" style="height:64%"></div>
+        <div class="mini-bar" style="height:27%"></div>
       </div>
       <div style="display:flex;justify-content:space-between;font-size:.58em;color:var(--dim);margin-top:4px">
-        <span>Issue</span><span>PRs</span><span>Reviews</span><span>Docs</span><span>Code</span>
+        <span>Skills (11)</span><span>Hooks (7)</span><span>Subagents (3)</span>
       </div>
     </div>
 
     <!-- Card 4: Data flow (wide) -->
     <div class="dash flow-card" data-stagger style="--s:0">
-      <div class="dash-header"><h4>Data Flow — Plan to PR</h4><span class="dash-badge green">Pipeline</span></div>
+      <div class="dash-header"><h4>Data Flow — Issue to PR</h4><span class="dash-badge green">Pipeline</span></div>
       <div class="flow-nodes">
         <div class="flow-node active">GitHub Issue</div>
         <div class="flow-arr">→</div>
-        <div class="flow-node active">Codebase Scan</div>
+        <div class="flow-node active">936 commits</div>
         <div class="flow-arr">→</div>
-        <div class="flow-node active">PR History</div>
+        <div class="flow-node active">973 merged PRs</div>
         <div class="flow-arr">→</div>
         <div class="flow-node active">docs/development/</div>
         <div class="flow-arr">→</div>
-        <div class="flow-node active">Approach Options</div>
+        <div class="flow-node active">2-3 Options</div>
         <div class="flow-arr">→</div>
         <div class="flow-node gate">⛔ Gate 1</div>
         <div class="flow-arr">→</div>
@@ -627,29 +625,29 @@ code{font-family:var(--mono);background:rgba(0,200,150,.06);padding:2px 7px;bord
       </div>
     </div>
 
-    <!-- Card 6: Footgun protection -->
+    <!-- Card 6: etcd-druid scope -->
     <div class="dash" data-stagger style="--s:0">
-      <div class="dash-header"><h4>Footgun Protection</h4><span class="dash-badge amber">15+ Rules</span></div>
-      <div class="dash-big">15+</div>
-      <div class="dash-sub">Known pitfalls caught automatically</div>
+      <div class="dash-header"><h4>etcd-druid Scope</h4><span class="dash-badge green">Operator</span></div>
+      <div class="dash-big">3</div>
+      <div class="dash-sub">CRDs managed by etcd-druid</div>
       <div class="mini-tl">
-        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span>Block zz_generated_* edits</span></div>
-        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span>Enforce two-commit rule</span></div>
-        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span>Correct test framework per repo</span></div>
-        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span>CEL validation placement</span></div>
-        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span>Prow labels + release notes</span></div>
+        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">Etcd — cluster lifecycle</span></div>
+        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">EtcdCopyBackupsTask — cross-bucket copy</span></div>
+        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">EtcdOpsTask — member operations</span></div>
+        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span>5 reconcilers · 1 webhook</span></div>
+        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span>8 backup providers (S3, GCS, ABS, Swift...)</span></div>
       </div>
     </div>
 
-    <!-- Card 7: Repo awareness -->
+    <!-- Card 7: Repo stats -->
     <div class="dash" data-stagger style="--s:1">
       <div class="dash-header"><h4>Repo Detection</h4><span class="dash-badge green">Auto</span></div>
       <div class="dash-big">3</div>
-      <div class="dash-sub">Repos with distinct conventions</div>
+      <div class="dash-sub">Repos · 2,072 commits · 222 releases</div>
       <div class="mini-tl">
-        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">etcd-druid → Go native + Gomega, logr</span></div>
-        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">backup-restore → Ginkgo v2, logrus</span></div>
-        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">wrapper → Go native, zap</span></div>
+        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">etcd-druid → v0.36.3, 52 contributors</span></div>
+        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">backup-restore → v0.41.2, 61 contributors</span></div>
+        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">wrapper → v0.7.0, 23 contributors</span></div>
       </div>
     </div>
 
@@ -738,7 +736,7 @@ code{font-family:var(--mono);background:rgba(0,200,150,.06);padding:2px 7px;bord
 <section class="sec">
   <div class="sec-eyebrow" data-stagger style="--s:0">Ecosystem</div>
   <div class="sec-h" data-stagger style="--s:1">Three repos.<br>One plugin.</div>
-  <p class="sec-sub" data-stagger style="--s:2">etcd-druid is the single operator responsible for every etcd cluster in Gardener — powering Kubernetes-as-a-service across multi-cloud environments for regulated industries.</p>
+  <p class="sec-sub" data-stagger style="--s:2">etcd-druid manages etcd clusters declaratively on Kubernetes — handling backup/restore across 8 cloud providers, snapshot compaction, defragmentation, and component protection. The plugin covers all three repos with 222 combined releases.</p>
   <div data-stagger style="--s:3">
     <table class="comp">
       <tr><th></th><th>etcd-druid</th><th>etcd-backup-restore</th><th>etcd-wrapper</th></tr>
@@ -752,17 +750,6 @@ code{font-family:var(--mono);background:rgba(0,200,150,.06);padding:2px 7px;bord
 </section>
 
 </div>
-
-<!-- ═══ MARQUEE ADOPTERS ═══ -->
-<section class="marquee">
-  <div class="marquee-label">Trusted by Gardener adopters running etcd-druid in production</div>
-  <div class="ticker">
-    <div class="ticker-track">
-      <span>SAP BTP</span><span>T-Systems</span><span>OVHcloud</span><span>STACKIT</span><span>plusserver</span><span>Cleura</span><span>ScaleUp Technologies</span><span>Finanz Informatik</span><span>noris network</span><span>metalstack.cloud</span>
-      <span>SAP BTP</span><span>T-Systems</span><span>OVHcloud</span><span>STACKIT</span><span>plusserver</span><span>Cleura</span><span>ScaleUp Technologies</span><span>Finanz Informatik</span><span>noris network</span><span>metalstack.cloud</span>
-    </div>
-  </div>
-</section>
 
 <div class="wrap">
 
