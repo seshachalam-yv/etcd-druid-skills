@@ -44,7 +44,7 @@ code{font-family:var(--mono);background:rgba(0,200,150,.06);padding:2px 7px;bord
 
 /* ═══ HERO ═══ */
 .hero{text-align:center;padding:60px 0 0;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative}
-.hero-eyebrow{font-size:clamp(12px,1.3vw,16px);font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--g);margin-bottom:20px;padding:5px 14px;background:rgba(0,200,150,.08);border:1px solid rgba(0,200,150,.15);border-radius:8px;display:inline-block}
+.hero-eyebrow{font-size:clamp(10px,1.1vw,13px);font-weight:600;text-transform:uppercase;letter-spacing:.15em;color:var(--g);margin-bottom:24px}
 .hero-h{font-size:clamp(44px,8vw,88px);font-weight:800;line-height:1.05;letter-spacing:-.04em;color:var(--bright);max-width:900px}
 .hero-h .acc{background:linear-gradient(135deg,#f0f4ff 0%,var(--g) 52%,var(--amber) 100%);background-size:200% 200%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:gradShift 6s ease infinite}
 @keyframes gradShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
@@ -53,8 +53,11 @@ code{font-family:var(--mono);background:rgba(0,200,150,.06);padding:2px 7px;bord
 .btn{display:inline-block;padding:14px 30px;border-radius:980px;font-weight:600;font-size:.88em;transition:all .25s}
 .btn-fill{background:linear-gradient(135deg,var(--g),var(--gd));color:#fff;border:none;box-shadow:0 4px 20px rgba(0,200,150,.2)}.btn-fill:hover{background:linear-gradient(135deg,#33dba8,var(--g));transform:scale(1.03);text-decoration:none;color:#fff;box-shadow:0 8px 30px rgba(0,200,150,.3)}
 .btn-line{color:var(--g);border:1px solid rgba(0,200,150,.25)}.btn-line:hover{border-color:var(--g);text-decoration:none;box-shadow:0 4px 20px rgba(0,200,150,.1)}
-.hero-logo{margin-bottom:24px}
-.hero-logo img{max-width:400px;width:100%}
+.hero-logo{margin-bottom:28px;position:relative}
+.hero-logo img{max-width:400px;width:100%;animation:logoFloat 4s ease-in-out infinite;filter:drop-shadow(0 0 30px rgba(0,200,150,.2))}
+@keyframes logoFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+.hero-logo::after{content:'';position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);width:200px;height:30px;background:radial-gradient(ellipse,rgba(0,200,150,.15),transparent 70%);border-radius:50%;animation:logoShadow 4s ease-in-out infinite}
+@keyframes logoShadow{0%,100%{opacity:.6;transform:translateX(-50%) scaleX(1)}50%{opacity:.3;transform:translateX(-50%) scaleX(.85)}}
 .hero-scroll{margin-top:40px;color:var(--dim);font-size:.75em;letter-spacing:.1em;text-transform:uppercase;animation:bob 2s ease-in-out infinite}
 @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}
 
