@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>etcd-druid-skills — Agentic development workflow</title>
+<link rel="icon" type="image/svg+xml" href="docs/icon.svg">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 :root{--g:#00c896;--gd:#009F76;--amber:#ffb300;--bg:#050810;--bg1:#0a0f1a;--bg2:#111827;--bg3:#1a2235;--border:rgba(136,146,176,.12);--text:#8892b0;--bright:#f0f4ff;--dim:#5a6480;--blue:#58a6ff;--red:#ff453a;--green:#30d158;--mono:'JetBrains Mono',monospace}
@@ -48,15 +49,16 @@ code{font-family:var(--mono);background:rgba(0,200,150,.06);padding:2px 7px;bord
 .hero-h{font-size:clamp(44px,8vw,88px);font-weight:800;line-height:1.05;letter-spacing:-.04em;color:var(--bright);max-width:900px}
 .hero-h .acc{background:linear-gradient(135deg,#f0f4ff 0%,var(--g) 52%,var(--amber) 100%);background-size:200% 200%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:gradShift 6s ease infinite}
 @keyframes gradShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
-.hero-sub{font-size:clamp(16px,2vw,21px);font-weight:300;line-height:1.6;color:var(--text);max-width:560px;margin:24px auto 0}
+.hero-sub{font-size:clamp(15px,1.8vw,19px);font-weight:300;line-height:1.7;color:var(--text);max-width:600px;margin:28px auto 0}
 .hero-cta{margin-top:36px;display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
 .btn{display:inline-block;padding:14px 30px;border-radius:980px;font-weight:600;font-size:.88em;transition:all .25s}
 .btn-fill{background:linear-gradient(135deg,var(--g),var(--gd));color:#fff;border:none;box-shadow:0 4px 20px rgba(0,200,150,.2)}.btn-fill:hover{background:linear-gradient(135deg,#33dba8,var(--g));transform:scale(1.03);text-decoration:none;color:#fff;box-shadow:0 8px 30px rgba(0,200,150,.3)}
 .btn-line{color:var(--g);border:1px solid rgba(0,200,150,.25)}.btn-line:hover{border-color:var(--g);text-decoration:none;box-shadow:0 4px 20px rgba(0,200,150,.1)}
-.hero-logo{margin-bottom:28px;position:relative;width:200px;height:260px;display:flex;align-items:center;justify-content:center}
-.hero-logo svg.logo-svg{width:140px;height:144px;position:relative;z-index:2}
-.hero-logo img{display:none}
-/* Hex charges up on strike */
+.hero-logo{margin-bottom:16px;position:relative;width:160px;height:220px;display:flex;align-items:center;justify-content:center}
+.hero-logo svg.logo-svg{width:100px;height:103px;position:relative;z-index:2}
+.hero-brand{font-size:clamp(36px,6vw,56px);font-weight:800;color:var(--bright);letter-spacing:-.03em;margin-bottom:8px;font-style:italic}
+.hero-brand .dim{color:var(--g);font-style:italic}
+.hero-eyebrow{font-size:clamp(10px,1.1vw,13px);font-weight:600;text-transform:uppercase;letter-spacing:.15em;color:var(--g);margin-bottom:28px}
 .hero-logo .hex-fill{fill:#009F76;opacity:.5;animation:hexChg 6s ease-in-out infinite}
 @keyframes hexChg{0%,30%{opacity:.5;filter:brightness(.8)}40%{opacity:1;filter:brightness(1.4)}50%,100%{opacity:1;filter:brightness(1)}}
 /* Facets light up in cascade */
@@ -400,8 +402,8 @@ code{font-family:var(--mono);background:rgba(0,200,150,.06);padding:2px 7px;bord
       <g class="bolt-inner"><polygon fill="url(#hlbolt)" points="66,54 56,72 63,72 59,89 74,67 65,67" filter="url(#hlgl)"/></g>
     </svg>
   </div>
-  <div class="hero-eyebrow" data-stagger style="--s:1">The agentic workflow for etcd-druid</div>
-  <h1 class="hero-h" data-stagger style="--s:2">Develop etcd-druid<br>with an <span class="acc">agentic workflow</span></h1>
+  <div class="hero-brand" data-stagger style="--s:1">etcd-druid<span class="dim">-skills</span></div>
+  <div class="hero-eyebrow" data-stagger style="--s:2">The agentic workflow for etcd-druid.</div>
   <p class="hero-sub" data-stagger style="--s:3">It doesn't just write code. It analyzes issues, researches past PRs, proposes options, and waits for your approval — before touching a single file.</p>
   <div class="hero-cta" data-stagger style="--s:4">
     <a class="btn btn-fill" href="#install">Get started</a>
