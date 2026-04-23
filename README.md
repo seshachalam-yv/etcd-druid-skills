@@ -15,6 +15,10 @@ Without this plugin, an LLM working in etcd-druid makes the same mistakes every 
 
 When you start a session in any etcd-druid, etcd-backup-restore, or etcd-wrapper checkout, the plugin auto-detects the repo, reads the relevant `docs/development/` guide, and activates the right skills — no configuration required.
 
+### See it in action
+
+<img src="docs/demo.gif" alt="etcd-druid-skills demo" width="800">
+
 ## Without vs. With This Plugin
 
 <table>
