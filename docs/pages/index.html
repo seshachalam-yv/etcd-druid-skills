@@ -328,29 +328,29 @@ code{font-family:var(--mono);background:rgba(0,200,150,.06);padding:2px 7px;bord
 /* ═══ FOOTER ═══ */
 .ft{text-align:center;padding:24px 0 40px;color:var(--dim);font-size:.72em;border-top:1px solid var(--border);margin-top:20px}
 
-/* ═══ PANEL ═══ */
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);z-index:200;opacity:0;pointer-events:none;transition:opacity .3s}
+/* ═══ MODAL (centered, OpenClaw-style) ═══ */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);z-index:200;opacity:0;pointer-events:none;transition:opacity .3s}
 .overlay.open{opacity:1;pointer-events:auto}
-.panel{position:fixed;top:0;right:0;bottom:0;width:520px;max-width:92vw;background:var(--bg1);border-left:1px solid var(--border);z-index:201;transform:translateX(100%);transition:transform .35s cubic-bezier(.16,1,.3,1);overflow-y:auto}
-.panel.open{transform:translateX(0)}
-.ph{position:sticky;top:0;background:var(--bg1);border-bottom:1px solid var(--border);padding:20px 28px;display:flex;align-items:center;justify-content:space-between;z-index:1}
-.ph h2{font-size:1.1em;font-weight:800;color:var(--bright);font-family:var(--mono)}
-.ph button{background:none;border:1px solid var(--border);color:var(--dim);width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:1em;display:flex;align-items:center;justify-content:center;transition:all .2s}
-.ph button:hover{border-color:var(--dim);color:var(--bright)}
-.pb{padding:24px 28px 40px}
-.pb .pi{font-family:var(--mono);color:var(--gd);font-size:.85em;padding:6px 14px;background:rgba(0,159,118,.06);border:1px solid rgba(0,159,118,.12);border-radius:6px;display:inline-block;margin-bottom:20px}
-.pb .pir{background:rgba(255,179,0,.05);border:1px solid rgba(255,179,0,.12);border-radius:8px;padding:12px 16px;margin-bottom:20px;font-family:var(--mono);font-size:.8em;color:var(--amber)}
-.pb .pd{color:var(--text);font-size:.9em;line-height:1.7;margin-bottom:24px}
-.pb .pw{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px}
-.pb .pwc{border-radius:8px;padding:14px;font-size:.82em;line-height:1.5}
-.pb .pwc.yes{background:rgba(48,209,88,.04);border:1px solid rgba(48,209,88,.1);color:var(--green)}
-.pb .pwc.no{background:rgba(255,69,58,.04);border:1px solid rgba(255,69,58,.1);color:var(--red)}
-.pb .pwc strong{display:block;margin-bottom:4px;font-size:.72em;text-transform:uppercase;letter-spacing:1px}
-.pb .ps{margin-bottom:24px}
-.pb .ps h3{font-size:.68em;text-transform:uppercase;letter-spacing:.1em;color:var(--gd);font-weight:600;margin-bottom:12px}
-.pb .ps ol,.pb .ps ul{padding-left:18px}
-.pb .ps li{color:var(--text);font-size:.84em;line-height:1.6;padding:4px 0}
-.pb .ps li::marker{color:var(--gd)}
+.modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.95);width:620px;max-width:92vw;max-height:85vh;background:var(--bg1);border:1px solid var(--border);border-radius:18px;z-index:201;opacity:0;pointer-events:none;transition:all .3s cubic-bezier(.16,1,.3,1);overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,.5)}
+.modal.open{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}
+.mh{position:sticky;top:0;background:var(--bg1);border-bottom:1px solid var(--border);padding:20px 28px;display:flex;align-items:center;justify-content:space-between;z-index:1;border-radius:18px 18px 0 0}
+.mh h2{font-size:1.15em;font-weight:800;color:var(--bright);font-family:var(--mono)}
+.mh button{background:none;border:1px solid var(--border);color:var(--dim);width:34px;height:34px;border-radius:10px;cursor:pointer;font-size:1.1em;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.mh button:hover{border-color:var(--dim);color:var(--bright);background:rgba(255,255,255,.04)}
+.mb{padding:24px 28px 36px}
+.mb .pi{font-family:var(--mono);color:var(--g);font-size:.85em;padding:6px 14px;background:rgba(0,200,150,.06);border:1px solid rgba(0,200,150,.12);border-radius:6px;display:inline-block;margin-bottom:20px}
+.mb .pir{background:rgba(255,179,0,.05);border:1px solid rgba(255,179,0,.12);border-radius:8px;padding:12px 16px;margin-bottom:20px;font-family:var(--mono);font-size:.8em;color:var(--amber)}
+.mb .pd{color:var(--text);font-size:.9em;line-height:1.7;margin-bottom:24px}
+.mb .pw{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px}
+.mb .pwc{border-radius:10px;padding:16px;font-size:.84em;line-height:1.5}
+.mb .pwc.yes{background:rgba(48,209,88,.04);border:1px solid rgba(48,209,88,.12);color:var(--green)}
+.mb .pwc.no{background:rgba(255,69,58,.04);border:1px solid rgba(255,69,58,.12);color:var(--red)}
+.mb .pwc strong{display:block;margin-bottom:6px;font-size:.72em;text-transform:uppercase;letter-spacing:1px}
+.mb .ps{margin-bottom:24px}
+.mb .ps h3{font-size:.7em;text-transform:uppercase;letter-spacing:.1em;color:var(--g);font-weight:600;margin-bottom:12px}
+.mb .ps ol,.mb .ps ul{padding-left:18px}
+.mb .ps li{color:var(--text);font-size:.85em;line-height:1.6;padding:4px 0}
+.mb .ps li::marker{color:var(--g)}
 </style>
 </head>
 <body>
@@ -815,6 +815,53 @@ code{font-family:var(--mono);background:rgba(0,200,150,.06);padding:2px 7px;bord
   </div>
 </section>
 
+<!-- ═══ SELF-IMPROVEMENT ═══ -->
+<section class="sec">
+  <div class="rv">
+    <div class="sec-eyebrow" data-stagger style="--s:0">Self-improving</div>
+    <div class="sec-h" data-stagger style="--s:1">The plugin gets<br>better every session.</div>
+    <p class="sec-sub" data-stagger style="--s:2">Every session is evaluated asynchronously. When a gap is found — a wrong claim, a missing footgun, a stale flag — it's captured as a structured observation. You decide what happens next.</p>
+  </div>
+  <div class="g2" style="margin-top:32px" data-stagger style="--s:3">
+    <div class="dash">
+      <div class="dash-header"><h4>How It Works</h4><span class="dash-badge amber">Auto-capture</span></div>
+      <div class="mini-tl" style="margin-top:16px">
+        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">Session ends → hook captures gaps automatically</span></div>
+        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">Next session → observations are pre-verified against current files</span></div>
+        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">Stale items auto-resolved (the fix is already in)</span></div>
+        <div class="mini-tl-row"><div class="mini-tl-dot active"></div><span class="bright">Verified gaps presented with evidence</span></div>
+        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">You choose: <strong style="color:var(--green)">R</strong> raise PR · <strong style="color:var(--amber)">S</strong> skip · <strong style="color:var(--red)">D</strong> dismiss</span></div>
+        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">PR raised only on explicit R choice</span></div>
+      </div>
+    </div>
+    <div class="dash">
+      <div class="dash-header"><h4>What Gets Captured</h4><span class="dash-badge green">Evidence-based</span></div>
+      <div style="margin-top:16px">
+        <div style="display:flex;gap:12px;margin-bottom:12px">
+          <div style="flex:1;padding:14px;border-radius:10px;background:rgba(255,69,58,.04);border:1px solid rgba(255,69,58,.1)">
+            <div style="font-size:.72em;color:var(--red);font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Wrong claim</div>
+            <div style="font-size:.78em;color:var(--text)">Plugin said "use make revendor" for etcd-druid — it's actually "make tidy"</div>
+          </div>
+          <div style="flex:1;padding:14px;border-radius:10px;background:rgba(255,179,0,.04);border:1px solid rgba(255,179,0,.1)">
+            <div style="font-size:.72em;color:var(--amber);font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Missing footgun</div>
+            <div style="font-size:.78em;color:var(--text)">New CEL validation gotcha not encoded in review skill</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:12px">
+          <div style="flex:1;padding:14px;border-radius:10px;background:rgba(41,151,255,.04);border:1px solid rgba(41,151,255,.1)">
+            <div style="font-size:.72em;color:var(--blue);font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Stale flag</div>
+            <div style="font-size:.78em;color:var(--text)">Feature gate was promoted from alpha to GA — skill still says alpha</div>
+          </div>
+          <div style="flex:1;padding:14px;border-radius:10px;background:rgba(0,200,150,.04);border:1px solid rgba(0,200,150,.1)">
+            <div style="font-size:.72em;color:var(--g);font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">User correction</div>
+            <div style="font-size:.78em;color:var(--text)">"No, the test should use Ginkgo v2 here, not Go native"</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ═══ ECOSYSTEM ═══ -->
 <section class="sec">
   <div class="sec-eyebrow" data-stagger style="--s:0">Ecosystem</div>
@@ -850,11 +897,11 @@ code{font-family:var(--mono);background:rgba(0,200,150,.06);padding:2px 7px;bord
 
 </div>
 
-<!-- PANEL -->
+<!-- MODAL -->
 <div class="overlay" id="ov" onclick="closePanel()"></div>
-<div class="panel" id="pn">
-  <div class="ph"><h2 id="p-nm"></h2><button onclick="closePanel()">✕</button></div>
-  <div class="pb">
+<div class="modal" id="pn">
+  <div class="mh"><h2 id="p-nm"></h2><button onclick="closePanel()">✕</button></div>
+  <div class="mb">
     <div class="pi" id="p-iv"></div>
     <div class="pir" id="p-ir" style="display:none"></div>
     <p class="pd" id="p-ds"></p>
