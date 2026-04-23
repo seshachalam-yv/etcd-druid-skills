@@ -46,10 +46,20 @@ code{font-family:var(--mono);background:rgba(0,200,150,.06);padding:2px 7px;bord
 .nk .gh-btn:hover{border-color:var(--g);background:rgba(0,200,150,.06)}
 
 /* Hero logo and brand — just fade out, don't move */
-.hero-logo{margin-bottom:16px;position:relative;width:160px;height:200px;display:flex;align-items:center;justify-content:center;transition:opacity .4s}
+.hero{text-align:center;padding:80px 0 40px;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative}
+.hero-logo{margin:0 auto 16px;position:relative;width:160px;height:200px;display:flex;align-items:center;justify-content:center;transition:opacity .4s}
 .hero-logo.shrunk{opacity:.3}
 .hero-brand{font-size:clamp(36px,6vw,56px);font-weight:800;color:var(--bright);letter-spacing:-.03em;margin-bottom:8px;font-style:italic;transition:opacity .4s}
+.hero-brand .dim{color:var(--g);font-style:italic}
 .hero-brand.shrunk{opacity:.3}
+.hero-eyebrow{font-size:clamp(10px,1.1vw,13px);font-weight:600;text-transform:uppercase;letter-spacing:.15em;color:var(--g);margin-bottom:28px}
+.hero-sub{font-size:clamp(15px,1.8vw,19px);font-weight:300;line-height:1.7;color:var(--text);max-width:600px;margin:28px auto 0;text-align:center}
+.hero-cta{margin-top:36px;display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+.btn{display:inline-block;padding:14px 30px;border-radius:980px;font-weight:600;font-size:.88em;transition:all .25s}
+.btn-fill{background:linear-gradient(135deg,var(--g),var(--gd));color:#fff;border:none;box-shadow:0 4px 20px rgba(0,200,150,.2)}.btn-fill:hover{background:linear-gradient(135deg,#33dba8,var(--g));transform:scale(1.03);text-decoration:none;color:#fff;box-shadow:0 8px 30px rgba(0,200,150,.3)}
+.btn-line{color:var(--g);border:1px solid rgba(0,200,150,.25)}.btn-line:hover{border-color:var(--g);text-decoration:none;box-shadow:0 4px 20px rgba(0,200,150,.1)}
+.hero-scroll{margin-top:40px;color:var(--dim);font-size:.75em;letter-spacing:.1em;text-transform:uppercase;animation:bob 2s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}
 .hero-logo .hex-fill{fill:#009F76;opacity:.5;animation:hexChg 6s ease-in-out infinite}
 @keyframes hexChg{0%,30%{opacity:.5;filter:brightness(.8)}40%{opacity:1;filter:brightness(1.4)}50%,100%{opacity:1;filter:brightness(1)}}
 /* Facets light up in cascade */
