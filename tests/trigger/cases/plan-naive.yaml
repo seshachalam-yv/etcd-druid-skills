@@ -1,0 +1,2 @@
+prompt: "I need to implement issue #482 — add lease-based leader election to etcd-druid. Where should I start?"
+expected_skill: plan
