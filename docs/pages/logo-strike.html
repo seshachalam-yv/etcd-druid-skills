@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Logo — Lightning Strike Charge</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#050810;color:#f0f4ff;font-family:'Inter',-apple-system,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;flex-direction:column;gap:40px}
+h1{font-size:1.2em;font-weight:700;color:#00c896}
+p{color:#5a6480;font-size:.85em;margin-top:4px}
+.stage{position:relative;width:200px;height:260px;display:flex;align-items:center;justify-content:center}
+
+/* The logo SVG */
+.logo-svg{width:140px;height:144px;position:relative;z-index:2}
+
+/* Hex shell — starts dim, charges up */
+.hex-fill{fill:#009F76;opacity:.5;animation:hexCharge 6s ease-in-out infinite}
+@keyframes hexCharge{0%,30%{opacity:.5;filter:brightness(.8)}40%{opacity:1;filter:brightness(1.4)}50%,100%{opacity:1;filter:brightness(1)}}
+
+/* Shadow */
+.shd{fill:#000;opacity:.24}
+
+/* Facets — start dark, light up on impact */
+.facet{opacity:.4;animation:facetLight 6s ease-in-out infinite}
+@keyframes facetLight{0%,30%{opacity:.4;filter:brightness(.7)}38%{opacity:1;filter:brightness(1.6)}50%,100%{opacity:1;filter:brightness(1)}}
+.f2{animation-delay:.05s}.f3{animation-delay:.1s}.f4{animation-delay:.15s}
+
+/* Bolt inside hex — hidden initially, appears on strike */
+.bolt-inner{opacity:0;animation:boltAppear 6s ease-in-out infinite}
+@keyframes boltAppear{0%,32%{opacity:0;transform:scale(.8) translateY(3px)}36%{opacity:1;transform:scale(1.15) translateY(-2px)}42%{opacity:1;transform:scale(1)}100%{opacity:.95;transform:scale(1)}}
+
+/* === LIGHTNING STRIKE FROM ABOVE === */
+.strike{position:absolute;top:0;left:50%;transform:translateX(-50%);z-index:3;width:60px;height:140px;pointer-events:none}
+.strike-bolt{fill:none;stroke:url(#strikeGrad);stroke-width:3;stroke-linecap:round;stroke-dasharray:300;stroke-dashoffset:300;animation:strikeDown 6s ease-in-out infinite;filter:drop-shadow(0 0 8px rgba(255,200,0,.6))}
+@keyframes strikeDown{0%,25%{stroke-dashoffset:300;opacity:1}32%{stroke-dashoffset:0;opacity:1}40%{opacity:0}100%{opacity:0;stroke-dashoffset:300}}
+
+/* Secondary thinner bolt */
+.strike-bolt2{fill:none;stroke:#fff;stroke-width:1.5;stroke-linecap:round;stroke-dasharray:300;stroke-dashoffset:300;animation:strikeDown2 6s ease-in-out infinite;opacity:.6}
+@keyframes strikeDown2{0%,26%{stroke-dashoffset:300;opacity:.6}33%{stroke-dashoffset:0;opacity:.6}38%{opacity:0}100%{opacity:0;stroke-dashoffset:300}}
+
+/* === IMPACT FLASH === */
+.flash{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:0;height:0;border-radius:50%;background:radial-gradient(circle,rgba(255,220,100,.8),rgba(0,200,150,.3),transparent 70%);z-index:1;animation:impactFlash 6s ease-out infinite;pointer-events:none}
+@keyframes impactFlash{0%,33%{width:0;height:0;opacity:0}36%{width:250px;height:250px;opacity:.8}45%{width:350px;height:350px;opacity:0}100%{opacity:0}}
+
+/* === SHOCKWAVE RING === */
+.ring{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:40px;height:40px;border-radius:50%;border:2px solid rgba(0,200,150,.5);z-index:1;animation:shockwave 6s ease-out infinite;pointer-events:none}
+@keyframes shockwave{0%,33%{width:40px;height:40px;opacity:0;border-width:2px}36%{opacity:.7;border-width:2px}50%{width:300px;height:300px;opacity:0;border-width:1px}100%{opacity:0}}
+
+.ring2{animation-delay:.1s;border-color:rgba(255,200,0,.3)}
+
+/* === ENERGY PARTICLES after strike === */
+.particles{position:absolute;top:50%;left:50%;z-index:4;pointer-events:none}
+.particle{position:absolute;width:4px;height:4px;border-radius:50%;background:#ffcc00;animation:particleBurst 6s ease-out infinite;opacity:0}
+@keyframes particleBurst{0%,34%{transform:translate(0,0) scale(1);opacity:0}36%{opacity:1;transform:translate(var(--px),var(--py)) scale(1)}50%{opacity:0;transform:translate(calc(var(--px)*2.5),calc(var(--py)*2.5)) scale(0)}100%{opacity:0}}
+
+/* Glow under logo */
+.glow-under{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);width:120px;height:20px;background:radial-gradient(ellipse,rgba(0,200,150,.2),transparent 70%);border-radius:50%;animation:glowPulse 6s ease-in-out infinite;z-index:0}
+@keyframes glowPulse{0%,30%{opacity:.2;transform:translateX(-50%) scaleX(.8)}40%{opacity:.8;transform:translateX(-50%) scaleX(1.2)}55%,100%{opacity:.4;transform:translateX(-50%) scaleX(1)}}
+
+@media(prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+</head>
+<body>
+
+<h1>Lightning Strike Charges the Logo</h1>
+<p>Bolt strikes from above → impact flash + shockwave → hex charges up → energy particles scatter</p>
+
+<div class="stage">
+  <!-- Glow under -->
+  <div class="glow-under"></div>
+
+  <!-- Lightning strike from above -->
+  <svg class="strike" viewBox="0 0 60 140">
+    <defs>
+      <linearGradient id="strikeGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#fff" stop-opacity=".3"/>
+        <stop offset="40%" stop-color="#ffcc00"/>
+        <stop offset="100%" stop-color="#ff8800"/>
+      </linearGradient>
+    </defs>
+    <!-- Main jagged bolt path -->
+    <path class="strike-bolt" d="M30,0 L25,30 L35,35 L20,65 L32,70 L15,105 L28,108 L22,140"/>
+    <!-- Secondary thinner bolt -->
+    <path class="strike-bolt2" d="M32,5 L28,25 L36,30 L24,55 L34,62 L20,95 L30,100 L26,135"/>
+  </svg>
+
+  <!-- Impact flash -->
+  <div class="flash"></div>
+
+  <!-- Shockwave rings -->
+  <div class="ring"></div>
+  <div class="ring ring2"></div>
+
+  <!-- Energy particles -->
+  <div class="particles">
+    <div class="particle" style="--px:-40px;--py:-30px"></div>
+    <div class="particle" style="--px:35px;--py:-35px;animation-delay:.05s"></div>
+    <div class="particle" style="--px:-30px;--py:25px;animation-delay:.08s"></div>
+    <div class="particle" style="--px:40px;--py:20px;animation-delay:.03s"></div>
+    <div class="particle" style="--px:-15px;--py:-45px;animation-delay:.06s"></div>
+    <div class="particle" style="--px:20px;--py:40px;animation-delay:.1s"></div>
+    <div class="particle" style="--px:-45px;--py:5px;animation-delay:.04s"></div>
+    <div class="particle" style="--px:45px;--py:-10px;animation-delay:.07s"></div>
+  </div>
+
+  <!-- Logo SVG -->
+  <svg class="logo-svg" viewBox="0 0 95 98">
+    <defs>
+      <linearGradient id="lfa" x1="12%" y1="-18%" x2="88%" y2="84%"><stop offset="0%" stop-color="#fff" stop-opacity=".92"/><stop offset="100%" stop-color="#439246"/></linearGradient>
+      <linearGradient id="lfb" x1="50%" y1="5%" x2="148%" y2="175%"><stop offset="0%" stop-color="#fff" stop-opacity=".80"/><stop offset="100%" stop-color="#439246"/></linearGradient>
+      <linearGradient id="lfc" x1="19%" y1="-9%" x2="82%" y2="77%"><stop offset="0%" stop-color="#fff" stop-opacity=".92"/><stop offset="100%" stop-color="#439246"/></linearGradient>
+      <linearGradient id="lfd" x1="57%" y1="26%" x2="137%" y2="158%"><stop offset="0%" stop-color="#fff" stop-opacity=".80"/><stop offset="100%" stop-color="#439246"/></linearGradient>
+      <linearGradient id="lbolt" x1="30%" y1="0%" x2="70%" y2="100%"><stop offset="0%" stop-color="#ffe680"/><stop offset="45%" stop-color="#ffb300"/><stop offset="100%" stop-color="#e67e00"/></linearGradient>
+      <clipPath id="lhx"><path d="M46,2 L83,17.4 L85.5,20.7 L94.5,59 L93,63.5 L70.5,93.8 L66.5,95.6 L29,95.6 L25,93.8 L2.5,63.5 L1,59 L10,20.7 L12.5,17.4 Z"/></clipPath>
+      <filter id="lgl"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    </defs>
+    <!-- Hex -->
+    <path class="hex-fill" d="M46,2 L83,17.4 L85.5,20.7 L94.5,59 L93,63.5 L70.5,93.8 L66.5,95.6 L29,95.6 L25,93.8 L2.5,63.5 L1,59 L10,20.7 L12.5,17.4 Z"/>
+    <polygon class="shd" points="-7,60 24,27 57,64 19,100" clip-path="url(#lhx)"/>
+    <!-- Facets -->
+    <path class="facet f1" fill="url(#lfa)" d="M62,44 C61.4,45.8 60.2,47.5 59,48.2 L50,53.4 C48.2,54.5 45.2,54.5 43.4,53.4 L34.4,48.2 C32.6,46.9 31.2,44.4 31.2,42.4 L31.2,31 C31.2,30.1 31.5,29.1 32,28.2 Z"/>
+    <path class="facet f2" fill="url(#lfb)" d="M61.2,28.4 C61.7,29.2 61.9,30.2 61.9,31 L61.9,42.8 C61.9,44.8 60.4,47.3 58.7,48.4 L49.7,53.6 C47.9,54.7 44.9,54.7 43.1,53.6 L34.1,48.4 C33.2,47.8 32.3,46.7 31.8,45.8 Z"/>
+    <path class="facet f3" fill="url(#lfc)" d="M71,65 C70.3,66.5 69.2,67.8 68.1,68.5 L52.8,77.2 C50.8,78.3 47.4,78.3 45.4,77.2 L30.1,68.5 C28.1,67.4 26.7,64.8 26.7,62.8 L26.7,45.8 C26.7,44.8 27,43.6 27.6,42.6 Z"/>
+    <path class="facet f4" fill="url(#lfd)" d="M70.9,42.8 C71.5,43.7 71.7,44.6 71.7,45.6 L71.7,63 C71.7,65 70.3,67.6 68.1,68.7 L52.8,77.4 C50.8,78.5 47.4,78.5 45.4,77.4 L30.1,68.7 C29.1,68.1 28.2,67.1 27.6,66.1 Z"/>
+    <!-- Bolt -->
+    <g class="bolt-inner"><polygon fill="url(#lbolt)" points="66,54 56,72 63,72 59,89 74,67 65,67" filter="url(#lgl)"/></g>
+  </svg>
+</div>
+
+<p style="color:#8892b0;font-size:.75em;max-width:500px;text-align:center;line-height:1.6">Every 6 seconds: jagged bolt strikes down → impact flash with radial gradient → shockwave rings expand → hex charges from dim to bright → facets light up in cascade → amber bolt materializes → energy particles scatter outward. Then it idles until the next strike.</p>
+
+</body>
+</html>
