@@ -15,7 +15,7 @@ Without this plugin, an LLM working in etcd-druid makes the same mistakes every 
 
 When you start a session in any etcd-druid, etcd-backup-restore, or etcd-wrapper checkout, the plugin auto-detects the repo, reads the relevant `docs/development/` guide, and activates the right skills — no configuration required.
 
-## Without vs. With This Plugin
+## ⚡ Without vs. With This Plugin
 
 <table>
 <tr>
@@ -46,7 +46,7 @@ When you start a session in any etcd-druid, etcd-backup-restore, or etcd-wrapper
 </tr>
 </table>
 
-## Requirements
+## 📋 Requirements
 
 | Requirement | Minimum |
 |-------------|---------|
@@ -57,7 +57,7 @@ When you start a session in any etcd-druid, etcd-backup-restore, or etcd-wrapper
 
 The plugin auto-detects which repo you are in at session start. It does not modify any repo files — all changes are in your Claude Code session context.
 
-## Installation
+## 🚀 Installation
 
 ### Claude Code (Marketplace)
 
@@ -103,7 +103,7 @@ If the reference card appears with your current git state, you're set.
 /plugin marketplace update seshachalam-yv-etcd-druid-skills
 ```
 
-## Workflow
+## 🔄 Workflow
 
 ```
  Issue / Bug Report
@@ -145,7 +145,7 @@ If the reference card appears with your current git state, you're set.
                          gh pr create
 ```
 
-### Skill Interactions
+### 🔗 Skill Interactions
 
 ```
 plan ──► implement ──┬──► api-change*  ──► CEL, two-commit, CRD tests
@@ -161,7 +161,7 @@ plan ──► implement ──┬──► api-change*  ──► CEL, two-comm
 
 The core loop is **plan → Gate 1 → implement → Gate 2 → PR**. Every skill supports a phase of this loop.
 
-### Skills
+### 🛠 Skills
 
 **Planning & Execution**
 
@@ -194,7 +194,7 @@ The core loop is **plan → Gate 1 → implement → Gate 2 → PR**. Every skil
 | [verification](skills/verification/SKILL.md) | tdd, debug, implement, review | 5-step evidence gate: run command → read output → then claim it passes. Prevents false completion claims. |
 | [receiving-review](skills/receiving-review/SKILL.md) | implement, review | Handle maintainer feedback without sycophancy: verify before implementing suggestions. |
 
-## Philosophy
+## 💡 Philosophy
 
 **Iron Laws, not reminders.** Each skill opens with one unconditional rule and a table of the rationalizations that cause violations. Addressing the thought pattern ("this task is too small for a plan") is more effective than repeating the abstract principle.
 
@@ -204,7 +204,7 @@ The core loop is **plan → Gate 1 → implement → Gate 2 → PR**. Every skil
 
 **Assumption surfacing before action.** The `plan` skill requires Claude to state every assumption explicitly before proposing approaches. Silent interpretation is the most common AI coding failure — this prevents it.
 
-### Iron Laws
+### ⚖️ Iron Laws
 
 | Skill | Law |
 |-------|-----|
@@ -215,7 +215,7 @@ The core loop is **plan → Gate 1 → implement → Gate 2 → PR**. Every skil
 | review | NO VERDICT WITHOUT READING THE DIFF AND docs/development/ FIRST |
 | verification | NO COMPLETION CLAIMS WITHOUT FRESH VERIFICATION EVIDENCE |
 
-## Evaluation
+## 📊 Evaluation
 
 The plugin is tested against 5 real PR scenarios from `gardener/etcd-druid` and `gardener/etcd-backup-restore`:
 
@@ -230,7 +230,7 @@ The plugin is tested against 5 real PR scenarios from `gardener/etcd-druid` and 
 
 5 iterations, zero cross-iteration variance. See [docs/evaluation.md](docs/evaluation.md) for the full methodology and reproduction guide.
 
-## The Component System
+## 🧩 The Component System
 
 ```
 etcd-druid            Kubernetes operator — owns Etcd CRD, reconciles cluster resources
@@ -247,7 +247,7 @@ All three run in the Gardener seed cluster. The plugin knows each repo's testing
 | CI command | `make ci-checks` | `make verify` | `make check && make test` |
 | Logging | logr | logrus | zap |
 
-## Compatibility
+## 🔧 Compatibility
 
 | Plugin version | etcd-druid | etcd-backup-restore | etcd-wrapper | Claude Code |
 |----------------|-----------|---------------------|--------------|-------------|
@@ -255,7 +255,7 @@ All three run in the Gardener seed cluster. The plugin knows each repo's testing
 
 The plugin targets the current `master` branch of each repo. For older release branches, skills still apply but some make targets and file paths may differ — consult that branch's `docs/development/`.
 
-## Getting Help
+## 💬 Getting Help
 
 1. **Check the reference skill first** — `/etcd-druid:reference` covers make targets, file paths, flags, and git workflow for all three repos.
 2. **Review the evaluation guide** — [`docs/evaluation.md`](docs/evaluation.md) explains how the plugin is tested and how to reproduce results.
@@ -264,7 +264,7 @@ The plugin targets the current `master` branch of each repo. For older release b
 
 For questions about the underlying etcd ecosystem (not the plugin), the best places are the [Gardener community page](https://gardener.cloud/community/) and the respective repo's GitHub Discussions.
 
-## Contributing
+## 🤝 Contributing
 
 **Skill workflow fixes:** Edit `skills/<name>/SKILL.md` and open a PR against this repo.
 
@@ -274,6 +274,6 @@ For questions about the underlying etcd ecosystem (not the plugin), the best pla
 
 **Testing changes:** Run a real session that exercises the workflow. Skills are behavior-shaping code — a change that looks correct may cause the agent to shortcut in unexpected ways. See [docs/evaluation.md](docs/evaluation.md) for the formal evaluation framework.
 
-## License
+## 📄 License
 
 Apache-2.0
