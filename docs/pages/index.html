@@ -54,9 +54,20 @@ code{font-family:var(--mono);background:rgba(0,200,150,.06);padding:2px 7px;bord
 .btn-fill{background:linear-gradient(135deg,var(--g),var(--gd));color:#fff;border:none;box-shadow:0 4px 20px rgba(0,200,150,.2)}.btn-fill:hover{background:linear-gradient(135deg,#33dba8,var(--g));transform:scale(1.03);text-decoration:none;color:#fff;box-shadow:0 8px 30px rgba(0,200,150,.3)}
 .btn-line{color:var(--g);border:1px solid rgba(0,200,150,.25)}.btn-line:hover{border-color:var(--g);text-decoration:none;box-shadow:0 4px 20px rgba(0,200,150,.1)}
 .hero-logo{margin-bottom:28px;position:relative}
-.hero-logo img{max-width:400px;width:100%;animation:logoFloat 4s ease-in-out infinite;filter:drop-shadow(0 0 30px rgba(0,200,150,.2))}
-@keyframes logoFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
-.hero-logo::after{content:'';position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);width:200px;height:30px;background:radial-gradient(ellipse,rgba(0,200,150,.15),transparent 70%);border-radius:50%;animation:logoShadow 4s ease-in-out infinite}
+.hero-logo img{display:none}
+.hero-logo svg{max-width:120px;width:100%;animation:logoFloat 4s ease-in-out infinite;filter:drop-shadow(0 0 30px rgba(0,200,150,.2))}
+@keyframes logoFloat{0%,100%{transform:translateY(0) rotate(0deg)}25%{transform:translateY(-6px) rotate(.5deg)}50%{transform:translateY(-10px) rotate(0deg)}75%{transform:translateY(-6px) rotate(-.5deg)}}
+/* Inner plant/gem sways like a shoot in wind */
+.logo-inner{transform-origin:50% 90%;animation:plantSway 5s ease-in-out infinite}
+@keyframes plantSway{0%,100%{transform:rotate(0deg) scaleY(1)}20%{transform:rotate(1.5deg) scaleY(1.01)}40%{transform:rotate(-.8deg) scaleY(.99)}60%{transform:rotate(1deg) scaleY(1.005)}80%{transform:rotate(-.5deg) scaleY(1)}}
+/* Lightning bolt flickers with energy */
+.logo-bolt{animation:boltFlicker 3s ease-in-out infinite;transform-origin:50% 30%}
+@keyframes boltFlicker{0%,100%{opacity:.95;transform:scale(1) translateY(0)}15%{opacity:1;transform:scale(1.06) translateY(-1px)}30%{opacity:.85;transform:scale(.98) translateY(.5px)}45%{opacity:1;transform:scale(1.03) translateY(-1.5px)}60%{opacity:.9;transform:scale(1) translateY(0)}75%{opacity:1;transform:scale(1.05) translateY(-1px)}90%{opacity:.88;transform:scale(.99) translateY(.5px)}}
+/* Hex shell breathes subtly */
+.logo-hex{animation:hexBreathe 6s ease-in-out infinite}
+@keyframes hexBreathe{0%,100%{transform:scale(1)}50%{transform:scale(1.008)}}
+/* Glow under the logo */
+.hero-logo::after{content:'';position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);width:160px;height:30px;background:radial-gradient(ellipse,rgba(0,200,150,.15),transparent 70%);border-radius:50%;animation:logoShadow 4s ease-in-out infinite}
 @keyframes logoShadow{0%,100%{opacity:.6;transform:translateX(-50%) scaleX(1)}50%{opacity:.3;transform:translateX(-50%) scaleX(.85)}}
 .hero-scroll{margin-top:40px;color:var(--dim);font-size:.75em;letter-spacing:.1em;text-transform:uppercase;animation:bob 2s ease-in-out infinite}
 @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}
@@ -337,8 +348,36 @@ code{font-family:var(--mono);background:rgba(0,200,150,.06);padding:2px 7px;bord
 
 <!-- ═══ HERO ═══ -->
 <section class="hero">
-  <div class="hero-logo" data-stagger style="--s:0"><img src="docs/logo.svg" alt="etcd-druid-skills"></div>
-  <div class="hero-eyebrow" data-stagger style="--s:1">Claude Code Plugin</div>
+  <div class="hero-logo" data-stagger style="--s:0">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 102" width="120" height="122">
+      <defs>
+        <linearGradient id="hfa" x1="12%" y1="-18%" x2="88%" y2="84%"><stop offset="0%" stop-color="#fff" stop-opacity=".92"/><stop offset="100%" stop-color="#439246"/></linearGradient>
+        <linearGradient id="hfb" x1="50%" y1="5%" x2="148%" y2="175%"><stop offset="0%" stop-color="#fff" stop-opacity=".80"/><stop offset="100%" stop-color="#439246"/></linearGradient>
+        <linearGradient id="hfc" x1="19%" y1="-9%" x2="82%" y2="77%"><stop offset="0%" stop-color="#fff" stop-opacity=".92"/><stop offset="100%" stop-color="#439246"/></linearGradient>
+        <linearGradient id="hfd" x1="57%" y1="26%" x2="137%" y2="158%"><stop offset="0%" stop-color="#fff" stop-opacity=".80"/><stop offset="100%" stop-color="#439246"/></linearGradient>
+        <linearGradient id="hbolt" x1="30%" y1="0%" x2="70%" y2="100%"><stop offset="0%" stop-color="#ffe680"/><stop offset="45%" stop-color="#ffb300"/><stop offset="100%" stop-color="#e67e00"/></linearGradient>
+        <clipPath id="hhx"><path d="M46,2 L83,17.4 L85.5,20.7 L94.5,59 L93,63.5 L70.5,93.8 L66.5,95.6 L29,95.6 L25,93.8 L2.5,63.5 L1,59 L10,20.7 L12.5,17.4 Z"/></clipPath>
+        <filter id="hglo"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      </defs>
+      <!-- Hex shell (breathes) -->
+      <g class="logo-hex">
+        <path d="M46,2 L83,17.4 L85.5,20.7 L94.5,59 L93,63.5 L70.5,93.8 L66.5,95.6 L29,95.6 L25,93.8 L2.5,63.5 L1,59 L10,20.7 L12.5,17.4 Z" fill="#009F76"/>
+        <polygon points="-7,60 24,27 57,64 19,100" fill="#000" opacity=".24" clip-path="url(#hhx)"/>
+      </g>
+      <!-- Inner plant/gem (sways like shoot in wind) -->
+      <g class="logo-inner">
+        <path d="M62,44 C61.4,45.8 60.2,47.5 59,48.2 L50,53.4 C48.2,54.5 45.2,54.5 43.4,53.4 L34.4,48.2 C32.6,46.9 31.2,44.4 31.2,42.4 L31.2,31 C31.2,30.1 31.5,29.1 32,28.2 Z" fill="url(#hfa)"/>
+        <path d="M61.2,28.4 C61.7,29.2 61.9,30.2 61.9,31 L61.9,42.8 C61.9,44.8 60.4,47.3 58.7,48.4 L49.7,53.6 C47.9,54.7 44.9,54.7 43.1,53.6 L34.1,48.4 C33.2,47.8 32.3,46.7 31.8,45.8 Z" fill="url(#hfb)"/>
+        <path d="M71,65 C70.3,66.5 69.2,67.8 68.1,68.5 L52.8,77.2 C50.8,78.3 47.4,78.3 45.4,77.2 L30.1,68.5 C28.1,67.4 26.7,64.8 26.7,62.8 L26.7,45.8 C26.7,44.8 27,43.6 27.6,42.6 Z" fill="url(#hfc)"/>
+        <path d="M70.9,42.8 C71.5,43.7 71.7,44.6 71.7,45.6 L71.7,63 C71.7,65 70.3,67.6 68.1,68.7 L52.8,77.4 C50.8,78.5 47.4,78.5 45.4,77.4 L30.1,68.7 C29.1,68.1 28.2,67.1 27.6,66.1 Z" fill="url(#hfd)"/>
+      </g>
+      <!-- Lightning bolt (flickers with energy) -->
+      <g class="logo-bolt">
+        <polygon points="66,54 56,72 63,72 59,89 74,67 65,67" fill="url(#hbolt)" filter="url(#hglo)"/>
+      </g>
+    </svg>
+  </div>
+  <div class="hero-eyebrow" data-stagger style="--s:1">The agentic workflow for etcd-druid</div>
   <h1 class="hero-h" data-stagger style="--s:2">Develop etcd-druid<br>with an <span class="acc">agentic workflow</span></h1>
   <p class="hero-sub" data-stagger style="--s:3">It doesn't just write code. It analyzes issues, researches past PRs, proposes options, and waits for your approval — before touching a single file.</p>
   <div class="hero-cta" data-stagger style="--s:4">
