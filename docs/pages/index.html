@@ -145,6 +145,9 @@ code{font-family:var(--mono);background:rgba(0,200,150,.06);padding:2px 7px;bord
 .sec-eyebrow{font-size:.72em;text-transform:uppercase;letter-spacing:.12em;color:var(--g);font-weight:700;margin-bottom:12px;padding:4px 12px;background:rgba(0,200,150,.08);border:1px solid rgba(0,200,150,.15);border-radius:6px;display:inline-block}
 .sec-h{font-size:clamp(32px,5vw,56px);font-weight:800;color:var(--bright);letter-spacing:-.03em;line-height:1.1;margin-bottom:12px}
 .sec-sub{color:var(--text);font-size:clamp(15px,1.8vw,19px);max-width:520px;margin-bottom:48px;font-weight:300;line-height:1.7}
+/* Center sections that need it */
+.code-sec,.sec-center{text-align:center}
+.sec-center .sec-sub{margin-left:auto;margin-right:auto}
 
 /* ═══ STICKY WORKFLOW ═══ */
 .sticky-wrap{height:500vh;position:relative}
@@ -431,7 +434,7 @@ code{font-family:var(--mono);background:rgba(0,200,150,.06);padding:2px 7px;bord
 <div class="wrap">
 
 <!-- ═══ INTERACTIVE TERMINAL DEMO ═══ -->
-<section class="code-sec" id="install">
+<section class="code-sec sec-center" id="install">
   <div class="sec-eyebrow" data-stagger style="--s:0">See it in action</div>
   <div class="sec-h" data-stagger style="--s:1;text-align:center">Three commands.<br>Then watch it work.</div>
   <div class="iterm" data-stagger style="--s:2" id="iterm">
@@ -519,7 +522,7 @@ code{font-family:var(--mono);background:rgba(0,200,150,.06);padding:2px 7px;bord
 </section>
 
 <!-- ═══ ANIMATED WORKFLOW DIAGRAM ═══ -->
-<section class="sec" id="workflow">
+<section class="sec sec-center" id="workflow">
   <div class="sec-eyebrow" data-stagger style="--s:0">How it works</div>
   <div class="sec-h" data-stagger style="--s:1">Agentic workflow.<br>Not autocomplete.</div>
   <p class="sec-sub" data-stagger style="--s:2">Every task follows a research-first approach. The plugin reads issues, studies past PRs, and builds a plan — then waits for you.</p>
