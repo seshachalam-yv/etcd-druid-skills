@@ -30,11 +30,16 @@ code{font-family:var(--mono);background:rgba(0,200,150,.06);padding:2px 7px;bord
 /* GRAIN */
 .grain{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.02;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
 
-/* NAV */
-.nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(5,8,16,.8);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid var(--border)}
+/* NAV (appears on scroll) */
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(5,8,16,.85);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid var(--border);transform:translateY(-100%);transition:transform .3s}
+.nav.show{transform:translateY(0)}
 .ni{max-width:980px;margin:0 auto;padding:12px 22px;display:flex;align-items:center;justify-content:space-between}
 .nl{display:flex;align-items:center;gap:8px}.nl img{height:22px}.nl span{font-weight:700;font-size:.82em;color:var(--bright)}
-.nk{display:flex;gap:22px;font-size:.78em}.nk a{color:var(--text);transition:color .2s}.nk a:hover{color:var(--bright);text-decoration:none}
+.nc{font-weight:700;font-size:.85em;color:var(--bright);letter-spacing:-.02em}
+.nc .dim{color:var(--g)}
+.nk{display:flex;gap:16px;align-items:center;font-size:.78em}.nk a{color:var(--text);transition:color .2s}.nk a:hover{color:var(--bright);text-decoration:none}
+.nk .gh-btn{padding:6px 14px;border-radius:8px;border:1px solid rgba(0,200,150,.2);color:var(--g);font-weight:600;font-size:.82em;transition:all .2s}
+.nk .gh-btn:hover{border-color:var(--g);background:rgba(0,200,150,.06)}
 
 .wrap{max-width:980px;margin:0 auto;padding:0 22px;position:relative;z-index:1}
 .wrap-wide{max-width:1200px;margin:0 auto;padding:0 22px;position:relative;z-index:1}
@@ -361,7 +366,17 @@ code{font-family:var(--mono);background:rgba(0,200,150,.06);padding:2px 7px;bord
 <div class="aurora"><div class="ab a"></div><div class="ab b"></div></div>
 <div class="grain"></div>
 
-<!-- nav removed -->
+<nav class="nav" id="nav">
+<div class="ni">
+  <div class="nl"><img src="docs/icon.svg" alt=""></div>
+  <div class="nc">etcd-druid<span class="dim">-skills</span></div>
+  <div class="nk">
+    <a href="#skills">Skills</a>
+    <a href="#install">Install</a>
+    <a class="gh-btn" href="https://github.com/seshachalam-yv/etcd-druid-skills">GitHub →</a>
+  </div>
+</div>
+</nav>
 
 <div class="wrap">
 
@@ -572,7 +587,7 @@ code{font-family:var(--mono);background:rgba(0,200,150,.06);padding:2px 7px;bord
         <line x1="0" y1="0" x2="256" y2="0" stroke="#00c896" stroke-width="1.5" opacity=".15" stroke-dasharray="5 3"><animate attributeName="stroke-dashoffset" from="30" to="0" dur="2s" repeatCount="indefinite"/></line>
       </g>
       <!-- Hover tooltip -->
-      <g class="fn-tip"><rect x="180" y="218" width="500" height="28" rx="6" fill="#1a1a1a" stroke="#333" stroke-width="1"/><text x="430" y="237" text-anchor="middle" font-family="Inter" font-size="9" fill="#86868b">Reads merged PRs, docs/development/, commit history — proposes 2-3 approaches before writing code</text></g>
+      <g class="fn-tip"><rect x="160" y="222" width="540" height="26" rx="6" fill="#0a0f1a" stroke="#1a2235" stroke-width="1"/><text x="430" y="240" text-anchor="middle" font-family="Inter" font-size="8.5" fill="#8892b0">Reads merged PRs, docs/development/, commit history — proposes 2-3 approaches before writing code</text></g>
     </g>
 
     <!-- ══ NODE 3: GATE 1 ══ -->
@@ -673,6 +688,98 @@ code{font-family:var(--mono);background:rgba(0,200,150,.06);padding:2px 7px;bord
   </svg>
 </div>
 </div>
+
+
+<!-- ═══ SKILLS ═══ -->
+<section class="sec" id="skills">
+  <div class="sec-eyebrow" data-stagger style="--s:0">Capabilities</div>
+  <div class="sec-h" data-stagger style="--s:1">9 specialized skills.</div>
+  <p class="sec-sub" data-stagger style="--s:2">Each encodes deep domain knowledge. Click any card for details.</p>
+
+  <div class="sk-cat" data-stagger style="--s:0">Planning & Execution</div>
+  <div class="sk-grid">
+    <div class="sk" data-stagger style="--s:0" onclick="openSkill('plan')"><div class="nm">📋 plan</div><div class="ds">Reads the issue, explores codebase & past PRs, proposes 2-3 approaches, writes a structured plan. <strong>Gate 1</strong> blocks code until you approve.</div><div class="iv">/etcd-druid:plan</div></div>
+    <div class="sk" data-stagger style="--s:1" onclick="openSkill('implement')"><div class="nm">⚡ implement</div><div class="ds">Creates isolated worktree, runs per-task subagent loop with spec-review + code-review, verifies CI. <strong>Gate 2</strong> blocks push.</div><div class="iv">/etcd-druid:implement</div></div>
+  </div>
+  <div class="sk-cat" data-stagger style="--s:0">Domain-Specific</div>
+  <div class="sk-grid">
+    <div class="sk" data-stagger style="--s:0" onclick="openSkill('api-change')"><div class="nm">🔧 api-change</div><div class="ds">CEL validation (field + cross-field), kubebuilder markers, two-commit generate workflow, CRD integration tests.</div><div class="iv">/etcd-druid:api-change</div></div>
+    <div class="sk" data-stagger style="--s:1" onclick="openSkill('tdd')"><div class="nm">🧪 tdd</div><div class="ds">Red-Green-Refactor per repo. Correct framework: Go native for druid/wrapper, Ginkgo v2 for backup-restore.</div><div class="iv">/etcd-druid:tdd</div></div>
+    <div class="sk" data-stagger style="--s:2" onclick="openSkill('debug')"><div class="nm">🔍 debug</div><div class="ds">6-phase root cause analysis. Delve debugger, per-repo log analysis (logr/logrus/zap), build failure triage.</div><div class="iv">/etcd-druid:debug</div></div>
+    <div class="sk" data-stagger style="--s:3" onclick="openSkill('e2e')"><div class="nm">🌐 e2e</div><div class="ds">KIND cluster setup, custom sidecar image builds, IMAGEVECTOR_OVERWRITE, pre-PR CI validation.</div><div class="iv">/etcd-druid:e2e</div></div>
+  </div>
+  <div class="sk-cat" data-stagger style="--s:0">Quality & Reference</div>
+  <div class="sk-grid">
+    <div class="sk" data-stagger style="--s:0" onclick="openSkill('review')"><div class="nm">✅ review</div><div class="ds">10-step checklist with 15 known footguns. Prow label validation, release note format, correct merge method.</div><div class="iv">/etcd-druid:review</div></div>
+    <div class="sk" data-stagger style="--s:1" onclick="openSkill('reference')"><div class="nm">📖 reference</div><div class="ds">Quick lookup: make targets, file paths, feature gates, CLI flags, git workflow, cherry-pick process.</div><div class="iv">/etcd-druid:reference</div></div>
+    <div class="sk" data-stagger style="--s:2" onclick="openSkill('observations')"><div class="nm">💡 observations</div><div class="ds">Triage plugin self-improvement findings. Pre-verifies against current files. Raise PR, skip, or dismiss.</div><div class="iv">/etcd-druid:observations</div></div>
+  </div>
+</section>
+
+
+<!-- ═══ SELF-IMPROVEMENT ═══ -->
+<section class="sec">
+  <div class="rv">
+    <div class="sec-eyebrow" data-stagger style="--s:0">Self-improving</div>
+    <div class="sec-h" data-stagger style="--s:1">The plugin gets<br>better every session.</div>
+    <p class="sec-sub" data-stagger style="--s:2">Every session is evaluated asynchronously. When a gap is found — a wrong claim, a missing footgun, a stale flag — it's captured as a structured observation. You decide what happens next.</p>
+  </div>
+  <div class="g2" style="margin-top:32px" data-stagger style="--s:3">
+    <div class="dash">
+      <div class="dash-header"><h4>How It Works</h4><span class="dash-badge amber">Auto-capture</span></div>
+      <div class="mini-tl" style="margin-top:16px">
+        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">Session ends → hook captures gaps automatically</span></div>
+        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">Next session → observations are pre-verified against current files</span></div>
+        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">Stale items auto-resolved (the fix is already in)</span></div>
+        <div class="mini-tl-row"><div class="mini-tl-dot active"></div><span class="bright">Verified gaps presented with evidence</span></div>
+        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">You choose: <strong style="color:var(--green)">R</strong> raise PR · <strong style="color:var(--amber)">S</strong> skip · <strong style="color:var(--red)">D</strong> dismiss</span></div>
+        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">PR raised only on explicit R choice</span></div>
+      </div>
+    </div>
+    <div class="dash">
+      <div class="dash-header"><h4>What Gets Captured</h4><span class="dash-badge green">Evidence-based</span></div>
+      <div style="margin-top:16px">
+        <div style="display:flex;gap:12px;margin-bottom:12px">
+          <div style="flex:1;padding:14px;border-radius:10px;background:rgba(255,69,58,.04);border:1px solid rgba(255,69,58,.1)">
+            <div style="font-size:.72em;color:var(--red);font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Wrong claim</div>
+            <div style="font-size:.78em;color:var(--text)">Plugin said "use make revendor" for etcd-druid — it's actually "make tidy"</div>
+          </div>
+          <div style="flex:1;padding:14px;border-radius:10px;background:rgba(255,179,0,.04);border:1px solid rgba(255,179,0,.1)">
+            <div style="font-size:.72em;color:var(--amber);font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Missing footgun</div>
+            <div style="font-size:.78em;color:var(--text)">New CEL validation gotcha not encoded in review skill</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:12px">
+          <div style="flex:1;padding:14px;border-radius:10px;background:rgba(41,151,255,.04);border:1px solid rgba(41,151,255,.1)">
+            <div style="font-size:.72em;color:var(--blue);font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Stale flag</div>
+            <div style="font-size:.78em;color:var(--text)">Feature gate was promoted from alpha to GA — skill still says alpha</div>
+          </div>
+          <div style="flex:1;padding:14px;border-radius:10px;background:rgba(0,200,150,.04);border:1px solid rgba(0,200,150,.1)">
+            <div style="font-size:.72em;color:var(--g);font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">User correction</div>
+            <div style="font-size:.78em;color:var(--text)">"No, the test should use Ginkgo v2 here, not Go native"</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══ IRON LAWS ═══ -->
+<section class="sec">
+  <div class="sec-eyebrow" data-stagger style="--s:0">Discipline</div>
+  <div class="sec-h" data-stagger style="--s:1">Iron Laws.</div>
+  <p class="sec-sub" data-stagger style="--s:2">One unconditional rule per skill. Addresses the thought pattern, not the abstract principle.</p>
+  <div data-stagger style="--s:3">
+    <div class="law"><div class="law-n">plan</div><div class="law-t">NO CODE BEFORE GATE 1</div></div>
+    <div class="law"><div class="law-n">implement</div><div class="law-t">NO PUSH BEFORE GATE 2</div></div>
+    <div class="law"><div class="law-n">tdd</div><div class="law-t">NO IMPLEMENTATION CODE BEFORE A FAILING TEST</div></div>
+    <div class="law"><div class="law-n">debug</div><div class="law-t">NO FIX WITHOUT A REPRODUCIBLE FAILURE FIRST</div></div>
+    <div class="law"><div class="law-n">review</div><div class="law-t">NO VERDICT WITHOUT READING THE DIFF FIRST</div></div>
+    <div class="law"><div class="law-n">verification</div><div class="law-t">NO CLAIMS WITHOUT FRESH EVIDENCE</div></div>
+  </div>
+</section>
+
 
 <!-- ═══ KEY METRICS ═══ -->
 <section class="pipeline">
@@ -776,93 +883,6 @@ code{font-family:var(--mono);background:rgba(0,200,150,.06);padding:2px 7px;bord
   </div>
 </section>
 
-<!-- ═══ SKILLS ═══ -->
-<section class="sec" id="skills">
-  <div class="sec-eyebrow" data-stagger style="--s:0">Capabilities</div>
-  <div class="sec-h" data-stagger style="--s:1">9 specialized skills.</div>
-  <p class="sec-sub" data-stagger style="--s:2">Each encodes deep domain knowledge. Click any card for details.</p>
-
-  <div class="sk-cat" data-stagger style="--s:0">Planning & Execution</div>
-  <div class="sk-grid">
-    <div class="sk" data-stagger style="--s:0" onclick="openSkill('plan')"><div class="nm">📋 plan</div><div class="ds">Reads the issue, explores codebase & past PRs, proposes 2-3 approaches, writes a structured plan. <strong>Gate 1</strong> blocks code until you approve.</div><div class="iv">/etcd-druid:plan</div></div>
-    <div class="sk" data-stagger style="--s:1" onclick="openSkill('implement')"><div class="nm">⚡ implement</div><div class="ds">Creates isolated worktree, runs per-task subagent loop with spec-review + code-review, verifies CI. <strong>Gate 2</strong> blocks push.</div><div class="iv">/etcd-druid:implement</div></div>
-  </div>
-  <div class="sk-cat" data-stagger style="--s:0">Domain-Specific</div>
-  <div class="sk-grid">
-    <div class="sk" data-stagger style="--s:0" onclick="openSkill('api-change')"><div class="nm">🔧 api-change</div><div class="ds">CEL validation (field + cross-field), kubebuilder markers, two-commit generate workflow, CRD integration tests.</div><div class="iv">/etcd-druid:api-change</div></div>
-    <div class="sk" data-stagger style="--s:1" onclick="openSkill('tdd')"><div class="nm">🧪 tdd</div><div class="ds">Red-Green-Refactor per repo. Correct framework: Go native for druid/wrapper, Ginkgo v2 for backup-restore.</div><div class="iv">/etcd-druid:tdd</div></div>
-    <div class="sk" data-stagger style="--s:2" onclick="openSkill('debug')"><div class="nm">🔍 debug</div><div class="ds">6-phase root cause analysis. Delve debugger, per-repo log analysis (logr/logrus/zap), build failure triage.</div><div class="iv">/etcd-druid:debug</div></div>
-    <div class="sk" data-stagger style="--s:3" onclick="openSkill('e2e')"><div class="nm">🌐 e2e</div><div class="ds">KIND cluster setup, custom sidecar image builds, IMAGEVECTOR_OVERWRITE, pre-PR CI validation.</div><div class="iv">/etcd-druid:e2e</div></div>
-  </div>
-  <div class="sk-cat" data-stagger style="--s:0">Quality & Reference</div>
-  <div class="sk-grid">
-    <div class="sk" data-stagger style="--s:0" onclick="openSkill('review')"><div class="nm">✅ review</div><div class="ds">10-step checklist with 15 known footguns. Prow label validation, release note format, correct merge method.</div><div class="iv">/etcd-druid:review</div></div>
-    <div class="sk" data-stagger style="--s:1" onclick="openSkill('reference')"><div class="nm">📖 reference</div><div class="ds">Quick lookup: make targets, file paths, feature gates, CLI flags, git workflow, cherry-pick process.</div><div class="iv">/etcd-druid:reference</div></div>
-    <div class="sk" data-stagger style="--s:2" onclick="openSkill('observations')"><div class="nm">💡 observations</div><div class="ds">Triage plugin self-improvement findings. Pre-verifies against current files. Raise PR, skip, or dismiss.</div><div class="iv">/etcd-druid:observations</div></div>
-  </div>
-</section>
-
-<!-- ═══ IRON LAWS ═══ -->
-<section class="sec">
-  <div class="sec-eyebrow" data-stagger style="--s:0">Discipline</div>
-  <div class="sec-h" data-stagger style="--s:1">Iron Laws.</div>
-  <p class="sec-sub" data-stagger style="--s:2">One unconditional rule per skill. Addresses the thought pattern, not the abstract principle.</p>
-  <div data-stagger style="--s:3">
-    <div class="law"><div class="law-n">plan</div><div class="law-t">NO CODE BEFORE GATE 1</div></div>
-    <div class="law"><div class="law-n">implement</div><div class="law-t">NO PUSH BEFORE GATE 2</div></div>
-    <div class="law"><div class="law-n">tdd</div><div class="law-t">NO IMPLEMENTATION CODE BEFORE A FAILING TEST</div></div>
-    <div class="law"><div class="law-n">debug</div><div class="law-t">NO FIX WITHOUT A REPRODUCIBLE FAILURE FIRST</div></div>
-    <div class="law"><div class="law-n">review</div><div class="law-t">NO VERDICT WITHOUT READING THE DIFF FIRST</div></div>
-    <div class="law"><div class="law-n">verification</div><div class="law-t">NO CLAIMS WITHOUT FRESH EVIDENCE</div></div>
-  </div>
-</section>
-
-<!-- ═══ SELF-IMPROVEMENT ═══ -->
-<section class="sec">
-  <div class="rv">
-    <div class="sec-eyebrow" data-stagger style="--s:0">Self-improving</div>
-    <div class="sec-h" data-stagger style="--s:1">The plugin gets<br>better every session.</div>
-    <p class="sec-sub" data-stagger style="--s:2">Every session is evaluated asynchronously. When a gap is found — a wrong claim, a missing footgun, a stale flag — it's captured as a structured observation. You decide what happens next.</p>
-  </div>
-  <div class="g2" style="margin-top:32px" data-stagger style="--s:3">
-    <div class="dash">
-      <div class="dash-header"><h4>How It Works</h4><span class="dash-badge amber">Auto-capture</span></div>
-      <div class="mini-tl" style="margin-top:16px">
-        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">Session ends → hook captures gaps automatically</span></div>
-        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">Next session → observations are pre-verified against current files</span></div>
-        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">Stale items auto-resolved (the fix is already in)</span></div>
-        <div class="mini-tl-row"><div class="mini-tl-dot active"></div><span class="bright">Verified gaps presented with evidence</span></div>
-        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">You choose: <strong style="color:var(--green)">R</strong> raise PR · <strong style="color:var(--amber)">S</strong> skip · <strong style="color:var(--red)">D</strong> dismiss</span></div>
-        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">PR raised only on explicit R choice</span></div>
-      </div>
-    </div>
-    <div class="dash">
-      <div class="dash-header"><h4>What Gets Captured</h4><span class="dash-badge green">Evidence-based</span></div>
-      <div style="margin-top:16px">
-        <div style="display:flex;gap:12px;margin-bottom:12px">
-          <div style="flex:1;padding:14px;border-radius:10px;background:rgba(255,69,58,.04);border:1px solid rgba(255,69,58,.1)">
-            <div style="font-size:.72em;color:var(--red);font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Wrong claim</div>
-            <div style="font-size:.78em;color:var(--text)">Plugin said "use make revendor" for etcd-druid — it's actually "make tidy"</div>
-          </div>
-          <div style="flex:1;padding:14px;border-radius:10px;background:rgba(255,179,0,.04);border:1px solid rgba(255,179,0,.1)">
-            <div style="font-size:.72em;color:var(--amber);font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Missing footgun</div>
-            <div style="font-size:.78em;color:var(--text)">New CEL validation gotcha not encoded in review skill</div>
-          </div>
-        </div>
-        <div style="display:flex;gap:12px">
-          <div style="flex:1;padding:14px;border-radius:10px;background:rgba(41,151,255,.04);border:1px solid rgba(41,151,255,.1)">
-            <div style="font-size:.72em;color:var(--blue);font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Stale flag</div>
-            <div style="font-size:.78em;color:var(--text)">Feature gate was promoted from alpha to GA — skill still says alpha</div>
-          </div>
-          <div style="flex:1;padding:14px;border-radius:10px;background:rgba(0,200,150,.04);border:1px solid rgba(0,200,150,.1)">
-            <div style="font-size:.72em;color:var(--g);font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">User correction</div>
-            <div style="font-size:.78em;color:var(--text)">"No, the test should use Ginkgo v2 here, not Go native"</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
 
 <!-- ═══ ECOSYSTEM ═══ -->
 <section class="sec">
@@ -992,7 +1012,9 @@ const flowObs=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting){
 }})},{threshold:.1});
 document.querySelectorAll('#aflow').forEach(el=>flowObs.observe(el));
 
-// Nav removed
+// Nav appears after scrolling past hero
+const navEl=document.getElementById('nav');
+window.addEventListener('scroll',()=>{navEl.classList.toggle('show',scrollY>500)},{passive:true});
 
 // Skills data
 const sk={
