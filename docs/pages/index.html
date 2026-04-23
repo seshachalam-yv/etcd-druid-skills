@@ -53,22 +53,39 @@ code{font-family:var(--mono);background:rgba(0,200,150,.06);padding:2px 7px;bord
 .btn{display:inline-block;padding:14px 30px;border-radius:980px;font-weight:600;font-size:.88em;transition:all .25s}
 .btn-fill{background:linear-gradient(135deg,var(--g),var(--gd));color:#fff;border:none;box-shadow:0 4px 20px rgba(0,200,150,.2)}.btn-fill:hover{background:linear-gradient(135deg,#33dba8,var(--g));transform:scale(1.03);text-decoration:none;color:#fff;box-shadow:0 8px 30px rgba(0,200,150,.3)}
 .btn-line{color:var(--g);border:1px solid rgba(0,200,150,.25)}.btn-line:hover{border-color:var(--g);text-decoration:none;box-shadow:0 4px 20px rgba(0,200,150,.1)}
-.hero-logo{margin-bottom:28px;position:relative}
+.hero-logo{margin-bottom:28px;position:relative;width:200px;height:260px;display:flex;align-items:center;justify-content:center}
+.hero-logo svg.logo-svg{width:140px;height:144px;position:relative;z-index:2}
 .hero-logo img{display:none}
-.hero-logo svg{max-width:120px;width:100%;animation:logoFloat 4s ease-in-out infinite;filter:drop-shadow(0 0 30px rgba(0,200,150,.2))}
-@keyframes logoFloat{0%,100%{transform:translateY(0) rotate(0deg)}25%{transform:translateY(-6px) rotate(.5deg)}50%{transform:translateY(-10px) rotate(0deg)}75%{transform:translateY(-6px) rotate(-.5deg)}}
-/* Inner plant/gem sways like a shoot in wind */
-.logo-inner{transform-origin:50% 90%;animation:plantSway 5s ease-in-out infinite}
-@keyframes plantSway{0%,100%{transform:rotate(0deg) scaleY(1)}20%{transform:rotate(1.5deg) scaleY(1.01)}40%{transform:rotate(-.8deg) scaleY(.99)}60%{transform:rotate(1deg) scaleY(1.005)}80%{transform:rotate(-.5deg) scaleY(1)}}
-/* Lightning bolt flickers with energy */
-.logo-bolt{animation:boltFlicker 3s ease-in-out infinite;transform-origin:50% 30%}
-@keyframes boltFlicker{0%,100%{opacity:.95;transform:scale(1) translateY(0)}15%{opacity:1;transform:scale(1.06) translateY(-1px)}30%{opacity:.85;transform:scale(.98) translateY(.5px)}45%{opacity:1;transform:scale(1.03) translateY(-1.5px)}60%{opacity:.9;transform:scale(1) translateY(0)}75%{opacity:1;transform:scale(1.05) translateY(-1px)}90%{opacity:.88;transform:scale(.99) translateY(.5px)}}
-/* Hex shell breathes subtly */
-.logo-hex{animation:hexBreathe 6s ease-in-out infinite}
-@keyframes hexBreathe{0%,100%{transform:scale(1)}50%{transform:scale(1.008)}}
-/* Glow under the logo */
-.hero-logo::after{content:'';position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);width:160px;height:30px;background:radial-gradient(ellipse,rgba(0,200,150,.15),transparent 70%);border-radius:50%;animation:logoShadow 4s ease-in-out infinite}
-@keyframes logoShadow{0%,100%{opacity:.6;transform:translateX(-50%) scaleX(1)}50%{opacity:.3;transform:translateX(-50%) scaleX(.85)}}
+/* Hex charges up on strike */
+.hero-logo .hex-fill{fill:#009F76;opacity:.5;animation:hexChg 6s ease-in-out infinite}
+@keyframes hexChg{0%,30%{opacity:.5;filter:brightness(.8)}40%{opacity:1;filter:brightness(1.4)}50%,100%{opacity:1;filter:brightness(1)}}
+/* Facets light up in cascade */
+.hero-logo .facet{opacity:.4;animation:facetLt 6s ease-in-out infinite}
+@keyframes facetLt{0%,30%{opacity:.4;filter:brightness(.7)}38%{opacity:1;filter:brightness(1.6)}50%,100%{opacity:1;filter:brightness(1)}}
+.hero-logo .f2{animation-delay:.05s}.hero-logo .f3{animation-delay:.1s}.hero-logo .f4{animation-delay:.15s}
+/* Bolt appears on strike */
+.hero-logo .bolt-inner{opacity:0;animation:boltIn 6s ease-in-out infinite}
+@keyframes boltIn{0%,32%{opacity:0;transform:scale(.8) translateY(3px)}36%{opacity:1;transform:scale(1.15) translateY(-2px)}42%{opacity:1;transform:scale(1)}100%{opacity:.95;transform:scale(1)}}
+/* Lightning strike from above */
+.hero-logo .strike{position:absolute;top:0;left:50%;transform:translateX(-50%);z-index:3;width:60px;height:140px;pointer-events:none}
+.hero-logo .strike-bolt{fill:none;stroke:url(#hStrikeG);stroke-width:3;stroke-linecap:round;stroke-dasharray:300;stroke-dashoffset:300;animation:strikeD 6s ease-in-out infinite;filter:drop-shadow(0 0 8px rgba(255,200,0,.6))}
+@keyframes strikeD{0%,25%{stroke-dashoffset:300;opacity:1}32%{stroke-dashoffset:0;opacity:1}40%{opacity:0}100%{opacity:0;stroke-dashoffset:300}}
+.hero-logo .strike-bolt2{fill:none;stroke:#fff;stroke-width:1.5;stroke-linecap:round;stroke-dasharray:300;stroke-dashoffset:300;animation:strikeD2 6s ease-in-out infinite;opacity:.6}
+@keyframes strikeD2{0%,26%{stroke-dashoffset:300;opacity:.6}33%{stroke-dashoffset:0;opacity:.6}38%{opacity:0}100%{opacity:0;stroke-dashoffset:300}}
+/* Impact flash */
+.hero-logo .flash{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:0;height:0;border-radius:50%;background:radial-gradient(circle,rgba(255,220,100,.8),rgba(0,200,150,.3),transparent 70%);z-index:1;animation:impFlash 6s ease-out infinite;pointer-events:none}
+@keyframes impFlash{0%,33%{width:0;height:0;opacity:0}36%{width:250px;height:250px;opacity:.8}45%{width:350px;height:350px;opacity:0}100%{opacity:0}}
+/* Shockwave ring */
+.hero-logo .ring{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:40px;height:40px;border-radius:50%;border:2px solid rgba(0,200,150,.5);z-index:1;animation:shock 6s ease-out infinite;pointer-events:none}
+@keyframes shock{0%,33%{width:40px;height:40px;opacity:0}36%{opacity:.7}50%{width:300px;height:300px;opacity:0;border-width:1px}100%{opacity:0}}
+.hero-logo .ring2{animation-delay:.1s;border-color:rgba(255,200,0,.3)}
+/* Energy particles */
+.hero-logo .particles{position:absolute;top:50%;left:50%;z-index:4;pointer-events:none}
+.hero-logo .particle{position:absolute;width:4px;height:4px;border-radius:50%;background:#ffcc00;animation:pBurst 6s ease-out infinite;opacity:0}
+@keyframes pBurst{0%,34%{transform:translate(0,0) scale(1);opacity:0}36%{opacity:1;transform:translate(var(--px),var(--py)) scale(1)}50%{opacity:0;transform:translate(calc(var(--px)*2.5),calc(var(--py)*2.5)) scale(0)}100%{opacity:0}}
+/* Glow under */
+.hero-logo .glow-under{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);width:120px;height:20px;background:radial-gradient(ellipse,rgba(0,200,150,.2),transparent 70%);border-radius:50%;animation:glowP 6s ease-in-out infinite;z-index:0}
+@keyframes glowP{0%,30%{opacity:.2;transform:translateX(-50%) scaleX(.8)}40%{opacity:.8;transform:translateX(-50%) scaleX(1.2)}55%,100%{opacity:.4;transform:translateX(-50%) scaleX(1)}}
 .hero-scroll{margin-top:40px;color:var(--dim);font-size:.75em;letter-spacing:.1em;text-transform:uppercase;animation:bob 2s ease-in-out infinite}
 @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}
 
@@ -349,32 +366,38 @@ code{font-family:var(--mono);background:rgba(0,200,150,.06);padding:2px 7px;bord
 <!-- ═══ HERO ═══ -->
 <section class="hero">
   <div class="hero-logo" data-stagger style="--s:0">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 102" width="120" height="122">
+    <div class="glow-under"></div>
+    <svg class="strike" viewBox="0 0 60 140"><defs><linearGradient id="hStrikeG" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#fff" stop-opacity=".3"/><stop offset="40%" stop-color="#ffcc00"/><stop offset="100%" stop-color="#ff8800"/></linearGradient></defs><path class="strike-bolt" d="M30,0 L25,30 L35,35 L20,65 L32,70 L15,105 L28,108 L22,140"/><path class="strike-bolt2" d="M32,5 L28,25 L36,30 L24,55 L34,62 L20,95 L30,100 L26,135"/></svg>
+    <div class="flash"></div>
+    <div class="ring"></div>
+    <div class="ring ring2"></div>
+    <div class="particles">
+      <div class="particle" style="--px:-40px;--py:-30px"></div>
+      <div class="particle" style="--px:35px;--py:-35px;animation-delay:.05s"></div>
+      <div class="particle" style="--px:-30px;--py:25px;animation-delay:.08s"></div>
+      <div class="particle" style="--px:40px;--py:20px;animation-delay:.03s"></div>
+      <div class="particle" style="--px:-15px;--py:-45px;animation-delay:.06s"></div>
+      <div class="particle" style="--px:20px;--py:40px;animation-delay:.1s"></div>
+      <div class="particle" style="--px:-45px;--py:5px;animation-delay:.04s"></div>
+      <div class="particle" style="--px:45px;--py:-10px;animation-delay:.07s"></div>
+    </div>
+    <svg class="logo-svg" viewBox="0 0 95 98">
       <defs>
-        <linearGradient id="hfa" x1="12%" y1="-18%" x2="88%" y2="84%"><stop offset="0%" stop-color="#fff" stop-opacity=".92"/><stop offset="100%" stop-color="#439246"/></linearGradient>
-        <linearGradient id="hfb" x1="50%" y1="5%" x2="148%" y2="175%"><stop offset="0%" stop-color="#fff" stop-opacity=".80"/><stop offset="100%" stop-color="#439246"/></linearGradient>
-        <linearGradient id="hfc" x1="19%" y1="-9%" x2="82%" y2="77%"><stop offset="0%" stop-color="#fff" stop-opacity=".92"/><stop offset="100%" stop-color="#439246"/></linearGradient>
-        <linearGradient id="hfd" x1="57%" y1="26%" x2="137%" y2="158%"><stop offset="0%" stop-color="#fff" stop-opacity=".80"/><stop offset="100%" stop-color="#439246"/></linearGradient>
-        <linearGradient id="hbolt" x1="30%" y1="0%" x2="70%" y2="100%"><stop offset="0%" stop-color="#ffe680"/><stop offset="45%" stop-color="#ffb300"/><stop offset="100%" stop-color="#e67e00"/></linearGradient>
-        <clipPath id="hhx"><path d="M46,2 L83,17.4 L85.5,20.7 L94.5,59 L93,63.5 L70.5,93.8 L66.5,95.6 L29,95.6 L25,93.8 L2.5,63.5 L1,59 L10,20.7 L12.5,17.4 Z"/></clipPath>
-        <filter id="hglo"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        <linearGradient id="hlfa" x1="12%" y1="-18%" x2="88%" y2="84%"><stop offset="0%" stop-color="#fff" stop-opacity=".92"/><stop offset="100%" stop-color="#439246"/></linearGradient>
+        <linearGradient id="hlfb" x1="50%" y1="5%" x2="148%" y2="175%"><stop offset="0%" stop-color="#fff" stop-opacity=".80"/><stop offset="100%" stop-color="#439246"/></linearGradient>
+        <linearGradient id="hlfc" x1="19%" y1="-9%" x2="82%" y2="77%"><stop offset="0%" stop-color="#fff" stop-opacity=".92"/><stop offset="100%" stop-color="#439246"/></linearGradient>
+        <linearGradient id="hlfd" x1="57%" y1="26%" x2="137%" y2="158%"><stop offset="0%" stop-color="#fff" stop-opacity=".80"/><stop offset="100%" stop-color="#439246"/></linearGradient>
+        <linearGradient id="hlbolt" x1="30%" y1="0%" x2="70%" y2="100%"><stop offset="0%" stop-color="#ffe680"/><stop offset="45%" stop-color="#ffb300"/><stop offset="100%" stop-color="#e67e00"/></linearGradient>
+        <clipPath id="hlhx"><path d="M46,2 L83,17.4 L85.5,20.7 L94.5,59 L93,63.5 L70.5,93.8 L66.5,95.6 L29,95.6 L25,93.8 L2.5,63.5 L1,59 L10,20.7 L12.5,17.4 Z"/></clipPath>
+        <filter id="hlgl"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
       </defs>
-      <!-- Hex shell (breathes) -->
-      <g class="logo-hex">
-        <path d="M46,2 L83,17.4 L85.5,20.7 L94.5,59 L93,63.5 L70.5,93.8 L66.5,95.6 L29,95.6 L25,93.8 L2.5,63.5 L1,59 L10,20.7 L12.5,17.4 Z" fill="#009F76"/>
-        <polygon points="-7,60 24,27 57,64 19,100" fill="#000" opacity=".24" clip-path="url(#hhx)"/>
-      </g>
-      <!-- Inner plant/gem (sways like shoot in wind) -->
-      <g class="logo-inner">
-        <path d="M62,44 C61.4,45.8 60.2,47.5 59,48.2 L50,53.4 C48.2,54.5 45.2,54.5 43.4,53.4 L34.4,48.2 C32.6,46.9 31.2,44.4 31.2,42.4 L31.2,31 C31.2,30.1 31.5,29.1 32,28.2 Z" fill="url(#hfa)"/>
-        <path d="M61.2,28.4 C61.7,29.2 61.9,30.2 61.9,31 L61.9,42.8 C61.9,44.8 60.4,47.3 58.7,48.4 L49.7,53.6 C47.9,54.7 44.9,54.7 43.1,53.6 L34.1,48.4 C33.2,47.8 32.3,46.7 31.8,45.8 Z" fill="url(#hfb)"/>
-        <path d="M71,65 C70.3,66.5 69.2,67.8 68.1,68.5 L52.8,77.2 C50.8,78.3 47.4,78.3 45.4,77.2 L30.1,68.5 C28.1,67.4 26.7,64.8 26.7,62.8 L26.7,45.8 C26.7,44.8 27,43.6 27.6,42.6 Z" fill="url(#hfc)"/>
-        <path d="M70.9,42.8 C71.5,43.7 71.7,44.6 71.7,45.6 L71.7,63 C71.7,65 70.3,67.6 68.1,68.7 L52.8,77.4 C50.8,78.5 47.4,78.5 45.4,77.4 L30.1,68.7 C29.1,68.1 28.2,67.1 27.6,66.1 Z" fill="url(#hfd)"/>
-      </g>
-      <!-- Lightning bolt (flickers with energy) -->
-      <g class="logo-bolt">
-        <polygon points="66,54 56,72 63,72 59,89 74,67 65,67" fill="url(#hbolt)" filter="url(#hglo)"/>
-      </g>
+      <path class="hex-fill" d="M46,2 L83,17.4 L85.5,20.7 L94.5,59 L93,63.5 L70.5,93.8 L66.5,95.6 L29,95.6 L25,93.8 L2.5,63.5 L1,59 L10,20.7 L12.5,17.4 Z"/>
+      <polygon class="shd" fill="#000" opacity=".24" points="-7,60 24,27 57,64 19,100" clip-path="url(#hlhx)"/>
+      <path class="facet f1" fill="url(#hlfa)" d="M62,44 C61.4,45.8 60.2,47.5 59,48.2 L50,53.4 C48.2,54.5 45.2,54.5 43.4,53.4 L34.4,48.2 C32.6,46.9 31.2,44.4 31.2,42.4 L31.2,31 C31.2,30.1 31.5,29.1 32,28.2 Z"/>
+      <path class="facet f2" fill="url(#hlfb)" d="M61.2,28.4 C61.7,29.2 61.9,30.2 61.9,31 L61.9,42.8 C61.9,44.8 60.4,47.3 58.7,48.4 L49.7,53.6 C47.9,54.7 44.9,54.7 43.1,53.6 L34.1,48.4 C33.2,47.8 32.3,46.7 31.8,45.8 Z"/>
+      <path class="facet f3" fill="url(#hlfc)" d="M71,65 C70.3,66.5 69.2,67.8 68.1,68.5 L52.8,77.2 C50.8,78.3 47.4,78.3 45.4,77.2 L30.1,68.5 C28.1,67.4 26.7,64.8 26.7,62.8 L26.7,45.8 C26.7,44.8 27,43.6 27.6,42.6 Z"/>
+      <path class="facet f4" fill="url(#hlfd)" d="M70.9,42.8 C71.5,43.7 71.7,44.6 71.7,45.6 L71.7,63 C71.7,65 70.3,67.6 68.1,68.7 L52.8,77.4 C50.8,78.5 47.4,78.5 45.4,77.4 L30.1,68.7 C29.1,68.1 28.2,67.1 27.6,66.1 Z"/>
+      <g class="bolt-inner"><polygon fill="url(#hlbolt)" points="66,54 56,72 63,72 59,89 74,67 65,67" filter="url(#hlgl)"/></g>
     </svg>
   </div>
   <div class="hero-eyebrow" data-stagger style="--s:1">The agentic workflow for etcd-druid</div>
