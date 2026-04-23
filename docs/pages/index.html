@@ -512,155 +512,78 @@ code{font-family:var(--mono);background:rgba(0,200,150,.06);padding:2px 7px;bord
 </div>
 </div>
 
-<!-- ═══ PIPELINE INFOGRAPHIC ═══ -->
+<!-- ═══ KEY METRICS ═══ -->
 <section class="pipeline">
-  <div class="sec-eyebrow" data-stagger style="--s:0">The complete pipeline</div>
-  <div class="sec-h" data-stagger style="--s:1">From issue<br>to merged PR.</div>
-  <p class="sec-sub" data-stagger style="--s:2">Every step is visible. Every gate requires your approval. Here's what happens inside.</p>
+  <div class="sec-eyebrow" data-stagger style="--s:0">By the numbers</div>
+  <div class="sec-h" data-stagger style="--s:1">What the plugin<br>brings to the table.</div>
+  <p class="sec-sub" data-stagger style="--s:2">Real data from the etcd-druid ecosystem — 2,072 commits, 222 releases, and growing.</p>
 
-  <!-- Pipeline flow -->
-  <div class="pipe-flow" data-stagger style="--s:3">
-    <div class="pipe-step"><div class="pipe-icon">📋</div><div class="pipe-label">Issue</div><div class="pipe-sub">GitHub</div></div>
-    <div class="pipe-arrow">→</div>
-    <div class="pipe-step"><div class="pipe-icon">🔍</div><div class="pipe-label">Analyze</div><div class="pipe-sub">Codebase</div></div>
-    <div class="pipe-arrow">→</div>
-    <div class="pipe-step"><div class="pipe-icon">📚</div><div class="pipe-label">Research</div><div class="pipe-sub">PRs + Reviews</div></div>
-    <div class="pipe-arrow">→</div>
-    <div class="pipe-step"><div class="pipe-icon">💡</div><div class="pipe-label">Design</div><div class="pipe-sub">2-3 Options</div></div>
-    <div class="pipe-arrow">→</div>
-    <div class="pipe-step"><div class="pipe-icon" style="border-color:var(--amber)">⛔</div><div class="pipe-label" style="color:var(--amber)">Gate 1</div><div class="pipe-sub">You approve</div></div>
-    <div class="pipe-arrow">→</div>
-    <div class="pipe-step"><div class="pipe-icon">⚡</div><div class="pipe-label">Implement</div><div class="pipe-sub">TDD + Review</div></div>
-    <div class="pipe-arrow">→</div>
-    <div class="pipe-step"><div class="pipe-icon" style="border-color:var(--amber)">⛔</div><div class="pipe-label" style="color:var(--amber)">Gate 2</div><div class="pipe-sub">You approve</div></div>
-    <div class="pipe-arrow">→</div>
-    <div class="pipe-step"><div class="pipe-icon" style="border-color:var(--green)">✅</div><div class="pipe-label" style="color:var(--green)">PR</div><div class="pipe-sub">Merged</div></div>
-  </div>
+  <div class="dash-grid" style="grid-template-columns:repeat(2,1fr)">
 
-  <!-- Dashboard cards -->
-  <div class="dash-grid">
-
-    <!-- Card 1: Plan phase breakdown -->
+    <!-- Left: Plugin capabilities -->
     <div class="dash" data-stagger style="--s:0">
-      <div class="dash-header"><h4>Plan Phase</h4><span class="dash-badge green">Gate 1</span></div>
-      <div class="dash-big">6</div>
-      <div class="dash-sub">Steps before any code is written</div>
+      <div class="dash-header"><h4>Plugin Capabilities</h4><span class="dash-badge green">v0.2.0</span></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin:20px 0">
+        <div style="text-align:center"><div class="dash-big">11</div><div style="font-size:.68em;color:var(--dim);margin-top:4px">Skills</div></div>
+        <div style="text-align:center"><div class="dash-big">7</div><div style="font-size:.68em;color:var(--dim);margin-top:4px">Hooks</div></div>
+        <div style="text-align:center"><div class="dash-big">3</div><div style="font-size:.68em;color:var(--dim);margin-top:4px">Subagents</div></div>
+      </div>
       <div class="mini-tl">
-        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">Read issue &amp; acceptance criteria</span></div>
-        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">Explore codebase &amp; 973+ merged PRs</span></div>
-        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">State assumptions explicitly</span></div>
-        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">Propose 2-3 approaches</span></div>
-        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">Write WHEN/THEN criteria</span></div>
-        <div class="mini-tl-row"><div class="mini-tl-dot active"></div><span class="bright">Wait for Gate 1 approval</span></div>
+        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">3 CRDs managed (Etcd, CopyBackups, OpsTask)</span></div>
+        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">5 reconcilers · 1 protection webhook</span></div>
+        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">8 backup providers (S3, GCS, ABS, Swift...)</span></div>
       </div>
     </div>
 
-    <!-- Card 2: Ecosystem scope -->
+    <!-- Right: Eval results donut -->
     <div class="dash" data-stagger style="--s:1">
-      <div class="dash-header"><h4>Ecosystem Coverage</h4><span class="dash-badge blue">3 Repos</span></div>
-      <div class="donut-wrap">
+      <div class="dash-header"><h4>Eval Results</h4><span class="dash-badge blue">5 Real PRs</span></div>
+      <div style="display:flex;align-items:center;gap:24px;margin-top:16px">
         <div class="donut" id="donut1">
           <svg viewBox="0 0 80 80"><circle class="track" cx="40" cy="40" r="34"/><circle class="fill" cx="40" cy="40" r="34" style="--pct:0.96"/></svg>
           <div class="donut-center">96%</div>
         </div>
-        <div class="donut-legend">
-          <span><span class="dot g"></span>Plugin: 96% eval</span>
-          <span><span class="dot d"></span>Baseline: 52%</span>
-          <span style="margin-top:6px;color:var(--green);font-weight:600">+44pp lift</span>
+        <div>
+          <div style="font-size:1.4em;font-weight:800;color:var(--bright);font-family:var(--mono)">+44pp</div>
+          <div style="font-size:.82em;color:var(--dim);margin-top:2px">average lift over vanilla Claude</div>
+          <div style="margin-top:12px;font-size:.78em;color:var(--text);line-height:1.6">
+            <span style="color:var(--green)">●</span> Plugin: 96% convention compliance<br>
+            <span style="color:var(--dim)">●</span> Baseline: 52%
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- Card 3: Plugin architecture -->
-    <div class="dash" data-stagger style="--s:2">
-      <div class="dash-header"><h4>Plugin Architecture</h4><span class="dash-badge amber">v0.2.0</span></div>
-      <div class="dash-big">11</div>
-      <div class="dash-sub">Skills · 7 hooks · 3 subagents</div>
-      <div class="mini-bars" id="research-bars">
-        <div class="mini-bar" style="height:100%"></div>
-        <div class="mini-bar" style="height:64%"></div>
-        <div class="mini-bar" style="height:27%"></div>
-      </div>
-      <div style="display:flex;justify-content:space-between;font-size:.58em;color:var(--dim);margin-top:4px">
-        <span>Skills (11)</span><span>Hooks (7)</span><span>Subagents (3)</span>
-      </div>
-    </div>
-
-    <!-- Card 4: Data flow (wide) -->
-    <div class="dash flow-card" data-stagger style="--s:0">
-      <div class="dash-header"><h4>Data Flow — Issue to PR</h4><span class="dash-badge green">Pipeline</span></div>
-      <div class="flow-nodes">
-        <div class="flow-node active">GitHub Issue</div>
-        <div class="flow-arr">→</div>
-        <div class="flow-node active">936 commits</div>
-        <div class="flow-arr">→</div>
-        <div class="flow-node active">973 merged PRs</div>
-        <div class="flow-arr">→</div>
-        <div class="flow-node active">docs/development/</div>
-        <div class="flow-arr">→</div>
-        <div class="flow-node active">2-3 Options</div>
-        <div class="flow-arr">→</div>
-        <div class="flow-node gate">⛔ Gate 1</div>
-        <div class="flow-arr">→</div>
-        <div class="flow-node active">Worktree</div>
-        <div class="flow-arr">→</div>
-        <div class="flow-node active">TDD Loop</div>
-        <div class="flow-arr">→</div>
-        <div class="flow-node active">CI Verify</div>
-        <div class="flow-arr">→</div>
-        <div class="flow-node gate">⛔ Gate 2</div>
-        <div class="flow-arr">→</div>
-        <div class="flow-node" style="border-color:var(--green);color:var(--green)">PR Created</div>
-      </div>
-    </div>
-
-    <!-- Card 5: Subagent architecture -->
-    <div class="dash" data-stagger style="--s:1">
-      <div class="dash-header"><h4>Implementation Loop</h4><span class="dash-badge blue">Per Task</span></div>
-      <div class="dash-sub">3 subagents review every task</div>
-      <div class="sub-ring">
-        <div class="sub-agent"><div class="sub-icon">🛠</div><div class="sub-nm">Implementer</div><div class="sub-role">Writes code (TDD)</div></div>
-        <div class="sub-agent"><div class="sub-icon">📋</div><div class="sub-nm">Spec Review</div><div class="sub-role">Checks plan match</div></div>
-        <div class="sub-agent"><div class="sub-icon">🔍</div><div class="sub-nm">Code Review</div><div class="sub-role">Validates quality</div></div>
-      </div>
-    </div>
-
-    <!-- Card 6: etcd-druid scope -->
+    <!-- Bottom-left: Repo stats -->
     <div class="dash" data-stagger style="--s:0">
-      <div class="dash-header"><h4>etcd-druid Scope</h4><span class="dash-badge green">Operator</span></div>
-      <div class="dash-big">3</div>
-      <div class="dash-sub">CRDs managed by etcd-druid</div>
-      <div class="mini-tl">
-        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">Etcd — cluster lifecycle</span></div>
-        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">EtcdCopyBackupsTask — cross-bucket copy</span></div>
-        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">EtcdOpsTask — member operations</span></div>
-        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span>5 reconcilers · 1 webhook</span></div>
-        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span>8 backup providers (S3, GCS, ABS, Swift...)</span></div>
+      <div class="dash-header"><h4>Ecosystem</h4><span class="dash-badge green">3 Repos</span></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:16px">
+        <div style="padding:12px;border-radius:10px;background:rgba(0,200,150,.04);border:1px solid rgba(0,200,150,.1);text-align:center">
+          <div style="font-family:var(--mono);font-size:.78em;color:var(--g);font-weight:700">etcd-druid</div>
+          <div style="font-size:.68em;color:var(--dim);margin-top:4px">v0.36.3 · 52 contrib</div>
+        </div>
+        <div style="padding:12px;border-radius:10px;background:rgba(41,151,255,.04);border:1px solid rgba(41,151,255,.1);text-align:center">
+          <div style="font-family:var(--mono);font-size:.78em;color:var(--blue);font-weight:700">backup-restore</div>
+          <div style="font-size:.68em;color:var(--dim);margin-top:4px">v0.41.2 · 61 contrib</div>
+        </div>
+        <div style="padding:12px;border-radius:10px;background:rgba(167,139,250,.04);border:1px solid rgba(167,139,250,.1);text-align:center">
+          <div style="font-family:var(--mono);font-size:.78em;color:#a78bfa;font-weight:700">wrapper</div>
+          <div style="font-size:.68em;color:var(--dim);margin-top:4px">v0.7.0 · 23 contrib</div>
+        </div>
       </div>
+      <div style="margin-top:14px;font-size:.76em;color:var(--dim);text-align:center">2,072 commits · 222 releases · 136 contributors</div>
     </div>
 
-    <!-- Card 7: Repo stats -->
+    <!-- Bottom-right: CI Pipeline -->
     <div class="dash" data-stagger style="--s:1">
-      <div class="dash-header"><h4>Repo Detection</h4><span class="dash-badge green">Auto</span></div>
-      <div class="dash-big">3</div>
-      <div class="dash-sub">Repos · 2,072 commits · 222 releases</div>
-      <div class="mini-tl">
-        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">etcd-druid → v0.36.3, 52 contributors</span></div>
-        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">backup-restore → v0.41.2, 61 contributors</span></div>
-        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">wrapper → v0.7.0, 23 contributors</span></div>
-      </div>
-    </div>
-
-    <!-- Card 8: CI verification -->
-    <div class="dash" data-stagger style="--s:2">
-      <div class="dash-header"><h4>CI Verification</h4><span class="dash-badge green">Before PR</span></div>
-      <div class="dash-sub">Full pipeline before Gate 2</div>
+      <div class="dash-header"><h4>CI Pipeline</h4><span class="dash-badge green">Before Gate 2</span></div>
+      <div class="dash-sub" style="margin-bottom:12px">Every PR runs the full verification suite</div>
       <div class="mini-tl">
         <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">make ci-checks</span></div>
         <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">make test-unit</span></div>
         <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">make test-integration</span></div>
         <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">make ci-e2e-kind</span></div>
-        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">Whole-diff review</span></div>
+        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">Whole-diff code review</span></div>
       </div>
     </div>
 
@@ -699,21 +622,21 @@ code{font-family:var(--mono);background:rgba(0,200,150,.06);padding:2px 7px;bord
 
   <div class="sk-cat" data-stagger style="--s:0">Planning & Execution</div>
   <div class="sk-grid">
-    <div class="sk" data-stagger style="--s:0" onclick="openSkill('plan')"><div class="nm">plan</div><div class="ds">Issue intake → approach selection → code plan with WHEN/THEN. Gate 1 blocks code until you approve.</div><div class="iv">/etcd-druid:plan</div></div>
-    <div class="sk" data-stagger style="--s:1" onclick="openSkill('implement')"><div class="nm">implement</div><div class="ds">Worktree → subagent loop → CI verify → PR draft. Gate 2 blocks push.</div><div class="iv">/etcd-druid:implement</div></div>
+    <div class="sk" data-stagger style="--s:0" onclick="openSkill('plan')"><div class="nm">📋 plan</div><div class="ds">Reads the issue, explores codebase & past PRs, proposes 2-3 approaches, writes a structured plan. <strong>Gate 1</strong> blocks code until you approve.</div><div class="iv">/etcd-druid:plan</div></div>
+    <div class="sk" data-stagger style="--s:1" onclick="openSkill('implement')"><div class="nm">⚡ implement</div><div class="ds">Creates isolated worktree, runs per-task subagent loop with spec-review + code-review, verifies CI. <strong>Gate 2</strong> blocks push.</div><div class="iv">/etcd-druid:implement</div></div>
   </div>
   <div class="sk-cat" data-stagger style="--s:0">Domain-Specific</div>
   <div class="sk-grid">
-    <div class="sk" data-stagger style="--s:0" onclick="openSkill('api-change')"><div class="nm">api-change</div><div class="ds">CEL validation, kubebuilder markers, two-commit generate, CRD tests.</div><div class="iv">/etcd-druid:api-change</div></div>
-    <div class="sk" data-stagger style="--s:1" onclick="openSkill('tdd')"><div class="nm">tdd</div><div class="ds">Red-Green-Refactor. Correct framework per repo. Fake client patterns.</div><div class="iv">/etcd-druid:tdd</div></div>
-    <div class="sk" data-stagger style="--s:2" onclick="openSkill('debug')"><div class="nm">debug</div><div class="ds">6-phase root cause, Delve, per-repo logs, build failure triage.</div><div class="iv">/etcd-druid:debug</div></div>
-    <div class="sk" data-stagger style="--s:3" onclick="openSkill('e2e')"><div class="nm">e2e</div><div class="ds">KIND cluster, custom sidecar images, image vector override, pre-PR CI.</div><div class="iv">/etcd-druid:e2e</div></div>
+    <div class="sk" data-stagger style="--s:0" onclick="openSkill('api-change')"><div class="nm">🔧 api-change</div><div class="ds">CEL validation (field + cross-field), kubebuilder markers, two-commit generate workflow, CRD integration tests.</div><div class="iv">/etcd-druid:api-change</div></div>
+    <div class="sk" data-stagger style="--s:1" onclick="openSkill('tdd')"><div class="nm">🧪 tdd</div><div class="ds">Red-Green-Refactor per repo. Correct framework: Go native for druid/wrapper, Ginkgo v2 for backup-restore.</div><div class="iv">/etcd-druid:tdd</div></div>
+    <div class="sk" data-stagger style="--s:2" onclick="openSkill('debug')"><div class="nm">🔍 debug</div><div class="ds">6-phase root cause analysis. Delve debugger, per-repo log analysis (logr/logrus/zap), build failure triage.</div><div class="iv">/etcd-druid:debug</div></div>
+    <div class="sk" data-stagger style="--s:3" onclick="openSkill('e2e')"><div class="nm">🌐 e2e</div><div class="ds">KIND cluster setup, custom sidecar image builds, IMAGEVECTOR_OVERWRITE, pre-PR CI validation.</div><div class="iv">/etcd-druid:e2e</div></div>
   </div>
   <div class="sk-cat" data-stagger style="--s:0">Quality & Reference</div>
   <div class="sk-grid">
-    <div class="sk" data-stagger style="--s:0" onclick="openSkill('review')"><div class="nm">review</div><div class="ds">10-step checklist, 15 footguns, Prow labels, release notes.</div><div class="iv">/etcd-druid:review</div></div>
-    <div class="sk" data-stagger style="--s:1" onclick="openSkill('reference')"><div class="nm">reference</div><div class="ds">Make targets, file paths, feature gates, CLI flags, cherry-pick.</div><div class="iv">/etcd-druid:reference</div></div>
-    <div class="sk" data-stagger style="--s:2" onclick="openSkill('observations')"><div class="nm">observations</div><div class="ds">Triage plugin self-improvement findings: raise PR, skip, dismiss.</div><div class="iv">/etcd-druid:observations</div></div>
+    <div class="sk" data-stagger style="--s:0" onclick="openSkill('review')"><div class="nm">✅ review</div><div class="ds">10-step checklist with 15 known footguns. Prow label validation, release note format, correct merge method.</div><div class="iv">/etcd-druid:review</div></div>
+    <div class="sk" data-stagger style="--s:1" onclick="openSkill('reference')"><div class="nm">📖 reference</div><div class="ds">Quick lookup: make targets, file paths, feature gates, CLI flags, git workflow, cherry-pick process.</div><div class="iv">/etcd-druid:reference</div></div>
+    <div class="sk" data-stagger style="--s:2" onclick="openSkill('observations')"><div class="nm">💡 observations</div><div class="ds">Triage plugin self-improvement findings. Pre-verifies against current files. Raise PR, skip, or dismiss.</div><div class="iv">/etcd-druid:observations</div></div>
   </div>
 </section>
 
