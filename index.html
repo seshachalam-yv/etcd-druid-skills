@@ -972,7 +972,7 @@ code{font-family:var(--mono);background:rgba(0,200,150,.06);padding:2px 7px;bord
     </details>
     <details class="faq">
       <summary>What are the known limitations?</summary>
-      <p>The plugin encodes conventions as of the current master branch. For older release branches, some make targets and file paths may differ. It also can't run e2e tests autonomously — it guides you through the setup.</p>
+      <p>The plugin encodes conventions as of the current master branch. For older release branches, some make targets and file paths may differ. Cross-repo e2e testing (e.g. testing backup-restore changes via etcd-druid) requires manual image push to a local registry.</p>
     </details>
   </div>
 </section>
