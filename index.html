@@ -369,6 +369,36 @@ code{font-family:var(--mono);background:rgba(0,200,150,.06);padding:2px 7px;bord
 .mb .ps ol,.mb .ps ul{padding-left:18px}
 .mb .ps li{color:var(--text);font-size:.85em;line-height:1.6;padding:4px 0}
 .mb .ps li::marker{color:var(--g)}
+
+/* Ecosystem cards */
+.eco-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:32px}
+@media(max-width:768px){.eco-grid{grid-template-columns:1fr}}
+.eco-card{background:rgba(10,15,26,.65);backdrop-filter:blur(12px);border:1px solid var(--border);border-radius:14px;overflow:hidden;transition:all .25s}
+.eco-card:hover{border-color:rgba(0,200,150,.25);transform:translateY(-3px)}
+.eco-header{padding:16px 20px;border-bottom:2px solid var(--border)}
+.eco-body{padding:12px 20px}
+.eco-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.03);font-size:.84em}
+.eco-row:last-child{border:none}
+.eco-label{color:var(--dim);font-weight:600;font-size:.78em;text-transform:uppercase;letter-spacing:.05em;min-width:40px}
+.eco-row span:last-child{color:var(--text);text-align:right}
+
+/* FAQ */
+.faq-grid{display:grid;gap:8px;margin-top:32px;max-width:700px}
+.faq{background:rgba(10,15,26,.65);backdrop-filter:blur(12px);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:border-color .2s}
+.faq:hover{border-color:rgba(0,200,150,.2)}
+.faq[open]{border-color:rgba(0,200,150,.15)}
+.faq summary{padding:16px 20px;cursor:pointer;font-weight:600;font-size:.9em;color:var(--bright);list-style:none;display:flex;align-items:center;justify-content:space-between}
+.faq summary::after{content:'+';color:var(--g);font-size:1.2em;font-weight:300;transition:transform .2s}
+.faq[open] summary::after{transform:rotate(45deg)}
+.faq summary::-webkit-details-marker{display:none}
+.faq p{padding:0 20px 16px;font-size:.85em;color:var(--text);line-height:1.7}
+.faq p a{color:var(--g)}
+
+/* Footer links */
+.ft-links{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.ft-links a{color:var(--dim);transition:color .2s}
+.ft-links a:hover{color:var(--g)}
+.ft-links span{color:#2a2e38}
 </style>
 </head>
 <body>
@@ -866,20 +896,86 @@ code{font-family:var(--mono);background:rgba(0,200,150,.06);padding:2px 7px;bord
   <div class="sec-h" data-stagger style="--s:1">Three repos.<br>One plugin.</div>
   <p class="sec-sub" data-stagger style="--s:2">etcd-druid manages etcd clusters declaratively on Kubernetes — handling backup/restore across 8 cloud providers, snapshot compaction, defragmentation, and component protection. The plugin covers all three repos with 222 combined releases.</p>
   <div data-stagger style="--s:3">
-    <table class="comp">
-      <tr><th></th><th>etcd-druid</th><th>etcd-backup-restore</th><th>etcd-wrapper</th></tr>
-      <tr><td><strong>Role</strong></td><td>K8s operator — Etcd CRD</td><td>Sidecar — snapshots, restore</td><td>Sidecar — embedded etcd</td></tr>
-      <tr><td><strong>Test</strong></td><td>Go native + Gomega</td><td>Ginkgo v2 + Gomega</td><td>Go native + Gomega</td></tr>
-      <tr><td><strong>Deps</strong></td><td><code>make tidy</code></td><td><code>make revendor</code></td><td><code>make revendor</code></td></tr>
-      <tr><td><strong>CI</strong></td><td><code>make ci-checks</code></td><td><code>make verify</code></td><td><code>make check && make test</code></td></tr>
-      <tr><td><strong>Log</strong></td><td>logr</td><td>logrus</td><td>zap</td></tr>
-    </table>
+    <div class="eco-grid">
+      <div class="eco-card">
+        <div class="eco-header" style="border-color:var(--g)">
+          <div style="font-family:var(--mono);font-size:1em;font-weight:700;color:var(--g)">etcd-druid</div>
+          <div style="font-size:.72em;color:var(--dim);margin-top:2px">Kubernetes operator</div>
+        </div>
+        <div class="eco-body">
+          <div class="eco-row"><span class="eco-label">Role</span><span>Owns Etcd CRD, reconciles cluster resources</span></div>
+          <div class="eco-row"><span class="eco-label">Test</span><span>Go native + Gomega</span></div>
+          <div class="eco-row"><span class="eco-label">Deps</span><span><code>make tidy</code></span></div>
+          <div class="eco-row"><span class="eco-label">CI</span><span><code>make ci-checks</code></span></div>
+          <div class="eco-row"><span class="eco-label">Log</span><span>logr</span></div>
+        </div>
+      </div>
+      <div class="eco-card">
+        <div class="eco-header" style="border-color:var(--blue)">
+          <div style="font-family:var(--mono);font-size:1em;font-weight:700;color:var(--blue)">etcd-backup-restore</div>
+          <div style="font-size:.72em;color:var(--dim);margin-top:2px">Sidecar</div>
+        </div>
+        <div class="eco-body">
+          <div class="eco-row"><span class="eco-label">Role</span><span>Snapshots, restore, initialization</span></div>
+          <div class="eco-row"><span class="eco-label">Test</span><span>Ginkgo v2 + Gomega</span></div>
+          <div class="eco-row"><span class="eco-label">Deps</span><span><code>make revendor</code></span></div>
+          <div class="eco-row"><span class="eco-label">CI</span><span><code>make verify</code></span></div>
+          <div class="eco-row"><span class="eco-label">Log</span><span>logrus</span></div>
+        </div>
+      </div>
+      <div class="eco-card">
+        <div class="eco-header" style="border-color:#a78bfa">
+          <div style="font-family:var(--mono);font-size:1em;font-weight:700;color:#a78bfa">etcd-wrapper</div>
+          <div style="font-size:.72em;color:var(--dim);margin-top:2px">Sidecar</div>
+        </div>
+        <div class="eco-body">
+          <div class="eco-row"><span class="eco-label">Role</span><span>Starts embedded etcd via HTTP API</span></div>
+          <div class="eco-row"><span class="eco-label">Test</span><span>Go native + Gomega</span></div>
+          <div class="eco-row"><span class="eco-label">Deps</span><span><code>make revendor</code></span></div>
+          <div class="eco-row"><span class="eco-label">CI</span><span><code>make check && make test</code></span></div>
+          <div class="eco-row"><span class="eco-label">Log</span><span>zap</span></div>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
 </div>
 
 <div class="wrap">
+
+<!-- ═══ FAQ ═══ -->
+<section class="sec">
+  <div class="sec-eyebrow" data-stagger style="--s:0">FAQ</div>
+  <div class="sec-h" data-stagger style="--s:1">Common questions.</div>
+
+  <div class="faq-grid" data-stagger style="--s:2">
+    <details class="faq">
+      <summary>Does it modify my repo files?</summary>
+      <p>No. The plugin only affects your Claude Code session context — it reads your repo but never writes to it directly. All code changes are made by Claude through normal tool calls that you approve.</p>
+    </details>
+    <details class="faq">
+      <summary>What Claude model do I need?</summary>
+      <p><code>claude-sonnet-4-5</code> or newer. Opus is recommended for <code>plan</code> and <code>implement</code> skills. The Haiku floor was raised — it won't activate on Haiku.</p>
+    </details>
+    <details class="faq">
+      <summary>Does it work offline?</summary>
+      <p>The plugin itself is local — skills and hooks run in your Claude Code session. But Claude Code requires an internet connection to the Anthropic API.</p>
+    </details>
+    <details class="faq">
+      <summary>Can I use it on other repos?</summary>
+      <p>It's built specifically for <code>gardener/etcd-druid</code>, <code>gardener/etcd-backup-restore</code>, and <code>gardener/etcd-wrapper</code>. It auto-detects which repo you're in and adjusts conventions accordingly.</p>
+    </details>
+    <details class="faq">
+      <summary>How do I contribute a new footgun or skill?</summary>
+      <p>Edit <code>skills/&lt;name&gt;/SKILL.md</code> and open a PR. For new cross-cutting guides, add a skill with <code>user-invocable: false</code>. See the <a href="https://github.com/seshachalam-yv/etcd-druid-skills#contributing">Contributing guide</a>.</p>
+    </details>
+    <details class="faq">
+      <summary>What are the known limitations?</summary>
+      <p>The plugin encodes conventions as of the current master branch. For older release branches, some make targets and file paths may differ. It also can't run e2e tests autonomously — it guides you through the setup.</p>
+    </details>
+  </div>
+</section>
 
 <!-- ═══ CTA ═══ -->
 <section class="cta-sec">
@@ -891,7 +987,20 @@ code{font-family:var(--mono);background:rgba(0,200,150,.06);padding:2px 7px;bord
   </div>
 </section>
 
-<div class="ft">etcd-druid-skills · Apache-2.0 · Inspired by <a href="https://github.com/obra/superpowers">Superpowers</a></div>
+<div class="ft">
+  <div class="ft-links">
+    <a href="https://github.com/seshachalam-yv/etcd-druid-skills">GitHub</a>
+    <span>·</span>
+    <a href="https://github.com/seshachalam-yv/etcd-druid-skills#readme">README</a>
+    <span>·</span>
+    <a href="https://github.com/seshachalam-yv/etcd-druid-skills/blob/master/LICENSE">Apache-2.0</a>
+    <span>·</span>
+    <a href="https://github.com/seshachalam-yv/etcd-druid-skills/blob/master/CHANGELOG.md">Changelog</a>
+    <span>·</span>
+    <a href="https://github.com/seshachalam-yv/etcd-druid-skills#contributing">Contributing</a>
+  </div>
+  <div style="margin-top:8px;font-size:.7em;color:#3a3f4a">etcd-druid-skills · v0.2.0</div>
+</div>
 
 </div>
 
