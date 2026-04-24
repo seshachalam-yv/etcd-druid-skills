@@ -12,18 +12,23 @@
 <meta property="og:title" content="etcd-druid-skills — Agentic development workflow">
 <meta property="og:description" content="A Claude Code plugin that makes your AI coding agent a capable etcd-druid contributor. 11 skills, 7 hooks, 96% eval pass rate.">
 <meta property="og:url" content="https://seshachalam-yv.github.io/etcd-druid-skills/">
-<meta property="og:image" content="https://raw.githubusercontent.com/seshachalam-yv/etcd-druid-skills/master/docs/logo.svg">
+<meta property="og:image" content="https://raw.githubusercontent.com/seshachalam-yv/etcd-druid-skills/master/docs/og-image.png?v=1777014522">
 <meta property="og:site_name" content="etcd-druid-skills">
 
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="etcd-druid-skills — Agentic development workflow">
 <meta name="twitter:description" content="Claude Code plugin for etcd-druid. Analyzes issues, researches PRs, proposes options, waits for approval.">
-<meta name="twitter:image" content="https://raw.githubusercontent.com/seshachalam-yv/etcd-druid-skills/master/docs/icon.svg">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/seshachalam-yv/etcd-druid-skills/master/docs/og-image.png?v=1777014522">
 
 <!-- Canonical URL -->
 <link rel="canonical" href="https://seshachalam-yv.github.io/etcd-druid-skills/">
 
+
+<!-- Cache control — force refresh on every deploy -->
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <link rel="icon" type="image/svg+xml" href="docs/icon.svg">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
@@ -399,6 +404,24 @@ code{font-family:var(--mono);background:rgba(0,200,150,.06);padding:2px 7px;bord
 .ft-links a{color:var(--dim);transition:color .2s}
 .ft-links a:hover{color:var(--g)}
 .ft-links span{color:#2a2e38}
+
+/* Racetrack feedback loop */
+.loop-wrap{max-width:760px;margin:40px auto 0}
+.loop-svg{width:100%;height:auto}
+.loop-track{animation:trackFlow 1.5s linear infinite}
+@keyframes trackFlow{to{stroke-dashoffset:-20}}
+.loop-node rect{transition:all .3s}
+.loop-node:hover rect{filter:drop-shadow(0 0 12px rgba(var(--ng),.4)) !important;stroke-opacity:1}
+.orbit-dot{opacity:.9}
+/* Evidence cards */
+.ev-row{display:flex;gap:12px;margin-top:28px}
+@media(max-width:768px){.ev-row{flex-direction:column}}
+.ev-card{flex:1;padding:14px 16px;border-radius:10px;font-size:.78em;color:var(--text);line-height:1.5;background:rgba(10,15,26,.65);backdrop-filter:blur(12px);border:1px solid var(--border);transition:all .25s}
+.ev-card:hover{transform:translateY(-2px)}
+.ev-label{font-size:.7em;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.ev-card.ev-red{border-color:rgba(255,69,58,.15)}.ev-card.ev-red .ev-label{color:var(--red)}
+.ev-card.ev-amber{border-color:rgba(255,179,0,.15)}.ev-card.ev-amber .ev-label{color:var(--amber)}
+.ev-card.ev-blue{border-color:rgba(88,166,255,.15)}.ev-card.ev-blue .ev-label{color:var(--blue)}
 </style>
 </head>
 <body>
@@ -750,47 +773,110 @@ code{font-family:var(--mono);background:rgba(0,200,150,.06);padding:2px 7px;bord
 
 <!-- ═══ SELF-IMPROVEMENT ═══ -->
 <section class="sec">
-  <div class="rv">
-    <div class="sec-eyebrow" data-stagger style="--s:0">Self-improving</div>
-    <div class="sec-h" data-stagger style="--s:1">The plugin gets<br>better every session.</div>
-    <p class="sec-sub" data-stagger style="--s:2">Every session is evaluated asynchronously. When a gap is found — a wrong claim, a missing footgun, a stale flag — it's captured as a structured observation. You decide what happens next.</p>
-  </div>
-  <div class="g2" style="margin-top:32px" data-stagger style="--s:3">
-    <div class="dash">
-      <div class="dash-header"><h4>How It Works</h4><span class="dash-badge amber">Auto-capture</span></div>
-      <div class="mini-tl" style="margin-top:16px">
-        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">Session ends → hook captures gaps automatically</span></div>
-        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">Next session → observations are pre-verified against current files</span></div>
-        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">Stale items auto-resolved (the fix is already in)</span></div>
-        <div class="mini-tl-row"><div class="mini-tl-dot active"></div><span class="bright">Verified gaps presented with evidence</span></div>
-        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">You choose: <strong style="color:var(--green)">R</strong> raise PR · <strong style="color:var(--amber)">S</strong> skip · <strong style="color:var(--red)">D</strong> dismiss</span></div>
-        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">PR raised only on explicit R choice</span></div>
-      </div>
-    </div>
-    <div class="dash">
-      <div class="dash-header"><h4>What Gets Captured</h4><span class="dash-badge green">Evidence-based</span></div>
-      <div style="margin-top:16px">
-        <div style="display:flex;gap:12px;margin-bottom:12px">
-          <div style="flex:1;padding:14px;border-radius:10px;background:rgba(255,69,58,.04);border:1px solid rgba(255,69,58,.1)">
-            <div style="font-size:.72em;color:var(--red);font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Wrong claim</div>
-            <div style="font-size:.78em;color:var(--text)">Plugin said "use make revendor" for etcd-druid — it's actually "make tidy"</div>
-          </div>
-          <div style="flex:1;padding:14px;border-radius:10px;background:rgba(255,179,0,.04);border:1px solid rgba(255,179,0,.1)">
-            <div style="font-size:.72em;color:var(--amber);font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Missing footgun</div>
-            <div style="font-size:.78em;color:var(--text)">New CEL validation gotcha not encoded in review skill</div>
-          </div>
-        </div>
-        <div style="display:flex;gap:12px">
-          <div style="flex:1;padding:14px;border-radius:10px;background:rgba(41,151,255,.04);border:1px solid rgba(41,151,255,.1)">
-            <div style="font-size:.72em;color:var(--blue);font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Stale flag</div>
-            <div style="font-size:.78em;color:var(--text)">Feature gate was promoted from alpha to GA — skill still says alpha</div>
-          </div>
-          <div style="flex:1;padding:14px;border-radius:10px;background:rgba(0,200,150,.04);border:1px solid rgba(0,200,150,.1)">
-            <div style="font-size:.72em;color:var(--g);font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">User correction</div>
-            <div style="font-size:.78em;color:var(--text)">"No, the test should use Ginkgo v2 here, not Go native"</div>
-          </div>
-        </div>
-      </div>
+  <div class="sec-eyebrow" data-stagger style="--s:0">Self-improving</div>
+  <div class="sec-h" data-stagger style="--s:1">The plugin gets<br>better every session.</div>
+  <p class="sec-sub" data-stagger style="--s:2">Every session is evaluated asynchronously. Gaps are captured, verified, and presented for your decision. Only you can approve a fix.</p>
+
+  <!-- Racetrack feedback loop -->
+  <div class="loop-wrap" data-stagger style="--s:3">
+    <svg class="loop-svg" viewBox="0 0 720 280" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <filter id="ndGlow"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        <filter id="dotGlow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        <!-- Racetrack path: rounded rectangle -->
+        <path id="trackPath" d="M180,60 L540,60 Q660,60 660,140 Q660,220 540,220 L180,220 Q60,220 60,140 Q60,60 180,60" fill="none"/>
+      </defs>
+
+      <!-- Ambient glow -->
+      <ellipse cx="360" cy="140" rx="280" ry="100" fill="#00c896" opacity=".02"/>
+
+      <!-- Track line (dashed, animated flow) -->
+      <use href="#trackPath" stroke="rgba(0,200,150,.12)" stroke-width="2" stroke-dasharray="6 4" class="loop-track"/>
+
+      <!-- Track solid dim outline -->
+      <use href="#trackPath" stroke="rgba(0,200,150,.06)" stroke-width="1"/>
+
+      <!-- ── NODES ── -->
+      <!-- 1. Session (top-left) -->
+      <g class="loop-node" style="--ng:0,200,150">
+        <rect x="130" y="40" width="100" height="40" rx="10" fill="var(--bg1)" stroke="#00c896" stroke-width="1.5" filter="url(#ndGlow)"/>
+        <text x="180" y="57" text-anchor="middle" font-family="var(--mono)" font-size="9" font-weight="700" fill="#00c896">SESSION</text>
+        <text x="180" y="71" text-anchor="middle" font-family="Inter,sans-serif" font-size="7" fill="#5a6480">run</text>
+      </g>
+
+      <!-- 2. Gap Detected (top-center) -->
+      <g class="loop-node" style="--ng:255,179,0">
+        <rect x="340" y="40" width="100" height="40" rx="10" fill="var(--bg1)" stroke="#ffb300" stroke-width="1.5" filter="url(#ndGlow)"/>
+        <text x="390" y="57" text-anchor="middle" font-family="var(--mono)" font-size="9" font-weight="700" fill="#ffb300">GAP</text>
+        <text x="390" y="71" text-anchor="middle" font-family="Inter,sans-serif" font-size="7" fill="#5a6480">detected</text>
+      </g>
+
+      <!-- 3. Capture (right) -->
+      <g class="loop-node" style="--ng:255,179,0">
+        <rect x="590" y="120" width="100" height="40" rx="10" fill="var(--bg1)" stroke="#ffb300" stroke-width="1.5" filter="url(#ndGlow)"/>
+        <text x="640" y="137" text-anchor="middle" font-family="var(--mono)" font-size="9" font-weight="700" fill="#ffb300">CAPTURE</text>
+        <text x="640" y="151" text-anchor="middle" font-family="Inter,sans-serif" font-size="7" fill="#5a6480">observe</text>
+      </g>
+
+      <!-- 4. Next Session (bottom-right) -->
+      <g class="loop-node" style="--ng:0,200,150">
+        <rect x="430" y="200" width="100" height="40" rx="10" fill="var(--bg1)" stroke="#00c896" stroke-width="1.5" filter="url(#ndGlow)"/>
+        <text x="480" y="217" text-anchor="middle" font-family="var(--mono)" font-size="9" font-weight="700" fill="#00c896">NEXT</text>
+        <text x="480" y="231" text-anchor="middle" font-family="Inter,sans-serif" font-size="7" fill="#5a6480">session</text>
+      </g>
+
+      <!-- 5. Triage (bottom-left) -->
+      <g class="loop-node" style="--ng:88,166,255">
+        <rect x="200" y="200" width="100" height="40" rx="10" fill="var(--bg1)" stroke="#58a6ff" stroke-width="1.5" filter="url(#ndGlow)"/>
+        <text x="250" y="217" text-anchor="middle" font-family="var(--mono)" font-size="9" font-weight="700" fill="#58a6ff">TRIAGE</text>
+        <text x="250" y="231" text-anchor="middle" font-family="Inter,sans-serif" font-size="7" fill="#5a6480">R / S / D</text>
+      </g>
+
+      <!-- 6. Improve (left) -->
+      <g class="loop-node" style="--ng:0,200,150">
+        <rect x="30" y="120" width="100" height="40" rx="10" fill="var(--bg1)" stroke="#00c896" stroke-width="1.5" filter="url(#ndGlow)"/>
+        <text x="80" y="137" text-anchor="middle" font-family="var(--mono)" font-size="9" font-weight="700" fill="#00c896">IMPROVE</text>
+        <text x="80" y="151" text-anchor="middle" font-family="Inter,sans-serif" font-size="7" fill="#5a6480">PR merged</text>
+      </g>
+
+      <!-- ── R/S/D BRANCHES from Triage ── -->
+      <!-- R: continues loop (thick green, curves to Improve) — main path -->
+      <path d="M200,220 Q160,220 130,180 Q110,160 80,160" fill="none" stroke="#00c896" stroke-width="2" opacity=".6" stroke-dasharray="4 2"/>
+      <text x="145" y="195" font-family="var(--mono)" font-size="8" font-weight="700" fill="#00c896">R</text>
+      <text x="145" y="205" font-family="Inter,sans-serif" font-size="6" fill="#3a8a5c">raise PR</text>
+
+      <!-- S: fades out downward -->
+      <path d="M240,240 Q240,260 235,268" fill="none" stroke="#ffb300" stroke-width="1" opacity=".3" stroke-dasharray="3 3"/>
+      <text x="230" y="265" font-family="var(--mono)" font-size="7" font-weight="600" fill="#ffb300" opacity=".5">S</text>
+
+      <!-- D: fades out downward other side -->
+      <path d="M260,240 Q260,260 265,268" fill="none" stroke="#ff453a" stroke-width="1" opacity=".3" stroke-dasharray="3 3"/>
+      <text x="268" y="265" font-family="var(--mono)" font-size="7" font-weight="600" fill="#ff453a" opacity=".5">D</text>
+
+      <!-- ── DIRECTIONAL ARROWS (small triangles between nodes) ── -->
+      <polygon points="235,60 240,56 240,64" fill="#00c896" opacity=".4"/>
+      <polygon points="445,60 450,56 450,64" fill="#ffb300" opacity=".4"/>
+      <polygon points="656,95 660,100 652,100" fill="#ffb300" opacity=".4" transform="rotate(20,656,97)"/>
+      <polygon points="535,220 530,216 530,224" fill="#00c896" opacity=".4"/>
+      <polygon points="305,220 300,216 300,224" fill="#58a6ff" opacity=".4"/>
+      <polygon points="64,175 60,170 68,170" fill="#00c896" opacity=".4" transform="rotate(-20,64,172)"/>
+
+      <!-- Center label -->
+      <text x="360" y="135" text-anchor="middle" font-family="var(--mono)" font-size="10" font-weight="600" fill="#5a6480" opacity=".5">FEEDBACK LOOP</text>
+      <text x="360" y="150" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#3a3f4a" opacity=".5">async evaluation</text>
+
+      <!-- ── ORBITING DOTS (4 dots staggered around the track) ── -->
+      <circle r="4" fill="#00c896" filter="url(#dotGlow)" class="orbit-dot"><animateMotion dur="10s" repeatCount="indefinite"><mpath href="#trackPath"/></animateMotion></circle>
+      <circle r="3" fill="#00c896" opacity=".6" class="orbit-dot"><animateMotion dur="10s" begin="-2.5s" repeatCount="indefinite"><mpath href="#trackPath"/></animateMotion></circle>
+      <circle r="4" fill="#00c896" filter="url(#dotGlow)" class="orbit-dot"><animateMotion dur="10s" begin="-5s" repeatCount="indefinite"><mpath href="#trackPath"/></animateMotion></circle>
+      <circle r="3" fill="#00c896" opacity=".6" class="orbit-dot"><animateMotion dur="10s" begin="-7.5s" repeatCount="indefinite"><mpath href="#trackPath"/></animateMotion></circle>
+    </svg>
+
+    <!-- Evidence cards -->
+    <div class="ev-row" data-stagger style="--s:4">
+      <div class="ev-card ev-red"><div class="ev-label">Wrong claim</div>Said "make revendor" for druid — actually "make tidy"</div>
+      <div class="ev-card ev-amber"><div class="ev-label">Missing footgun</div>New CEL gotcha not in review skill</div>
+      <div class="ev-card ev-blue"><div class="ev-label">Stale flag</div>Feature gate promoted to GA — skill says alpha</div>
     </div>
   </div>
 </section>
