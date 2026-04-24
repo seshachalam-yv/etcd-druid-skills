@@ -206,6 +206,8 @@ code{font-family:var(--mono);background:rgba(0,200,150,.06);padding:2px 7px;bord
 .aflow-svg{width:100%;max-width:900px;margin:40px auto 0;display:block}
 
 /* Flow nodes: spring-physics hover */
+[data-stagger]{opacity:0;transform:translateY(16px);transition:opacity .4s cubic-bezier(.16,1,.3,1),transform .4s cubic-bezier(.16,1,.3,1)}
+[data-stagger].vis{opacity:1;transform:none}
 .fn{opacity:0;transform:translateY(16px);transition:all .6s cubic-bezier(.16,1,.3,1);cursor:default}
 .fn.vis{opacity:1;transform:none}
 .fn-box:hover{transform:scale(1.015);transition:transform .4s cubic-bezier(.34,1.56,.64,1)}
