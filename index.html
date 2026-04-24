@@ -3,23 +3,29 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>etcd-druid-skills — Agentic development workflow</title>
-<meta name="description" content="A Claude Code plugin that analyzes issues, researches past PRs, proposes options, and waits for your approval — before writing a single line of code. 11 skills, 7 hooks, 3 subagents for etcd-druid, etcd-backup-restore, and etcd-wrapper.">
+<title>etcd-druid-skills — The agentic workflow for etcd-druid</title>
+<meta name="description" content="It doesn't just write code. It analyzes issues, researches past PRs, proposes options, and waits for your approval — before touching a single file. Claude Code plugin for etcd-druid.">
 <meta name="author" content="Seshachalam Yerasala Venkata">
 
 <!-- Open Graph -->
 <meta property="og:type" content="website">
-<meta property="og:title" content="etcd-druid-skills — Agentic development workflow">
-<meta property="og:description" content="A Claude Code plugin that makes your AI coding agent a capable etcd-druid contributor. 11 skills, 7 hooks, 96% eval pass rate.">
+<meta property="og:title" content="etcd-druid-skills — The agentic workflow for etcd-druid">
+<meta property="og:description" content="It doesn't just write code. It analyzes issues, researches past PRs, proposes options, and waits for your approval — before touching a single file.">
 <meta property="og:url" content="https://seshachalam-yv.github.io/etcd-druid-skills/">
-<meta property="og:image" content="https://raw.githubusercontent.com/seshachalam-yv/etcd-druid-skills/master/docs/og-image.png?v=1777014522">
+<meta property="og:image" content="https://seshachalam-yv.github.io/etcd-druid-skills/docs/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:alt" content="etcd-druid-skills — The agentic workflow for etcd-druid. Claude Code plugin.">
 <meta property="og:site_name" content="etcd-druid-skills">
 
 <!-- Twitter Card -->
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="etcd-druid-skills — Agentic development workflow">
-<meta name="twitter:description" content="Claude Code plugin for etcd-druid. Analyzes issues, researches PRs, proposes options, waits for approval.">
-<meta name="twitter:image" content="https://raw.githubusercontent.com/seshachalam-yv/etcd-druid-skills/master/docs/og-image.png?v=1777014522">
+<meta name="twitter:card" content="summary_large_image">
+<meta property="twitter:url" content="https://seshachalam-yv.github.io/etcd-druid-skills/">
+<meta name="twitter:title" content="etcd-druid-skills — The agentic workflow for etcd-druid">
+<meta name="twitter:description" content="It doesn't just write code. It analyzes issues, researches past PRs, proposes options, and waits for your approval — before touching a single file.">
+<meta name="twitter:image" content="https://seshachalam-yv.github.io/etcd-druid-skills/docs/og-image.png">
+<meta name="twitter:image:alt" content="etcd-druid-skills — The agentic workflow for etcd-druid. Claude Code plugin.">
 
 <!-- Canonical URL -->
 <link rel="canonical" href="https://seshachalam-yv.github.io/etcd-druid-skills/">
@@ -405,23 +411,70 @@ code{font-family:var(--mono);background:rgba(0,200,150,.06);padding:2px 7px;bord
 .ft-links a:hover{color:var(--g)}
 .ft-links span{color:#2a2e38}
 
-/* Racetrack feedback loop */
-.loop-wrap{max-width:760px;margin:40px auto 0}
-.loop-svg{width:100%;height:auto}
-.loop-track{animation:trackFlow 1.5s linear infinite}
-@keyframes trackFlow{to{stroke-dashoffset:-20}}
-.loop-node rect{transition:all .3s}
-.loop-node:hover rect{filter:drop-shadow(0 0 12px rgba(var(--ng),.4)) !important;stroke-opacity:1}
-.orbit-dot{opacity:.9}
+/* Racetrack feedback loop — redesigned as clear step flow */
+.loop-wrap{max-width:800px;margin:40px auto 0}
+.loop-steps{display:grid;grid-template-columns:1fr;gap:0;position:relative}
+.loop-step{display:grid;grid-template-columns:48px 1fr;gap:16px;padding:20px 0;position:relative}
+.loop-step:last-child .loop-line{display:none}
+.loop-num{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.85em;font-weight:800;position:relative;z-index:2;transition:all .3s cubic-bezier(.34,1.56,.64,1)}
+.loop-step:hover .loop-num{transform:scale(1.1)}
+.loop-num.green{background:rgba(0,200,150,.1);border:1.5px solid #00c896;color:#00c896}
+.loop-num.amber{background:rgba(255,179,0,.1);border:1.5px solid #ffb300;color:#ffb300}
+.loop-num.blue{background:rgba(88,166,255,.1);border:1.5px solid #58a6ff;color:#58a6ff}
+.loop-line{position:absolute;left:23px;top:68px;bottom:0;width:2px;background:linear-gradient(180deg,rgba(0,200,150,.3),rgba(0,200,150,.08));z-index:1}
+.loop-content{padding-top:6px}
+.loop-title{font-size:1em;font-weight:700;color:var(--bright);margin-bottom:4px}
+.loop-desc{font-size:.84em;color:var(--text);line-height:1.6}
+.loop-tag{display:inline-block;font-family:var(--mono);font-size:.72em;padding:3px 10px;border-radius:6px;margin-top:8px}
+.loop-tag.green{background:rgba(0,200,150,.06);border:1px solid rgba(0,200,150,.15);color:#00c896}
+.loop-tag.amber{background:rgba(255,179,0,.06);border:1px solid rgba(255,179,0,.15);color:#ffb300}
+.loop-tag.blue{background:rgba(88,166,255,.06);border:1px solid rgba(88,166,255,.15);color:#58a6ff}
+/* Loop-back arrow */
+.loop-back{text-align:center;padding:12px 0 0;position:relative}
+.loop-back-arrow{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:.78em;color:var(--g);opacity:.6;padding:10px 20px;border:1px dashed rgba(0,200,150,.2);border-radius:980px}
+
+/* Racetrack SVG (visual summary) */
+.race-wrap{margin:40px auto 0;max-width:680px}
+.race-svg{width:100%;height:auto}
+.race-track{animation:raceFlow 1s linear infinite}
+@keyframes raceFlow{to{stroke-dashoffset:-20}}
+.race-node{cursor:default;transition:transform .3s cubic-bezier(.34,1.56,.64,1)}
+.race-node:hover{transform:scale(1.06)}
+
 /* Evidence cards */
-.ev-row{display:flex;gap:12px;margin-top:28px}
-@media(max-width:768px){.ev-row{flex-direction:column}}
-.ev-card{flex:1;padding:14px 16px;border-radius:10px;font-size:.78em;color:var(--text);line-height:1.5;background:rgba(10,15,26,.65);backdrop-filter:blur(12px);border:1px solid var(--border);transition:all .25s}
-.ev-card:hover{transform:translateY(-2px)}
-.ev-label{font-size:.7em;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.ev-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:32px}
+@media(max-width:768px){.ev-row{grid-template-columns:1fr}}
+.ev-card{padding:18px 20px;border-radius:12px;font-size:.82em;color:var(--text);line-height:1.6;background:rgba(10,15,26,.65);backdrop-filter:blur(12px);border:1px solid var(--border);transition:all .3s cubic-bezier(.34,1.56,.64,1);cursor:default}
+.ev-card:hover{transform:translateY(-3px);box-shadow:0 8px 30px rgba(0,0,0,.3)}
+.ev-label{font-size:.7em;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
 .ev-card.ev-red{border-color:rgba(255,69,58,.15)}.ev-card.ev-red .ev-label{color:var(--red)}
+.ev-card.ev-red:hover{border-color:rgba(255,69,58,.35)}
 .ev-card.ev-amber{border-color:rgba(255,179,0,.15)}.ev-card.ev-amber .ev-label{color:var(--amber)}
+.ev-card.ev-amber:hover{border-color:rgba(255,179,0,.35)}
 .ev-card.ev-blue{border-color:rgba(88,166,255,.15)}.ev-card.ev-blue .ev-label{color:var(--blue)}
+.ev-card.ev-blue:hover{border-color:rgba(88,166,255,.35)}
+.ev-card{cursor:pointer}
+.ev-card::after{content:'View details →';display:block;margin-top:10px;font-size:.72em;font-family:var(--mono);color:var(--dim);opacity:.5;transition:opacity .2s}
+.ev-card:hover::after{opacity:1}
+.ev-before{color:var(--red);font-size:.8em;margin-top:8px;padding:6px 10px;background:rgba(255,69,58,.04);border-radius:6px;font-family:var(--mono)}
+.ev-after{color:var(--green);font-size:.8em;margin-top:4px;padding:6px 10px;background:rgba(48,209,88,.04);border-radius:6px;font-family:var(--mono)}
+.ev-header{font-size:.72em;text-transform:uppercase;letter-spacing:.1em;color:var(--dim);font-weight:600;margin-top:40px;margin-bottom:12px}
+
+/* Observation detail modal sections */
+.obs-section{margin-bottom:20px}
+.obs-section h3{font-size:.7em;text-transform:uppercase;letter-spacing:.1em;font-weight:600;margin-bottom:10px}
+.obs-section h3.red{color:var(--red)}.obs-section h3.amber{color:var(--amber)}.obs-section h3.blue{color:var(--blue)}.obs-section h3.green{color:var(--green)}.obs-section h3.dim{color:var(--dim)}
+.obs-block{padding:14px 16px;border-radius:10px;font-size:.84em;line-height:1.7;color:var(--text);font-family:var(--mono)}
+.obs-block.dark{background:rgba(10,15,26,.8);border:1px solid var(--border)}
+.obs-block.red-bg{background:rgba(255,69,58,.04);border:1px solid rgba(255,69,58,.12)}
+.obs-block.green-bg{background:rgba(48,209,88,.04);border:1px solid rgba(48,209,88,.12)}
+.obs-block.amber-bg{background:rgba(255,179,0,.04);border:1px solid rgba(255,179,0,.12)}
+.obs-block .line{display:block;padding:2px 0}
+.obs-block .line.hl{color:var(--bright);font-weight:600}
+.obs-block .line.red{color:var(--red)}.obs-block .line.green{color:var(--green)}.obs-block .line.amber{color:var(--amber)}.obs-block .line.dim{color:var(--dim)}
+.obs-arrow{text-align:center;padding:8px 0;color:var(--dim);font-size:.9em}
+.obs-file{font-family:var(--mono);font-size:.82em;color:var(--g);padding:8px 14px;background:rgba(0,200,150,.06);border:1px solid rgba(0,200,150,.12);border-radius:6px;display:inline-block;margin-top:4px}
+.obs-badge{display:inline-block;font-size:.68em;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:4px 10px;border-radius:6px;margin-bottom:16px}
 </style>
 </head>
 <body>
@@ -604,14 +657,14 @@ code{font-family:var(--mono);background:rgba(0,200,150,.06);padding:2px 7px;bord
     <circle cx="430" cy="830" r="180" fill="url(#aGrad)" opacity=".015"/>
 
     <!-- ══ CONNECTIONS (animated draw-in lines) ══ -->
-    <line class="fconn" data-delay="300" x1="430" y1="65" x2="430" y2="108" stroke="url(#connGrad1)" stroke-width="2.5" marker-end="url(#arrG)"/>
-    <line class="fconn" data-delay="1600" x1="430" y1="232" x2="430" y2="278" stroke="url(#connGrad1)" stroke-width="2.5" marker-end="url(#arrG)"/>
-    <line class="fconn" data-delay="2800" x1="430" y1="368" x2="430" y2="418" stroke="url(#connGrad2)" stroke-width="2.5" marker-end="url(#arrA)"/>
-    <line class="fconn" data-delay="5400" x1="430" y1="740" x2="430" y2="790" stroke="url(#connGrad1)" stroke-width="2.5" marker-end="url(#arrG)"/>
-    <line class="fconn" data-delay="7000" x1="430" y1="908" x2="430" y2="955" stroke="url(#pGrad)" stroke-width="2.5"/>
+    <line class="fconn" data-delay="150" x1="430" y1="65" x2="430" y2="108" stroke="url(#connGrad1)" stroke-width="2.5" marker-end="url(#arrG)"/>
+    <line class="fconn" data-delay="600" x1="430" y1="232" x2="430" y2="278" stroke="url(#connGrad1)" stroke-width="2.5" marker-end="url(#arrG)"/>
+    <line class="fconn" data-delay="1000" x1="430" y1="368" x2="430" y2="418" stroke="url(#connGrad2)" stroke-width="2.5" marker-end="url(#arrA)"/>
+    <line class="fconn" data-delay="2000" x1="430" y1="740" x2="430" y2="790" stroke="url(#connGrad1)" stroke-width="2.5" marker-end="url(#arrG)"/>
+    <line class="fconn" data-delay="2600" x1="430" y1="908" x2="430" y2="955" stroke="url(#pGrad)" stroke-width="2.5"/>
 
     <!-- ══ NODE 1: Issue / Bug Report ══ -->
-    <g class="fn fn-box" data-delay="0">
+    <g class="fn fn-box" data-delay="0" style="cursor:pointer" onclick="openSkill('plan')">
       <rect x="290" y="16" width="280" height="50" rx="25" fill="#0a0a0a" stroke="url(#gGrad)" stroke-width="2"/>
       <rect x="290" y="16" width="280" height="50" rx="25" fill="url(#gGrad)" opacity=".06"/>
       <text x="430" y="46" text-anchor="middle" font-family="Inter,sans-serif" font-size="15" font-weight="700" fill="#f5f5f7">📋  Issue / Bug Report</text>
@@ -620,7 +673,7 @@ code{font-family:var(--mono);background:rgba(0,200,150,.06);padding:2px 7px;bord
     </g>
 
     <!-- ══ NODE 2: /etcd-druid:plan ══ -->
-    <g class="fn fn-box" data-delay="700">
+    <g class="fn fn-box" data-delay="300" style="cursor:pointer" onclick="openSkill('plan')">
       <rect x="80" y="108" width="700" height="125" rx="16" fill="#0a0a0a" stroke="url(#gGrad)" stroke-width="1.5"/>
       <rect x="80" y="108" width="700" height="125" rx="16" fill="url(#gGrad)" opacity=".03"/>
       <!-- Header bar -->
@@ -645,7 +698,7 @@ code{font-family:var(--mono);background:rgba(0,200,150,.06);padding:2px 7px;bord
     </g>
 
     <!-- ══ NODE 3: GATE 1 ══ -->
-    <g class="fn fn-gate" data-delay="2000">
+    <g class="fn fn-gate" data-delay="700">
       <rect x="280" y="278" width="300" height="90" rx="14" fill="#1a1400" stroke="url(#aGrad)" stroke-width="2.5" filter="url(#gl1)"/>
       <!-- Pulsing border glow -->
       <rect x="278" y="276" width="304" height="94" rx="16" fill="none" stroke="#ffb300" stroke-width="1" opacity=".2"><animate attributeName="opacity" values=".1;.3;.1" dur="2.5s" repeatCount="indefinite"/></rect>
@@ -655,7 +708,7 @@ code{font-family:var(--mono);background:rgba(0,200,150,.06);padding:2px 7px;bord
     </g>
 
     <!-- ══ NODE 4: /etcd-druid:implement ══ -->
-    <g class="fn fn-box" data-delay="3200">
+    <g class="fn fn-box" data-delay="1200" style="cursor:pointer" onclick="openSkill('implement')">
       <rect x="80" y="418" width="700" height="322" rx="16" fill="#0a0a0a" stroke="url(#bGrad)" stroke-width="1.5"/>
       <rect x="80" y="418" width="700" height="322" rx="16" fill="url(#bGrad)" opacity=".02"/>
       <rect x="80" y="418" width="700" height="1" fill="url(#bGrad)" opacity=".5"/>
@@ -679,7 +732,7 @@ code{font-family:var(--mono);background:rgba(0,200,150,.06);padding:2px 7px;bord
       </g>
 
       <!-- Arrow: Impl → Spec -->
-      <line class="sub-arrow fconn" data-delay="4000" x1="315" y1="573" x2="360" y2="573" stroke="#00c896" stroke-width="1.5" marker-end="url(#arrG)"/>
+      <line class="sub-arrow fconn" data-delay="1500" x1="315" y1="573" x2="360" y2="573" stroke="#00c896" stroke-width="1.5" marker-end="url(#arrG)"/>
 
       <!-- Spec Review -->
       <g class="fn-sub">
@@ -690,7 +743,7 @@ code{font-family:var(--mono);background:rgba(0,200,150,.06);padding:2px 7px;bord
       </g>
 
       <!-- Arrow: Spec → Code -->
-      <line class="sub-arrow fconn" data-delay="4400" x1="500" y1="573" x2="545" y2="573" stroke="#2997ff" stroke-width="1.5" marker-end="url(#arrB)"/>
+      <line class="sub-arrow fconn" data-delay="1700" x1="500" y1="573" x2="545" y2="573" stroke="#2997ff" stroke-width="1.5" marker-end="url(#arrB)"/>
 
       <!-- Code Review -->
       <g class="fn-sub">
@@ -701,7 +754,7 @@ code{font-family:var(--mono);background:rgba(0,200,150,.06);padding:2px 7px;bord
       </g>
 
       <!-- Fix loop -->
-      <path class="fconn" data-delay="4800" d="M615,602 Q640,645 430,645 Q220,645 245,602" fill="none" stroke="#48484a" stroke-width="1" stroke-dasharray="4 3"/>
+      <path class="fconn" data-delay="1900" d="M615,602 Q640,645 430,645 Q220,645 245,602" fill="none" stroke="#48484a" stroke-width="1" stroke-dasharray="4 3"/>
       <text x="430" y="660" text-anchor="middle" font-family="Inter" font-size="9" fill="#48484a">↑ fix issues and re-review</text>
 
       <!-- Steps 3-4 -->
@@ -710,7 +763,7 @@ code{font-family:var(--mono);background:rgba(0,200,150,.06);padding:2px 7px;bord
     </g>
 
     <!-- ══ NODE 5: GATE 2 ══ -->
-    <g class="fn fn-gate" data-delay="5800">
+    <g class="fn fn-gate" data-delay="2200">
       <rect x="240" y="790" width="380" height="118" rx="14" fill="#1a1400" stroke="url(#aGrad)" stroke-width="2.5" filter="url(#gl1)"/>
       <rect x="238" y="788" width="384" height="122" rx="16" fill="none" stroke="#ffb300" stroke-width="1" opacity=".2"><animate attributeName="opacity" values=".1;.3;.1" dur="2.5s" repeatCount="indefinite"/></rect>
       <text x="300" y="825" font-family="Inter,sans-serif" font-size="20" font-weight="800" fill="#ffb300">⛔ GATE 2</text>
@@ -723,22 +776,22 @@ code{font-family:var(--mono);background:rgba(0,200,150,.06);padding:2px 7px;bord
     </g>
 
     <!-- ══ NODE 6: gh pr create ══ -->
-    <g class="fn fn-pr" data-delay="7500">
+    <g class="fn fn-pr" data-delay="2800">
       <rect x="280" y="955" width="300" height="52" rx="26" fill="url(#pGrad)" filter="url(#gl2)"/>
       <rect x="278" y="953" width="304" height="56" rx="28" fill="none" stroke="#30d158" stroke-width="1" opacity=".3"><animate attributeName="opacity" values=".15;.4;.15" dur="2s" repeatCount="indefinite"/></rect>
       <text x="430" y="987" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="14" font-weight="700" fill="#000">gh pr create ✓</text>
     </g>
 
     <!-- ══ ANIMATED DATA PARTICLES ══ -->
-    <circle class="fpulse fpart" data-delay="500" cx="430" cy="80" r="3" fill="#00c896" filter="url(#gl1)"><animate attributeName="cy" from="70" to="103" dur="1.8s" repeatCount="indefinite"/><animate attributeName="opacity" from=".9" to="0" dur="1.8s" repeatCount="indefinite"/></circle>
-    <circle class="fpulse fpart" data-delay="1800" cx="430" cy="248" r="3" fill="#00c896" filter="url(#gl1)"><animate attributeName="cy" from="237" to="273" dur="1.8s" repeatCount="indefinite"/><animate attributeName="opacity" from=".9" to="0" dur="1.8s" repeatCount="indefinite"/></circle>
-    <circle class="fpulse fpart" data-delay="3000" cx="430" cy="385" r="3" fill="#ffb300" filter="url(#gl1)"><animate attributeName="cy" from="373" to="413" dur="1.8s" repeatCount="indefinite"/><animate attributeName="opacity" from=".9" to="0" dur="1.8s" repeatCount="indefinite"/></circle>
-    <circle class="fpulse fpart" data-delay="5600" cx="430" cy="758" r="3" fill="#2997ff" filter="url(#gl1)"><animate attributeName="cy" from="745" to="785" dur="1.8s" repeatCount="indefinite"/><animate attributeName="opacity" from=".9" to="0" dur="1.8s" repeatCount="indefinite"/></circle>
-    <circle class="fpulse fpart" data-delay="7200" cx="430" cy="928" r="3" fill="#30d158" filter="url(#gl2)"><animate attributeName="cy" from="913" to="950" dur="1.8s" repeatCount="indefinite"/><animate attributeName="opacity" from=".9" to="0" dur="1.8s" repeatCount="indefinite"/></circle>
+    <circle class="fpulse fpart" data-delay="200" cx="430" cy="80" r="3" fill="#00c896" filter="url(#gl1)"><animate attributeName="cy" from="70" to="103" dur="1.8s" repeatCount="indefinite"/><animate attributeName="opacity" from=".9" to="0" dur="1.8s" repeatCount="indefinite"/></circle>
+    <circle class="fpulse fpart" data-delay="700" cx="430" cy="248" r="3" fill="#00c896" filter="url(#gl1)"><animate attributeName="cy" from="237" to="273" dur="1.8s" repeatCount="indefinite"/><animate attributeName="opacity" from=".9" to="0" dur="1.8s" repeatCount="indefinite"/></circle>
+    <circle class="fpulse fpart" data-delay="1100" cx="430" cy="385" r="3" fill="#ffb300" filter="url(#gl1)"><animate attributeName="cy" from="373" to="413" dur="1.8s" repeatCount="indefinite"/><animate attributeName="opacity" from=".9" to="0" dur="1.8s" repeatCount="indefinite"/></circle>
+    <circle class="fpulse fpart" data-delay="2100" cx="430" cy="758" r="3" fill="#2997ff" filter="url(#gl1)"><animate attributeName="cy" from="745" to="785" dur="1.8s" repeatCount="indefinite"/><animate attributeName="opacity" from=".9" to="0" dur="1.8s" repeatCount="indefinite"/></circle>
+    <circle class="fpulse fpart" data-delay="2700" cx="430" cy="928" r="3" fill="#30d158" filter="url(#gl2)"><animate attributeName="cy" from="913" to="950" dur="1.8s" repeatCount="indefinite"/><animate attributeName="opacity" from=".9" to="0" dur="1.8s" repeatCount="indefinite"/></circle>
 
     <!-- Second wave of particles (offset timing) -->
-    <circle class="fpulse fpart" data-delay="1000" cx="428" cy="80" r="2" fill="#00c896" opacity=".5"><animate attributeName="cy" from="70" to="103" dur="1.8s" begin=".9s" repeatCount="indefinite"/><animate attributeName="opacity" from=".6" to="0" dur="1.8s" begin=".9s" repeatCount="indefinite"/></circle>
-    <circle class="fpulse fpart" data-delay="3500" cx="428" cy="385" r="2" fill="#ffb300" opacity=".5"><animate attributeName="cy" from="373" to="413" dur="1.8s" begin=".9s" repeatCount="indefinite"/><animate attributeName="opacity" from=".6" to="0" dur="1.8s" begin=".9s" repeatCount="indefinite"/></circle>
+    <circle class="fpulse fpart" data-delay="400" cx="428" cy="80" r="2" fill="#00c896" opacity=".5"><animate attributeName="cy" from="70" to="103" dur="1.8s" begin=".9s" repeatCount="indefinite"/><animate attributeName="opacity" from=".6" to="0" dur="1.8s" begin=".9s" repeatCount="indefinite"/></circle>
+    <circle class="fpulse fpart" data-delay="1300" cx="428" cy="385" r="2" fill="#ffb300" opacity=".5"><animate attributeName="cy" from="373" to="413" dur="1.8s" begin=".9s" repeatCount="indefinite"/><animate attributeName="opacity" from=".6" to="0" dur="1.8s" begin=".9s" repeatCount="indefinite"/></circle>
   </svg>
 </div>
 </div>
@@ -775,108 +828,149 @@ code{font-family:var(--mono);background:rgba(0,200,150,.06);padding:2px 7px;bord
 <section class="sec">
   <div class="sec-eyebrow" data-stagger style="--s:0">Self-improving</div>
   <div class="sec-h" data-stagger style="--s:1">The plugin gets<br>better every session.</div>
-  <p class="sec-sub" data-stagger style="--s:2">Every session is evaluated asynchronously. Gaps are captured, verified, and presented for your decision. Only you can approve a fix.</p>
+  <p class="sec-sub" data-stagger style="--s:2">Every Claude Code session is evaluated asynchronously. Gaps in skill guidance are captured, verified, and presented for your decision. Only you can approve a fix.</p>
 
-  <!-- Racetrack feedback loop -->
+  <!-- Step-by-step feedback loop -->
   <div class="loop-wrap" data-stagger style="--s:3">
-    <svg class="loop-svg" viewBox="0 0 720 280" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <filter id="ndGlow"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-        <filter id="dotGlow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-        <!-- Racetrack path: rounded rectangle -->
-        <path id="trackPath" d="M180,60 L540,60 Q660,60 660,140 Q660,220 540,220 L180,220 Q60,220 60,140 Q60,60 180,60" fill="none"/>
-      </defs>
+    <div class="loop-steps">
 
-      <!-- Ambient glow -->
-      <ellipse cx="360" cy="140" rx="280" ry="100" fill="#00c896" opacity=".02"/>
+      <div class="loop-step">
+        <div><div class="loop-num green">1</div><div class="loop-line"></div></div>
+        <div class="loop-content">
+          <div class="loop-title">You start a Claude Code session</div>
+          <div class="loop-desc">You open Claude Code in an etcd-druid checkout and invoke <code>/etcd-druid:plan</code> or <code>/etcd-druid:implement</code> on a real issue. The plugin's skills guide the workflow — plan, code, review.</div>
+          <div class="loop-tag green">automatic</div>
+        </div>
+      </div>
 
-      <!-- Track line (dashed, animated flow) -->
-      <use href="#trackPath" stroke="rgba(0,200,150,.12)" stroke-width="2" stroke-dasharray="6 4" class="loop-track"/>
+      <div class="loop-step">
+        <div><div class="loop-num amber">2</div><div class="loop-line"></div></div>
+        <div class="loop-content">
+          <div class="loop-title">Async evaluation detects a gap</div>
+          <div class="loop-desc">After the Claude Code session ends, an async evaluation compares what the plugin's skills instructed against what actually happened in the conversation. If a skill gave wrong guidance, missed a footgun, or had an outdated workflow step — it's flagged as an observation.</div>
+          <div class="loop-tag amber">async — runs after your session ends</div>
+        </div>
+      </div>
 
-      <!-- Track solid dim outline -->
-      <use href="#trackPath" stroke="rgba(0,200,150,.06)" stroke-width="1"/>
+      <div class="loop-step">
+        <div><div class="loop-num amber">3</div><div class="loop-line"></div></div>
+        <div class="loop-content">
+          <div class="loop-title">Structured observation saved</div>
+          <div class="loop-desc">Each gap is captured as a structured observation with: the type of error, evidence from the conversation (what was wrong), a suggested fix, and which skill file to update.</div>
+        </div>
+      </div>
 
-      <!-- ── NODES ── -->
-      <!-- 1. Session (top-left) -->
-      <g class="loop-node" style="--ng:0,200,150">
-        <rect x="130" y="40" width="100" height="40" rx="10" fill="var(--bg1)" stroke="#00c896" stroke-width="1.5" filter="url(#ndGlow)"/>
-        <text x="180" y="57" text-anchor="middle" font-family="var(--mono)" font-size="9" font-weight="700" fill="#00c896">SESSION</text>
-        <text x="180" y="71" text-anchor="middle" font-family="Inter,sans-serif" font-size="7" fill="#5a6480">run</text>
-      </g>
+      <div class="loop-step">
+        <div><div class="loop-num blue">4</div><div class="loop-line"></div></div>
+        <div class="loop-content">
+          <div class="loop-title">Next Claude Code session: you triage</div>
+          <div class="loop-desc">When you start your next Claude Code session, <code>/etcd-druid:observations</code> loads all pending observations. Each one is pre-verified against the current skill files. For each observation, you choose:</div>
+          <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+            <div class="loop-tag green">Raise PR — fix the skill</div>
+            <div class="loop-tag amber">Skip — not now</div>
+            <div class="loop-tag" style="background:rgba(255,69,58,.06);border:1px solid rgba(255,69,58,.15);color:#ff453a">Dismiss — not a real gap</div>
+          </div>
+        </div>
+      </div>
 
-      <!-- 2. Gap Detected (top-center) -->
-      <g class="loop-node" style="--ng:255,179,0">
-        <rect x="340" y="40" width="100" height="40" rx="10" fill="var(--bg1)" stroke="#ffb300" stroke-width="1.5" filter="url(#ndGlow)"/>
-        <text x="390" y="57" text-anchor="middle" font-family="var(--mono)" font-size="9" font-weight="700" fill="#ffb300">GAP</text>
-        <text x="390" y="71" text-anchor="middle" font-family="Inter,sans-serif" font-size="7" fill="#5a6480">detected</text>
-      </g>
+      <div class="loop-step">
+        <div><div class="loop-num green">5</div></div>
+        <div class="loop-content">
+          <div class="loop-title">Plugin improves</div>
+          <div class="loop-desc">If you chose "Raise PR", the plugin opens a PR against its own skill files. Once merged, every future Claude Code session benefits from the corrected guidance. No skill is ever modified without your explicit approval.</div>
+          <div class="loop-tag green">only on your approval</div>
+        </div>
+      </div>
 
-      <!-- 3. Capture (right) -->
-      <g class="loop-node" style="--ng:255,179,0">
-        <rect x="590" y="120" width="100" height="40" rx="10" fill="var(--bg1)" stroke="#ffb300" stroke-width="1.5" filter="url(#ndGlow)"/>
-        <text x="640" y="137" text-anchor="middle" font-family="var(--mono)" font-size="9" font-weight="700" fill="#ffb300">CAPTURE</text>
-        <text x="640" y="151" text-anchor="middle" font-family="Inter,sans-serif" font-size="7" fill="#5a6480">observe</text>
-      </g>
+    </div>
 
-      <!-- 4. Next Session (bottom-right) -->
-      <g class="loop-node" style="--ng:0,200,150">
-        <rect x="430" y="200" width="100" height="40" rx="10" fill="var(--bg1)" stroke="#00c896" stroke-width="1.5" filter="url(#ndGlow)"/>
-        <text x="480" y="217" text-anchor="middle" font-family="var(--mono)" font-size="9" font-weight="700" fill="#00c896">NEXT</text>
-        <text x="480" y="231" text-anchor="middle" font-family="Inter,sans-serif" font-size="7" fill="#5a6480">session</text>
-      </g>
+    <!-- Loop-back indicator -->
+    <div class="loop-back" data-stagger style="--s:4">
+      <div class="loop-back-arrow">↺ &nbsp;Next Claude Code session starts at step 1 — the cycle repeats</div>
+    </div>
 
-      <!-- 5. Triage (bottom-left) -->
-      <g class="loop-node" style="--ng:88,166,255">
-        <rect x="200" y="200" width="100" height="40" rx="10" fill="var(--bg1)" stroke="#58a6ff" stroke-width="1.5" filter="url(#ndGlow)"/>
-        <text x="250" y="217" text-anchor="middle" font-family="var(--mono)" font-size="9" font-weight="700" fill="#58a6ff">TRIAGE</text>
-        <text x="250" y="231" text-anchor="middle" font-family="Inter,sans-serif" font-size="7" fill="#5a6480">R / S / D</text>
-      </g>
+    <!-- Racetrack visual summary -->
+    <div class="race-wrap" data-stagger style="--s:4">
+      <svg class="race-svg" viewBox="0 0 680 220" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <filter id="rGlow"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          <filter id="rDotGlow"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          <path id="rTrack" d="M170,48 L510,48 Q632,48 632,110 Q632,172 510,172 L170,172 Q48,172 48,110 Q48,48 170,48" fill="none"/>
+        </defs>
 
-      <!-- 6. Improve (left) -->
-      <g class="loop-node" style="--ng:0,200,150">
-        <rect x="30" y="120" width="100" height="40" rx="10" fill="var(--bg1)" stroke="#00c896" stroke-width="1.5" filter="url(#ndGlow)"/>
-        <text x="80" y="137" text-anchor="middle" font-family="var(--mono)" font-size="9" font-weight="700" fill="#00c896">IMPROVE</text>
-        <text x="80" y="151" text-anchor="middle" font-family="Inter,sans-serif" font-size="7" fill="#5a6480">PR merged</text>
-      </g>
+        <!-- Ambient glow -->
+        <ellipse cx="340" cy="110" rx="260" ry="80" fill="#00c896" opacity=".015"/>
 
-      <!-- ── R/S/D BRANCHES from Triage ── -->
-      <!-- R: continues loop (thick green, curves to Improve) — main path -->
-      <path d="M200,220 Q160,220 130,180 Q110,160 80,160" fill="none" stroke="#00c896" stroke-width="2" opacity=".6" stroke-dasharray="4 2"/>
-      <text x="145" y="195" font-family="var(--mono)" font-size="8" font-weight="700" fill="#00c896">R</text>
-      <text x="145" y="205" font-family="Inter,sans-serif" font-size="6" fill="#3a8a5c">raise PR</text>
+        <!-- Track -->
+        <use href="#rTrack" stroke="rgba(0,200,150,.1)" stroke-width="2" stroke-dasharray="6 4" class="race-track"/>
+        <use href="#rTrack" stroke="rgba(0,200,150,.05)" stroke-width="1"/>
 
-      <!-- S: fades out downward -->
-      <path d="M240,240 Q240,260 235,268" fill="none" stroke="#ffb300" stroke-width="1" opacity=".3" stroke-dasharray="3 3"/>
-      <text x="230" y="265" font-family="var(--mono)" font-size="7" font-weight="600" fill="#ffb300" opacity=".5">S</text>
+        <!-- Nodes — all green (same system, one loop) -->
+        <g class="race-node">
+          <rect x="98" y="30" width="90" height="36" rx="8" fill="#0a0f1a" stroke="#00c896" stroke-width="1.5" filter="url(#rGlow)"/>
+          <text x="143" y="52" text-anchor="middle" font-family="Inter,sans-serif" font-size="9.5" font-weight="700" fill="#00c896">Session</text>
+        </g>
 
-      <!-- D: fades out downward other side -->
-      <path d="M260,240 Q260,260 265,268" fill="none" stroke="#ff453a" stroke-width="1" opacity=".3" stroke-dasharray="3 3"/>
-      <text x="268" y="265" font-family="var(--mono)" font-size="7" font-weight="600" fill="#ff453a" opacity=".5">D</text>
+        <g class="race-node">
+          <rect x="270" y="30" width="120" height="36" rx="8" fill="#0a0f1a" stroke="#ffb300" stroke-width="1.5" filter="url(#rGlow)"/>
+          <text x="330" y="52" text-anchor="middle" font-family="Inter,sans-serif" font-size="9.5" font-weight="700" fill="#ffb300">Gap Detected</text>
+        </g>
 
-      <!-- ── DIRECTIONAL ARROWS (small triangles between nodes) ── -->
-      <polygon points="235,60 240,56 240,64" fill="#00c896" opacity=".4"/>
-      <polygon points="445,60 450,56 450,64" fill="#ffb300" opacity=".4"/>
-      <polygon points="656,95 660,100 652,100" fill="#ffb300" opacity=".4" transform="rotate(20,656,97)"/>
-      <polygon points="535,220 530,216 530,224" fill="#00c896" opacity=".4"/>
-      <polygon points="305,220 300,216 300,224" fill="#58a6ff" opacity=".4"/>
-      <polygon points="64,175 60,170 68,170" fill="#00c896" opacity=".4" transform="rotate(-20,64,172)"/>
+        <g class="race-node">
+          <rect x="560" y="92" width="88" height="36" rx="8" fill="#0a0f1a" stroke="#ffb300" stroke-width="1.5" filter="url(#rGlow)"/>
+          <text x="604" y="114" text-anchor="middle" font-family="Inter,sans-serif" font-size="9.5" font-weight="700" fill="#ffb300">Capture</text>
+        </g>
 
-      <!-- Center label -->
-      <text x="360" y="135" text-anchor="middle" font-family="var(--mono)" font-size="10" font-weight="600" fill="#5a6480" opacity=".5">FEEDBACK LOOP</text>
-      <text x="360" y="150" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#3a3f4a" opacity=".5">async evaluation</text>
+        <g class="race-node">
+          <rect x="398" y="154" width="120" height="36" rx="8" fill="#0a0f1a" stroke="#58a6ff" stroke-width="1.5" filter="url(#rGlow)"/>
+          <text x="458" y="176" text-anchor="middle" font-family="Inter,sans-serif" font-size="9.5" font-weight="700" fill="#58a6ff">You Triage</text>
+        </g>
 
-      <!-- ── ORBITING DOTS (4 dots staggered around the track) ── -->
-      <circle r="4" fill="#00c896" filter="url(#dotGlow)" class="orbit-dot"><animateMotion dur="10s" repeatCount="indefinite"><mpath href="#trackPath"/></animateMotion></circle>
-      <circle r="3" fill="#00c896" opacity=".6" class="orbit-dot"><animateMotion dur="10s" begin="-2.5s" repeatCount="indefinite"><mpath href="#trackPath"/></animateMotion></circle>
-      <circle r="4" fill="#00c896" filter="url(#dotGlow)" class="orbit-dot"><animateMotion dur="10s" begin="-5s" repeatCount="indefinite"><mpath href="#trackPath"/></animateMotion></circle>
-      <circle r="3" fill="#00c896" opacity=".6" class="orbit-dot"><animateMotion dur="10s" begin="-7.5s" repeatCount="indefinite"><mpath href="#trackPath"/></animateMotion></circle>
-    </svg>
+        <g class="race-node">
+          <rect x="200" y="154" width="120" height="36" rx="8" fill="#0a0f1a" stroke="#00c896" stroke-width="1.5" filter="url(#rGlow)"/>
+          <text x="260" y="176" text-anchor="middle" font-family="Inter,sans-serif" font-size="9.5" font-weight="700" fill="#00c896">PR Merged</text>
+        </g>
 
-    <!-- Evidence cards -->
-    <div class="ev-row" data-stagger style="--s:4">
-      <div class="ev-card ev-red"><div class="ev-label">Wrong claim</div>Said "make revendor" for druid — actually "make tidy"</div>
-      <div class="ev-card ev-amber"><div class="ev-label">Missing footgun</div>New CEL gotcha not in review skill</div>
-      <div class="ev-card ev-blue"><div class="ev-label">Stale flag</div>Feature gate promoted to GA — skill says alpha</div>
+        <g class="race-node">
+          <rect x="32" y="92" width="110" height="36" rx="8" fill="#0a0f1a" stroke="#00c896" stroke-width="1.5" filter="url(#rGlow)"/>
+          <text x="87" y="114" text-anchor="middle" font-family="Inter,sans-serif" font-size="9.5" font-weight="700" fill="#00c896">Improved</text>
+        </g>
+
+        <!-- Directional arrows -->
+        <polygon points="200,48 205,44 205,52" fill="#00c896" opacity=".5"/>
+        <polygon points="400,48 405,44 405,52" fill="#ffb300" opacity=".5"/>
+        <polygon points="628,78 632,83 624,83" fill="#ffb300" opacity=".5"/>
+        <polygon points="520,172 515,168 515,176" fill="#58a6ff" opacity=".5"/>
+        <polygon points="330,172 325,168 325,176" fill="#00c896" opacity=".5"/>
+        <polygon points="52,135 48,130 56,130" fill="#00c896" opacity=".5"/>
+
+        <!-- Orbiting dots -->
+        <circle r="4" fill="#00c896" filter="url(#rDotGlow)"><animateMotion dur="6s" repeatCount="indefinite"><mpath href="#rTrack"/></animateMotion></circle>
+        <circle r="3" fill="#00c896" opacity=".5"><animateMotion dur="6s" begin="-2s" repeatCount="indefinite"><mpath href="#rTrack"/></animateMotion></circle>
+        <circle r="4" fill="#00c896" filter="url(#rDotGlow)"><animateMotion dur="6s" begin="-4s" repeatCount="indefinite"><mpath href="#rTrack"/></animateMotion></circle>
+      </svg>
+    </div>
+
+    <!-- Example observations with before/after -->
+    <div class="ev-header" data-stagger style="--s:5">Real examples the plugin catches and self-corrects:</div>
+    <div class="ev-row" data-stagger style="--s:5">
+      <div class="ev-card ev-red" onclick="openObs('wrong-guidance')">
+        <div class="ev-label">Skill gave wrong guidance</div>
+        The <strong>tdd skill</strong> instructed "always use <code>t.Parallel()</code> in table-driven tests." A maintainer rejected the PR — reconciler tests sharing envtest state must run sequentially.
+        <div class="ev-before">✗ tdd skill: "always t.Parallel()"</div>
+        <div class="ev-after">✓ Updated: "t.Parallel() except envtest reconciler tests"</div>
+      </div>
+      <div class="ev-card ev-amber" onclick="openObs('missing-footgun')">
+        <div class="ev-label">Footgun not in checklist</div>
+        During a PR review, a maintainer caught a CEL rule referencing an optional field without a <code>has()</code> guard — causing CRD validation panics. The <strong>review skill</strong>'s 15-footgun checklist didn't cover this.
+        <div class="ev-after">✓ Added footgun #16: "CEL optional field requires has() guard"</div>
+      </div>
+      <div class="ev-card ev-blue" onclick="openObs('outdated-workflow')">
+        <div class="ev-label">Workflow step outdated</div>
+        The <strong>api-change skill</strong> said "run <code>make generate</code> in a separate commit." But upstream changed the workflow — <code>make generate</code> is now included in <code>make ci-checks</code>, so the two-commit rule caused unnecessary commits.
+        <div class="ev-before">✗ "Always separate hand-written + generated commits"</div>
+        <div class="ev-after">✓ Updated: "Check if make ci-checks includes generate first"</div>
+      </div>
     </div>
   </div>
 </section>
@@ -1026,6 +1120,13 @@ code{font-family:var(--mono);background:rgba(0,200,150,.06);padding:2px 7px;bord
   </div>
 </div>
 
+<!-- OBSERVATION DETAIL MODAL -->
+<div class="overlay" id="obs-ov" onclick="closeObs()"></div>
+<div class="modal" id="obs-modal">
+  <div class="mh"><h2 id="obs-title"></h2><button onclick="closeObs()">✕</button></div>
+  <div class="mb" id="obs-body"></div>
+</div>
+
 <script>
 // Stagger reveal
 const sObs=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting){x.target.classList.add('vis');sObs.unobserve(x.target)}})},{threshold:.1});
@@ -1121,7 +1222,66 @@ observations:{iv:'/etcd-druid:observations',ir:'NO PR WITHOUT USER CHOICE',ds:'T
 };
 function openSkill(n){const s=sk[n];if(!s)return;document.getElementById('p-nm').textContent=n;document.getElementById('p-iv').textContent=s.iv;const ir=document.getElementById('p-ir');if(s.ir){ir.textContent='⚡ '+s.ir;ir.style.display='block'}else ir.style.display='none';document.getElementById('p-ds').textContent=s.ds;document.getElementById('p-ph').innerHTML=s.ph.map(x=>'<li>'+x+'</li>').join('');document.getElementById('p-ft').innerHTML=s.ft.map(x=>'<li>'+x+'</li>').join('');document.getElementById('p-wh').innerHTML='<div class="pwc yes"><strong>✓ Use when</strong>'+s.wh+'</div><div class="pwc no"><strong>✗ Not for</strong>'+s.nwh+'</div>';document.getElementById('ov').classList.add('open');document.getElementById('pn').classList.add('open');document.body.style.overflow='hidden'}
 function closePanel(){document.getElementById('ov').classList.remove('open');document.getElementById('pn').classList.remove('open');document.body.style.overflow=''}
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closePanel()});
+function closeObs(){document.getElementById('obs-ov').classList.remove('open');document.getElementById('obs-modal').classList.remove('open');document.body.style.overflow=''}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closePanel();closeObs()}});
+
+// Observation detail data
+const obsData={
+'wrong-guidance':{
+  title:'Skill gave wrong guidance',
+  badge:'wrong claim',
+  badgeColor:'red',
+  sections:[
+    {heading:'What happened',hColor:'red',content:'<div class="obs-block dark"><span class="line hl">During PR review for etcd-druid #1285:</span><span class="line dim">Maintainer comment:</span><span class="line red">"These reconciler tests share envtest state across cases.</span><span class="line red">Running them in parallel causes flaky failures.</span><span class="line red">Please remove t.Parallel() from this test file."</span></div>'},
+    {heading:'What the skill said',hColor:'red',content:'<div class="obs-block red-bg"><span class="line">skills/tdd/SKILL.md, line 47:</span><span class="line hl">"Always use t.Parallel() in table-driven tests</span><span class="line hl">for faster feedback loops."</span></div>'},
+    {heading:'Why it was wrong',hColor:'dim',content:'<div class="obs-block dark"><span class="line">Tests using envtest (the shared Kubernetes API server test</span><span class="line">environment) create and modify real objects in a shared etcd.</span><span class="line">Running them in parallel causes race conditions:</span><span class="line dim">• Test A creates an Etcd CR → Test B lists all Etcd CRs → gets unexpected results</span><span class="line dim">• Test A deletes a ConfigMap → Test C expects it to exist → flaky failure</span><span class="line">This is specific to reconciler tests. Unit tests with</span><span class="line">isolated inputs are fine to parallelize.</span></div>'},
+    {heading:'The fix',hColor:'green',content:'<div class="obs-block green-bg"><span class="line hl">Updated skills/tdd/SKILL.md:</span><span class="line green">"Use t.Parallel() in table-driven tests — except for</span><span class="line green">reconciler tests that share envtest state. These must</span><span class="line green">run sequentially to avoid flaky failures from shared</span><span class="line green">Kubernetes objects."</span></div>'},
+    {heading:'Affected file',hColor:'dim',content:'<div class="obs-file">skills/tdd/SKILL.md</div>'},
+    {heading:'Resolution',hColor:'green',content:'<div class="obs-block dark"><span class="line green">✓ Raised as PR → reviewed → merged</span><span class="line dim">All future sessions now give correct t.Parallel() guidance.</span></div>'}
+  ]
+},
+'missing-footgun':{
+  title:'Footgun not in checklist',
+  badge:'missing footgun',
+  badgeColor:'amber',
+  sections:[
+    {heading:'What happened',hColor:'amber',content:'<div class="obs-block dark"><span class="line hl">During PR review for etcd-druid #1302 (new API field):</span><span class="line dim">Maintainer comment:</span><span class="line amber">"This CEL rule references .spec.backup.schedule but the</span><span class="line amber">backup field is optional. Without has(self.spec.backup),</span><span class="line amber">this panics when backup is nil."</span></div>'},
+    {heading:'What the review skill checked',hColor:'amber',content:'<div class="obs-block amber-bg"><span class="line">skills/review/SKILL.md — Footgun checklist (15 items):</span><span class="line dim">#1  Editing zz_generated_* files directly</span><span class="line dim">#2  Using gomega in druid unit tests</span><span class="line dim">#3  Forgetting make generate after adding a field</span><span class="line dim">...</span><span class="line dim">#15 Wrong merge method for generated commits</span><span class="line amber hl">⚠ No check for CEL optional field guards</span></div>'},
+    {heading:'Why it matters',hColor:'dim',content:'<div class="obs-block dark"><span class="line">CEL validation rules in Kubernetes CRDs execute at admission</span><span class="line">time. If a rule references a field path that doesn\'t exist</span><span class="line">(because a parent is optional and nil), the CRD validation</span><span class="line">panics — blocking ALL creates and updates to that resource.</span><span class="line dim">This is a cluster-level outage for etcd provisioning.</span></div>'},
+    {heading:'The fix',hColor:'green',content:'<div class="obs-block green-bg"><span class="line hl">Added footgun #16 to skills/review/SKILL.md:</span><span class="line green">"#16 CEL rule references optional field without has() guard.</span><span class="line green">Every CEL rule that accesses a field under an optional parent</span><span class="line green">must be wrapped: has(self.spec.parent) && self.spec.parent.field.</span><span class="line green">Without this, nil parents cause admission webhook panics."</span></div>'},
+    {heading:'Affected file',hColor:'dim',content:'<div class="obs-file">skills/review/SKILL.md</div>'},
+    {heading:'Resolution',hColor:'green',content:'<div class="obs-block dark"><span class="line green">✓ Raised as PR → reviewed → merged</span><span class="line dim">Review skill now catches this pattern before PR submission.</span></div>'}
+  ]
+},
+'outdated-workflow':{
+  title:'Workflow step outdated',
+  badge:'stale workflow',
+  badgeColor:'blue',
+  sections:[
+    {heading:'What happened',hColor:'blue',content:'<div class="obs-block dark"><span class="line hl">During implementation of etcd-druid #1310 (new API field):</span><span class="line">The plugin created two commits as instructed by the skill:</span><span class="line dim">  Commit 1: Hand-written code (new field + validation)</span><span class="line dim">  Commit 2: make generate (deepcopy, CRD manifests)</span><span class="line blue">But CI failed on commit 1 because make ci-checks now</span><span class="line blue">runs make generate internally and detected uncommitted</span><span class="line blue">changes from the generate step.</span></div>'},
+    {heading:'What the skill said',hColor:'blue',content:'<div class="obs-block amber-bg"><span class="line">skills/api-change/SKILL.md, "Two-commit rule" section:</span><span class="line hl">"Always create two separate commits for API changes:</span><span class="line hl">1. Hand-written code (field, validation, tests)</span><span class="line hl">2. make generate output (deepcopy, CRD yaml)"</span></div>'},
+    {heading:'Why it was outdated',hColor:'dim',content:'<div class="obs-block dark"><span class="line">Upstream etcd-druid updated their Makefile: the ci-checks</span><span class="line">target now includes a generate-and-verify step that runs</span><span class="line">make generate and checks for a clean git diff.</span><span class="line dim">This means:</span><span class="line dim">• Commit 1 alone will always fail CI (missing generated files)</span><span class="line dim">• The two-commit workflow now creates noise, not value</span><span class="line">The skill needed to check the current Makefile behavior</span><span class="line">before prescribing the two-commit pattern.</span></div>'},
+    {heading:'The fix',hColor:'green',content:'<div class="obs-block green-bg"><span class="line hl">Updated skills/api-change/SKILL.md:</span><span class="line green">"Before committing, check if the repo\'s CI target (make</span><span class="line green">ci-checks or make verify) includes a generate step. If it</span><span class="line green">does, include generated files in the same commit.</span><span class="line green">If not, use the two-commit rule."</span></div>'},
+    {heading:'Affected file',hColor:'dim',content:'<div class="obs-file">skills/api-change/SKILL.md</div>'},
+    {heading:'Resolution',hColor:'green',content:'<div class="obs-block dark"><span class="line green">✓ Raised as PR → reviewed → merged</span><span class="line dim">API change skill now reads the Makefile before deciding commit strategy.</span></div>'}
+  ]
+}
+};
+
+function openObs(key){
+  const d=obsData[key];if(!d)return;
+  document.getElementById('obs-title').textContent=d.title;
+  const colors={red:'var(--red)',amber:'var(--amber)',blue:'var(--blue)'};
+  const bgColors={red:'rgba(255,69,58,.1)',amber:'rgba(255,179,0,.1)',blue:'rgba(88,166,255,.1)'};
+  let html='<div class="obs-badge" style="background:'+bgColors[d.badgeColor]+';color:'+colors[d.badgeColor]+'">'+d.badge+'</div>';
+  d.sections.forEach(s=>{
+    html+='<div class="obs-section"><h3 class="'+s.hColor+'">'+s.heading+'</h3>'+s.content+'</div>';
+  });
+  document.getElementById('obs-body').innerHTML=html;
+  document.getElementById('obs-ov').classList.add('open');
+  document.getElementById('obs-modal').classList.add('open');
+  document.body.style.overflow='hidden';
+}
 </script>
 </body>
 </html>
