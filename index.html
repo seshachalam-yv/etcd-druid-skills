@@ -1123,7 +1123,7 @@ function startAutoCycle(){
 }
 // Start auto-cycle when terminal is visible
 const cycleObs=new IntersectionObserver(e=>{e.forEach(x=>{
-  if(x.isIntersecting){startAutoCycle()}
+  if(x.isIntersecting){clearInterval(autoCycleTimer);startAutoCycle()}
   else{clearInterval(autoCycleTimer)}
 })},{threshold:.2});
 if(itermEl)cycleObs.observe(itermEl);
