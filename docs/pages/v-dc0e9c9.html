@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>etcd-druid-skills — Agentic development workflow</title>
+<link rel="icon" type="image/svg+xml" href="docs/icon.svg">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--g:#00c896;--gd:#009F76;--amber:#ffb300;--bg:#050810;--bg1:#0a0f1a;--bg2:#111827;--bg3:#1a2235;--border:rgba(136,146,176,.12);--text:#8892b0;--bright:#f0f4ff;--dim:#5a6480;--blue:#58a6ff;--red:#ff453a;--green:#30d158;--mono:'JetBrains Mono',monospace}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Inter',-apple-system,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:var(--g);text-decoration:none}a:hover{color:#33dba8;text-decoration:none}
+code{font-family:var(--mono);background:rgba(0,200,150,.06);padding:2px 7px;border-radius:4px;font-size:.84em;color:var(--g)}
+::selection{background:var(--g);color:var(--bg)}
+
+/* STARFIELD */
+.stars{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(1px 1px at 20% 30%,rgba(255,255,255,.4),transparent),radial-gradient(1px 1px at 40% 70%,rgba(255,255,255,.3),transparent),radial-gradient(1px 1px at 60% 20%,rgba(255,255,255,.25),transparent),radial-gradient(1px 1px at 80% 60%,rgba(255,255,255,.35),transparent),radial-gradient(1px 1px at 10% 80%,rgba(255,255,255,.2),transparent),radial-gradient(1px 1px at 70% 40%,rgba(255,255,255,.3),transparent);background-size:350px 200px;animation:starTwinkle 8s ease-in-out infinite alternate}
+@keyframes starTwinkle{0%{opacity:.3}100%{opacity:.6}}
+
+/* NEBULA */
+.aurora{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.ab{position:absolute;border-radius:50%;filter:blur(120px);will-change:transform}
+.ab.a{width:800px;height:800px;top:-300px;left:-200px;background:radial-gradient(circle,rgba(0,200,150,.1),transparent 70%);animation:da 30s ease-in-out infinite alternate}
+.ab.b{width:600px;height:600px;bottom:-200px;right:-150px;background:radial-gradient(circle,rgba(255,179,0,.06),transparent 70%);animation:db 25s ease-in-out infinite alternate}
+@keyframes da{to{transform:translate(120px,80px) scale(1.2)}}
+@keyframes db{to{transform:translate(-80px,-60px) scale(1.1)}}
+
+/* GRAIN */
+.grain{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.02;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+/* NAV */
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(5,8,16,.8);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid var(--border)}
+.ni{max-width:980px;margin:0 auto;padding:12px 22px;display:flex;align-items:center;justify-content:space-between}
+.nl{display:flex;align-items:center;gap:8px}.nl img{height:22px}.nl span{font-weight:700;font-size:.82em;color:var(--bright)}
+.nk{display:flex;gap:22px;font-size:.78em}.nk a{color:var(--text);transition:color .2s}.nk a:hover{color:var(--bright);text-decoration:none}
+
+.wrap{max-width:980px;margin:0 auto;padding:0 22px;position:relative;z-index:1}
+.wrap-wide{max-width:1200px;margin:0 auto;padding:0 22px;position:relative;z-index:1}
+
+/* REVEAL */
+[data-stagger]{opacity:0;transform:translateY(30px);transition:opacity .7s ease,transform .7s ease}
+[data-stagger].vis{opacity:1;transform:none;transition-delay:calc(var(--s,0) * 100ms)}
+
+/* ═══ HERO ═══ */
+.hero{text-align:center;padding:60px 0 0;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative}
+.hero-eyebrow{font-size:clamp(10px,1.1vw,13px);font-weight:600;text-transform:uppercase;letter-spacing:.15em;color:var(--g);margin-bottom:24px}
+.hero-h{font-size:clamp(44px,8vw,88px);font-weight:800;line-height:1.05;letter-spacing:-.04em;color:var(--bright);max-width:900px}
+.hero-h .acc{background:linear-gradient(135deg,#f0f4ff 0%,var(--g) 52%,var(--amber) 100%);background-size:200% 200%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:gradShift 6s ease infinite}
+@keyframes gradShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+.hero-sub{font-size:clamp(15px,1.8vw,19px);font-weight:300;line-height:1.7;color:var(--text);max-width:600px;margin:28px auto 0}
+.hero-cta{margin-top:36px;display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+.btn{display:inline-block;padding:14px 30px;border-radius:980px;font-weight:600;font-size:.88em;transition:all .25s}
+.btn-fill{background:linear-gradient(135deg,var(--g),var(--gd));color:#fff;border:none;box-shadow:0 4px 20px rgba(0,200,150,.2)}.btn-fill:hover{background:linear-gradient(135deg,#33dba8,var(--g));transform:scale(1.03);text-decoration:none;color:#fff;box-shadow:0 8px 30px rgba(0,200,150,.3)}
+.btn-line{color:var(--g);border:1px solid rgba(0,200,150,.25)}.btn-line:hover{border-color:var(--g);text-decoration:none;box-shadow:0 4px 20px rgba(0,200,150,.1)}
+.hero-logo{margin-bottom:16px;position:relative;width:160px;height:220px;display:flex;align-items:center;justify-content:center}
+.hero-logo svg.logo-svg{width:100px;height:103px;position:relative;z-index:2}
+.hero-brand{font-size:clamp(36px,6vw,56px);font-weight:800;color:var(--bright);letter-spacing:-.03em;margin-bottom:8px;font-style:italic}
+.hero-brand .dim{color:var(--g);font-style:italic}
+.hero-eyebrow{font-size:clamp(10px,1.1vw,13px);font-weight:600;text-transform:uppercase;letter-spacing:.15em;color:var(--g);margin-bottom:28px}
+.hero-logo .hex-fill{fill:#009F76;opacity:.5;animation:hexChg 6s ease-in-out infinite}
+@keyframes hexChg{0%,30%{opacity:.5;filter:brightness(.8)}40%{opacity:1;filter:brightness(1.4)}50%,100%{opacity:1;filter:brightness(1)}}
+/* Facets light up in cascade */
+.hero-logo .facet{opacity:.4;animation:facetLt 6s ease-in-out infinite}
+@keyframes facetLt{0%,30%{opacity:.4;filter:brightness(.7)}38%{opacity:1;filter:brightness(1.6)}50%,100%{opacity:1;filter:brightness(1)}}
+.hero-logo .f2{animation-delay:.05s}.hero-logo .f3{animation-delay:.1s}.hero-logo .f4{animation-delay:.15s}
+/* Bolt appears on strike */
+.hero-logo .bolt-inner{opacity:0;animation:boltIn 6s ease-in-out infinite}
+@keyframes boltIn{0%,32%{opacity:0;transform:scale(.8) translateY(3px)}36%{opacity:1;transform:scale(1.15) translateY(-2px)}42%{opacity:1;transform:scale(1)}100%{opacity:.95;transform:scale(1)}}
+/* Lightning strike from above */
+.hero-logo .strike{position:absolute;top:0;left:50%;transform:translateX(-50%);z-index:3;width:60px;height:140px;pointer-events:none}
+.hero-logo .strike-bolt{fill:none;stroke:url(#hStrikeG);stroke-width:3;stroke-linecap:round;stroke-dasharray:300;stroke-dashoffset:300;animation:strikeD 6s ease-in-out infinite;filter:drop-shadow(0 0 8px rgba(255,200,0,.6))}
+@keyframes strikeD{0%,25%{stroke-dashoffset:300;opacity:1}32%{stroke-dashoffset:0;opacity:1}40%{opacity:0}100%{opacity:0;stroke-dashoffset:300}}
+.hero-logo .strike-bolt2{fill:none;stroke:#fff;stroke-width:1.5;stroke-linecap:round;stroke-dasharray:300;stroke-dashoffset:300;animation:strikeD2 6s ease-in-out infinite;opacity:.6}
+@keyframes strikeD2{0%,26%{stroke-dashoffset:300;opacity:.6}33%{stroke-dashoffset:0;opacity:.6}38%{opacity:0}100%{opacity:0;stroke-dashoffset:300}}
+/* Impact flash */
+.hero-logo .flash{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:0;height:0;border-radius:50%;background:radial-gradient(circle,rgba(255,220,100,.8),rgba(0,200,150,.3),transparent 70%);z-index:1;animation:impFlash 6s ease-out infinite;pointer-events:none}
+@keyframes impFlash{0%,33%{width:0;height:0;opacity:0}36%{width:250px;height:250px;opacity:.8}45%{width:350px;height:350px;opacity:0}100%{opacity:0}}
+/* Shockwave ring */
+.hero-logo .ring{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:40px;height:40px;border-radius:50%;border:2px solid rgba(0,200,150,.5);z-index:1;animation:shock 6s ease-out infinite;pointer-events:none}
+@keyframes shock{0%,33%{width:40px;height:40px;opacity:0}36%{opacity:.7}50%{width:300px;height:300px;opacity:0;border-width:1px}100%{opacity:0}}
+.hero-logo .ring2{animation-delay:.1s;border-color:rgba(255,200,0,.3)}
+/* Energy particles */
+.hero-logo .particles{position:absolute;top:50%;left:50%;z-index:4;pointer-events:none}
+.hero-logo .particle{position:absolute;width:4px;height:4px;border-radius:50%;background:#ffcc00;animation:pBurst 6s ease-out infinite;opacity:0}
+@keyframes pBurst{0%,34%{transform:translate(0,0) scale(1);opacity:0}36%{opacity:1;transform:translate(var(--px),var(--py)) scale(1)}50%{opacity:0;transform:translate(calc(var(--px)*2.5),calc(var(--py)*2.5)) scale(0)}100%{opacity:0}}
+/* Glow under */
+.hero-logo .glow-under{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);width:120px;height:20px;background:radial-gradient(ellipse,rgba(0,200,150,.2),transparent 70%);border-radius:50%;animation:glowP 6s ease-in-out infinite;z-index:0}
+@keyframes glowP{0%,30%{opacity:.2;transform:translateX(-50%) scaleX(.8)}40%{opacity:.8;transform:translateX(-50%) scaleX(1.2)}55%,100%{opacity:.4;transform:translateX(-50%) scaleX(1)}}
+.hero-scroll{margin-top:40px;color:var(--dim);font-size:.75em;letter-spacing:.1em;text-transform:uppercase;animation:bob 2s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}
+
+/* ═══ STAT COUNTERS ═══ */
+.counter-sec{padding:80px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.counter-row{display:grid;grid-template-columns:repeat(5,1fr);gap:20px;text-align:center}
+@media(max-width:768px){.counter-row{grid-template-columns:repeat(2,1fr)}}
+.counter-n{font-family:var(--mono);font-size:clamp(32px,5vw,56px);font-weight:800;color:var(--bright);line-height:1}
+.counter-l{font-size:.7em;color:var(--dim);margin-top:8px;text-transform:uppercase;letter-spacing:1.5px;font-weight:500}
+
+/* ═══ INTERACTIVE TERMINAL (Claude Code CLI style) ═══ */
+.iterm{background:#1a1a2e;border:1px solid #2a2a40;border-radius:12px;overflow:hidden;max-width:760px;margin:40px auto 0;position:relative;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.iterm::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,#d97706,transparent)}
+.iterm-bar{padding:8px 16px;background:#12121f;border-bottom:1px solid #2a2a40;display:flex;gap:6px;align-items:center}
+.iterm-bar .claude-icon{width:18px;height:18px;border-radius:4px;background:linear-gradient(135deg,#d97706,#ea580c);display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;font-weight:800}
+.iterm-bar span{color:#6b7280;font-size:.72em;font-family:var(--mono);margin-left:8px}
+.iterm-bar .bar-right{margin-left:auto;display:flex;align-items:center;gap:12px;font-size:.68em;color:#4b5563;font-family:var(--mono)}
+.iterm-bar .status-dot{width:6px;height:6px;border-radius:50%;background:#22c55e;display:inline-block}
+.iterm-body{padding:16px 20px;font-family:var(--mono);font-size:.8em;line-height:1.75;min-height:340px;position:relative;background:#0f0f1a}
+.iterm-line{opacity:0;transform:translateY(4px);transition:opacity .3s,transform .3s}
+.iterm-line.vis{opacity:1;transform:none}
+.iterm-line .prompt{color:#d97706}
+.iterm-line .cmd{color:#22c55e}
+.iterm-line .arg{color:#60a5fa}
+.iterm-line .out{color:#9ca3af}
+.iterm-line .ok{color:#22c55e}
+.iterm-line .warn{color:#eab308}
+.iterm-line .hl{color:#e5e7eb;font-weight:600}
+.iterm-line .dim{color:#4b5563}
+.iterm-cursor{display:inline-block;width:7px;height:14px;background:#d97706;animation:curBlink 1s step-end infinite;vertical-align:middle;margin-left:2px}
+@keyframes curBlink{0%,100%{opacity:1}50%{opacity:0}}
+.iterm-tabs{display:flex;gap:0;padding:0 16px;background:#12121f;border-bottom:1px solid #2a2a40}
+.iterm-tab{padding:8px 16px;font-size:.7em;font-family:var(--mono);color:#6b7280;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s}
+.iterm-tab.active{color:#d97706;border-bottom-color:#d97706}
+.iterm-tab:hover{color:#e5e7eb}
+.iterm-scene{display:none}.iterm-scene.active{display:block}
+.iterm-footer{padding:6px 16px;background:#12121f;border-top:1px solid #2a2a40;display:flex;justify-content:space-between;font-size:.65em;font-family:var(--mono);color:#4b5563}
+.iterm-footer .ctx{color:#22c55e}
+
+/* ═══ INSTALL CODE ═══ */
+.code-sec{padding:100px 0}
+.code-sec .sec-h{text-align:center}
+.code-sec .sec-sub{text-align:center;margin-left:auto;margin-right:auto}
+.term{background:rgba(10,15,26,.8);backdrop-filter:blur(12px);border:1px solid var(--border);border-radius:16px;overflow:hidden;max-width:680px;margin:40px auto 0;position:relative}
+.term::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gd),transparent)}
+.term-bar{padding:10px 16px;background:rgba(255,255,255,.02);border-bottom:1px solid var(--border);display:flex;gap:6px;align-items:center}
+.td{width:10px;height:10px;border-radius:50%}.td.r{background:#ff5f57}.td.y{background:#febc2e}.td.g{background:#28c840}
+.term-bar span{color:var(--dim);font-size:.72em;font-family:var(--mono);margin-left:auto}
+.term-body{padding:20px 24px;font-family:var(--mono);font-size:.84em;line-height:2.1;overflow-x:auto}
+.term-body .c{color:var(--dim)}.term-body .cmd{color:var(--green)}.term-body .arg{color:var(--blue)}
+
+/* ═══ SECTIONS ═══ */
+.sec{padding:120px 0 0}
+.sec-eyebrow{font-size:.72em;text-transform:uppercase;letter-spacing:.12em;color:var(--g);font-weight:700;margin-bottom:12px;padding:4px 12px;background:rgba(0,200,150,.08);border:1px solid rgba(0,200,150,.15);border-radius:6px;display:inline-block}
+.sec-h{font-size:clamp(32px,5vw,56px);font-weight:800;color:var(--bright);letter-spacing:-.03em;line-height:1.1;margin-bottom:12px}
+.sec-sub{color:var(--text);font-size:clamp(15px,1.8vw,19px);max-width:520px;margin-bottom:48px;font-weight:300;line-height:1.7}
+
+/* ═══ STICKY WORKFLOW ═══ */
+.sticky-wrap{height:500vh;position:relative}
+.sticky-panel{position:sticky;top:0;height:100vh;display:flex;align-items:center;overflow:hidden}
+.sticky-inner{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;width:100%}
+@media(max-width:768px){.sticky-inner{grid-template-columns:1fr}}
+.sticky-left .step-num{font-family:var(--mono);font-size:clamp(60px,10vw,120px);font-weight:900;line-height:1;background:linear-gradient(135deg,var(--gd),var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;opacity:.3;transition:opacity .4s}
+.sticky-left .step-num.active{opacity:1}
+.sticky-left h3{font-size:clamp(24px,3vw,36px);font-weight:700;color:var(--bright);letter-spacing:-.02em;margin:8px 0}
+.sticky-left p{color:var(--text);font-size:.95em;line-height:1.6}
+.sticky-left .cli-tag{display:inline-block;margin-top:12px;font-family:var(--mono);font-size:.82em;color:var(--gd);padding:6px 14px;background:rgba(0,159,118,.08);border:1px solid rgba(0,159,118,.15);border-radius:8px}
+.sticky-right{display:flex;flex-direction:column;gap:8px}
+.step-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px 20px;transition:all .5s;opacity:.3;transform:scale(.97)}
+.step-card.active{opacity:1;transform:scale(1);border-color:var(--gd);background:rgba(0,159,118,.04)}
+.step-card h4{color:var(--bright);font-size:.85em;font-weight:600}.step-card p{color:var(--dim);font-size:.78em;margin-top:2px}
+
+/* ═══ DATA BARS ═══ */
+.bars-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:48px}
+@media(max-width:768px){.bars-grid{grid-template-columns:1fr}}
+.bar-item{margin-bottom:20px}
+.bar-label{display:flex;justify-content:space-between;margin-bottom:8px;font-size:.82em}
+.bar-label span:first-child{color:var(--bright);font-weight:500}
+.bar-label span:last-child{font-family:var(--mono);color:var(--gd);font-weight:700}
+.bar-track{background:var(--bg3);border-radius:6px;height:6px;overflow:hidden}
+.bar-fill{height:100%;border-radius:6px;width:0;transition:width 1.4s cubic-bezier(.22,1,.36,1)}
+.bar-fill.plugin{background:linear-gradient(90deg,var(--gd),var(--g))}
+.bar-fill.baseline{background:var(--dim)}
+
+/* ═══ SKILLS ═══ */
+
+/* ═══ ANIMATED FLOW DIAGRAM v2 ═══ */
+.aflow{padding:80px 0;overflow:hidden}
+.aflow-svg{width:100%;max-width:900px;margin:40px auto 0;display:block}
+
+/* Flow nodes: spring-physics hover */
+.fn{opacity:0;transform:translateY(16px);transition:all .6s cubic-bezier(.16,1,.3,1);cursor:default}
+.fn.vis{opacity:1;transform:none}
+.fn-box:hover{transform:scale(1.015);transition:transform .4s cubic-bezier(.34,1.56,.64,1)}
+.fn-box:hover>rect:first-of-type{filter:drop-shadow(0 0 20px rgba(0,200,150,.25))}
+.fn-gate:hover{transform:scale(1.02);transition:transform .4s cubic-bezier(.34,1.56,.64,1)}
+.fn-gate:hover>rect:first-of-type{filter:drop-shadow(0 0 24px rgba(255,179,0,.3))}
+.fn-pr:hover{transform:scale(1.03);transition:transform .4s cubic-bezier(.34,1.56,.64,1)}
+.fn-sub:hover{transform:scale(1.04);transition:transform .35s cubic-bezier(.34,1.56,.64,1)}
+
+/* Connection lines: draw-in + continuous flow */
+.fconn{stroke-dasharray:1000;stroke-dashoffset:1000;transition:stroke-dashoffset 1s cubic-bezier(.22,1,.36,1)}
+.fconn.vis{stroke-dashoffset:0}
+
+/* Flowing dashed edges (Anthropic-style continuous flow) */
+.fedge{stroke-dasharray:8 4;stroke-dashoffset:0}
+.fedge.vis{animation:edgeFlow 1s linear infinite}
+@keyframes edgeFlow{to{stroke-dashoffset:-24}}
+
+/* Pulsing data dots */
+.fpulse{opacity:0;transition:opacity .4s}.fpulse.vis{opacity:1}
+
+/* Phase dot breathing */
+@keyframes dotBreathe{0%,100%{r:4;opacity:.8}50%{r:5.5;opacity:1}}
+.phase-dot{animation:dotBreathe 2.5s ease-in-out infinite}
+
+/* Subagent orbit — dot circling between agents */
+@keyframes orbitLoop{0%{offset-distance:0%}100%{offset-distance:100%}}
+
+/* Gate pause effect — border breathing */
+@keyframes gateBreathe{0%,100%{stroke-opacity:.15;stroke-width:1}50%{stroke-opacity:.4;stroke-width:1.5}}
+
+/* PR node celebration glow */
+@keyframes prGlow{0%,100%{filter:drop-shadow(0 0 8px rgba(48,209,88,.3))}50%{filter:drop-shadow(0 0 20px rgba(48,209,88,.5))}}
+.fn-pr.vis{animation:prGlow 2.5s ease-in-out infinite}
+
+/* Tooltip */
+.fn-tip{opacity:0;transition:opacity .2s;pointer-events:none}
+.fn:hover .fn-tip{opacity:1}
+
+/* Status indicator dots */
+.status-dot{r:5;transition:all .3s}
+@keyframes statusPulse{0%,100%{r:5;opacity:.7}50%{r:7;opacity:1}}
+.pipeline{padding:120px 0 0}
+.pipe-flow{display:flex;gap:0;margin:48px 0;position:relative;overflow-x:auto;padding-bottom:20px}
+.pipe-flow::before{content:'';position:absolute;top:48px;left:40px;right:40px;height:2px;background:linear-gradient(90deg,var(--gd),var(--blue),var(--amber),var(--green));opacity:.3}
+.pipe-step{flex:1;min-width:140px;text-align:center;position:relative;z-index:1}
+.pipe-icon{width:64px;height:64px;border-radius:16px;background:var(--bg2);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:1.5em;margin:0 auto 12px;transition:all .4s}
+.pipe-step:hover .pipe-icon{border-color:var(--gd);box-shadow:0 0 30px rgba(0,200,150,.15);transform:scale(1.1)}
+.pipe-step .pipe-label{font-size:.72em;font-weight:600;color:var(--bright);text-transform:uppercase;letter-spacing:.08em}
+.pipe-step .pipe-sub{font-size:.68em;color:var(--dim);margin-top:2px}
+.pipe-arrow{color:var(--dim);font-size:.9em;display:flex;align-items:center;padding-top:10px;min-width:20px;justify-content:center}
+
+/* DASHBOARD CARDS */
+.dash-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:48px 0}
+@media(max-width:900px){.dash-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.dash-grid{grid-template-columns:1fr}}
+.dash{background:rgba(10,15,26,.65);backdrop-filter:blur(12px);border:1px solid var(--border);border-radius:16px;padding:24px;position:relative;overflow:hidden;transition:all .25s cubic-bezier(.4,0,.2,1)}
+.dash:hover{border-color:rgba(0,200,150,.3);transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,200,150,.1)}
+.dash-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.dash-header h4{font-size:.75em;text-transform:uppercase;letter-spacing:.08em;color:var(--dim);font-weight:600}
+.dash-header .dash-badge{font-size:.65em;padding:3px 8px;border-radius:6px;font-weight:600}
+.dash-header .dash-badge.green{background:rgba(48,209,88,.1);color:var(--green)}
+.dash-header .dash-badge.blue{background:rgba(41,151,255,.1);color:var(--blue)}
+.dash-header .dash-badge.amber{background:rgba(255,179,0,.1);color:var(--amber)}
+.dash-big{font-family:var(--mono);font-size:2em;font-weight:800;color:var(--bright);line-height:1;margin-bottom:4px}
+.dash-sub{font-size:.78em;color:var(--dim);margin-bottom:16px}
+/* Mini bar chart */
+.mini-bars{display:flex;align-items:end;gap:4px;height:48px;margin-top:8px}
+.mini-bar{flex:1;background:var(--gd);border-radius:3px 3px 0 0;min-width:6px;transition:height .6s ease}
+.mini-bar.dim{background:var(--dim);opacity:.4}
+/* Mini donut */
+.donut-wrap{display:flex;align-items:center;gap:16px;margin-top:8px}
+.donut{width:80px;height:80px;position:relative}
+.donut svg{width:100%;height:100%;transform:rotate(-90deg)}
+.donut circle{fill:none;stroke-width:8;cx:40;cy:40;r:34}
+.donut .track{stroke:var(--bg3)}
+.donut .fill{stroke:var(--gd);stroke-dasharray:213.6;stroke-dashoffset:213.6;stroke-linecap:round;transition:stroke-dashoffset 1.5s ease}
+.donut .fill.vis{stroke-dashoffset:calc(213.6 * (1 - var(--pct)))}
+.donut-center{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:1.1em;font-weight:800;color:var(--bright)}
+.donut-legend{font-size:.72em;color:var(--dim);line-height:1.8}
+.donut-legend span{display:block}
+.donut-legend .dot{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:6px}
+.donut-legend .dot.g{background:var(--gd)}.donut-legend .dot.d{background:var(--dim)}
+/* Mini timeline */
+.mini-tl{margin-top:8px}
+.mini-tl-row{display:flex;align-items:center;gap:8px;padding:4px 0;font-size:.72em}
+.mini-tl-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.mini-tl-dot.done{background:var(--green)}.mini-tl-dot.active{background:var(--amber);box-shadow:0 0 6px var(--amber)}.mini-tl-dot.pending{background:var(--bg3)}
+.mini-tl-row span{color:var(--dim)}.mini-tl-row span.bright{color:var(--bright)}
+/* Flow diagram card */
+.flow-card{grid-column:span 2}
+@media(max-width:900px){.flow-card{grid-column:span 1}}
+.flow-nodes{display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin-top:12px}
+.flow-node{padding:6px 12px;border-radius:8px;font-size:.72em;font-weight:600;font-family:var(--mono);border:1px solid var(--border);background:var(--bg2);color:var(--text);transition:all .3s}
+.flow-node.active{border-color:var(--gd);color:var(--gd);background:rgba(0,200,150,.06)}
+.flow-node.gate{border-color:var(--amber);color:var(--amber);background:rgba(255,179,0,.06)}
+.flow-arr{color:var(--dim);font-size:.75em}
+/* Subagent card */
+.sub-ring{display:flex;gap:12px;margin-top:12px}
+.sub-agent{flex:1;text-align:center;padding:12px 8px;border-radius:10px;border:1px solid var(--border);background:var(--bg2);font-size:.7em;transition:all .3s}
+.sub-agent:hover{border-color:var(--gd)}
+.sub-agent .sub-icon{font-size:1.6em;margin-bottom:4px}
+.sub-agent .sub-nm{color:var(--bright);font-weight:600}
+.sub-agent .sub-role{color:var(--dim);margin-top:2px}
+.sk-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media(max-width:768px){.sk-grid{grid-template-columns:1fr}}
+.sk{background:rgba(10,15,26,.65);backdrop-filter:blur(12px);border:1px solid var(--border);border-radius:14px;padding:24px;cursor:pointer;transition:all .25s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden}
+.sk::after{content:'→';position:absolute;top:22px;right:20px;color:var(--dim);font-size:.85em;transition:all .25s}
+.sk:hover{border-color:rgba(0,200,150,.35);transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,200,150,.12)}
+.sk:hover::after{color:var(--g);transform:translateX(4px)}
+.sk .nm{font-family:var(--mono);color:var(--g);font-weight:700;font-size:.95em}
+.sk .ds{color:var(--text);font-size:.82em;margin-top:8px;line-height:1.6}
+.sk .iv{font-family:var(--mono);color:var(--dim);font-size:.72em;margin-top:14px;padding-top:12px;border-top:1px solid #2a2e38}
+.sk-cat{font-size:.72em;text-transform:uppercase;letter-spacing:.12em;color:var(--g);margin:32px 0 12px;font-weight:600;padding:3px 10px;background:rgba(0,200,150,.06);border:1px solid rgba(0,200,150,.1);border-radius:4px;display:inline-block}
+
+/* ═══ IRON LAWS ═══ */
+.law{display:flex;align-items:center;gap:16px;padding:16px 0;border-bottom:1px solid var(--border);transition:all .3s}
+.law:last-child{border:none}
+.law:hover{padding-left:8px}
+.law-n{font-family:var(--mono);color:var(--gd);font-weight:700;font-size:.82em;min-width:100px}
+.law-t{font-family:var(--mono);color:var(--amber);font-size:.76em;letter-spacing:.02em}
+
+/* ═══ EVAL TABLE ═══ */
+.eval{width:100%;border-collapse:separate;border-spacing:0;border-radius:14px;overflow:hidden;border:1px solid var(--border)}
+.eval th{background:var(--bg2);color:var(--bright);padding:14px 18px;text-align:left;font-size:.72em;text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+.eval td{padding:14px 18px;border-top:1px solid var(--border);font-size:.85em}
+.eval tr:last-child td{font-weight:700;color:var(--green);background:rgba(48,209,88,.04)}
+.lift{color:var(--green);font-weight:600}
+
+/* ═══ MARQUEE ADOPTERS ═══ */
+.marquee{overflow:hidden;padding:60px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.marquee-label{text-align:center;font-size:.68em;text-transform:uppercase;letter-spacing:.12em;color:var(--dim);margin-bottom:24px;font-weight:500}
+.ticker{display:flex;overflow:hidden}
+.ticker-track{display:flex;gap:48px;animation:tickScroll 30s linear infinite;flex-shrink:0}
+.ticker-track span{white-space:nowrap;font-size:.95em;font-weight:500;color:var(--dim);transition:color .2s;padding:8px 0}
+.ticker-track span:hover{color:var(--bright)}
+@keyframes tickScroll{to{transform:translateX(-50%)}}
+
+/* ═══ COMP TABLE ═══ */
+.comp{width:100%;border-collapse:separate;border-spacing:0;border-radius:14px;overflow:hidden;border:1px solid var(--border)}
+.comp th{background:var(--bg2);color:var(--bright);padding:14px 18px;text-align:left;font-size:.76em;font-weight:600}
+.comp td{padding:14px 18px;border-top:1px solid var(--border);font-size:.84em}
+
+/* ═══ CTA ═══ */
+.cta-sec{text-align:center;padding:120px 0 60px}
+.cta-h{font-size:clamp(32px,5vw,56px);font-weight:800;color:var(--bright);letter-spacing:-.03em;margin-bottom:16px}
+.cta-sub{color:var(--text);font-size:1em;margin-bottom:32px;font-weight:300}
+
+/* ═══ FOOTER ═══ */
+.ft{text-align:center;padding:24px 0 40px;color:var(--dim);font-size:.72em;border-top:1px solid var(--border);margin-top:20px}
+
+/* ═══ MODAL (centered, OpenClaw-style) ═══ */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);z-index:200;opacity:0;pointer-events:none;transition:opacity .3s}
+.overlay.open{opacity:1;pointer-events:auto}
+.modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.95);width:620px;max-width:92vw;max-height:85vh;background:var(--bg1);border:1px solid var(--border);border-radius:18px;z-index:201;opacity:0;pointer-events:none;transition:all .3s cubic-bezier(.16,1,.3,1);overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,.5)}
+.modal.open{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}
+.mh{position:sticky;top:0;background:var(--bg1);border-bottom:1px solid var(--border);padding:20px 28px;display:flex;align-items:center;justify-content:space-between;z-index:1;border-radius:18px 18px 0 0}
+.mh h2{font-size:1.15em;font-weight:800;color:var(--bright);font-family:var(--mono)}
+.mh button{background:none;border:1px solid var(--border);color:var(--dim);width:34px;height:34px;border-radius:10px;cursor:pointer;font-size:1.1em;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.mh button:hover{border-color:var(--dim);color:var(--bright);background:rgba(255,255,255,.04)}
+.mb{padding:24px 28px 36px}
+.mb .pi{font-family:var(--mono);color:var(--g);font-size:.85em;padding:6px 14px;background:rgba(0,200,150,.06);border:1px solid rgba(0,200,150,.12);border-radius:6px;display:inline-block;margin-bottom:20px}
+.mb .pir{background:rgba(255,179,0,.05);border:1px solid rgba(255,179,0,.12);border-radius:8px;padding:12px 16px;margin-bottom:20px;font-family:var(--mono);font-size:.8em;color:var(--amber)}
+.mb .pd{color:var(--text);font-size:.9em;line-height:1.7;margin-bottom:24px}
+.mb .pw{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px}
+.mb .pwc{border-radius:10px;padding:16px;font-size:.84em;line-height:1.5}
+.mb .pwc.yes{background:rgba(48,209,88,.04);border:1px solid rgba(48,209,88,.12);color:var(--green)}
+.mb .pwc.no{background:rgba(255,69,58,.04);border:1px solid rgba(255,69,58,.12);color:var(--red)}
+.mb .pwc strong{display:block;margin-bottom:6px;font-size:.72em;text-transform:uppercase;letter-spacing:1px}
+.mb .ps{margin-bottom:24px}
+.mb .ps h3{font-size:.7em;text-transform:uppercase;letter-spacing:.1em;color:var(--g);font-weight:600;margin-bottom:12px}
+.mb .ps ol,.mb .ps ul{padding-left:18px}
+.mb .ps li{color:var(--text);font-size:.85em;line-height:1.6;padding:4px 0}
+.mb .ps li::marker{color:var(--g)}
+</style>
+</head>
+<body>
+
+<div class="stars"></div>
+<div class="aurora"><div class="ab a"></div><div class="ab b"></div></div>
+<div class="grain"></div>
+
+<!-- nav removed -->
+
+<div class="wrap">
+
+<!-- ═══ HERO ═══ -->
+<section class="hero">
+  <div class="hero-logo" data-stagger style="--s:0">
+    <div class="glow-under"></div>
+    <svg class="strike" viewBox="0 0 60 140"><defs><linearGradient id="hStrikeG" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#fff" stop-opacity=".3"/><stop offset="40%" stop-color="#ffcc00"/><stop offset="100%" stop-color="#ff8800"/></linearGradient></defs><path class="strike-bolt" d="M30,0 L25,30 L35,35 L20,65 L32,70 L15,105 L28,108 L22,140"/><path class="strike-bolt2" d="M32,5 L28,25 L36,30 L24,55 L34,62 L20,95 L30,100 L26,135"/></svg>
+    <div class="flash"></div>
+    <div class="ring"></div>
+    <div class="ring ring2"></div>
+    <div class="particles">
+      <div class="particle" style="--px:-40px;--py:-30px"></div>
+      <div class="particle" style="--px:35px;--py:-35px;animation-delay:.05s"></div>
+      <div class="particle" style="--px:-30px;--py:25px;animation-delay:.08s"></div>
+      <div class="particle" style="--px:40px;--py:20px;animation-delay:.03s"></div>
+      <div class="particle" style="--px:-15px;--py:-45px;animation-delay:.06s"></div>
+      <div class="particle" style="--px:20px;--py:40px;animation-delay:.1s"></div>
+      <div class="particle" style="--px:-45px;--py:5px;animation-delay:.04s"></div>
+      <div class="particle" style="--px:45px;--py:-10px;animation-delay:.07s"></div>
+    </div>
+    <svg class="logo-svg" viewBox="0 0 95 98">
+      <defs>
+        <linearGradient id="hlfa" x1="12%" y1="-18%" x2="88%" y2="84%"><stop offset="0%" stop-color="#fff" stop-opacity=".92"/><stop offset="100%" stop-color="#439246"/></linearGradient>
+        <linearGradient id="hlfb" x1="50%" y1="5%" x2="148%" y2="175%"><stop offset="0%" stop-color="#fff" stop-opacity=".80"/><stop offset="100%" stop-color="#439246"/></linearGradient>
+        <linearGradient id="hlfc" x1="19%" y1="-9%" x2="82%" y2="77%"><stop offset="0%" stop-color="#fff" stop-opacity=".92"/><stop offset="100%" stop-color="#439246"/></linearGradient>
+        <linearGradient id="hlfd" x1="57%" y1="26%" x2="137%" y2="158%"><stop offset="0%" stop-color="#fff" stop-opacity=".80"/><stop offset="100%" stop-color="#439246"/></linearGradient>
+        <linearGradient id="hlbolt" x1="30%" y1="0%" x2="70%" y2="100%"><stop offset="0%" stop-color="#ffe680"/><stop offset="45%" stop-color="#ffb300"/><stop offset="100%" stop-color="#e67e00"/></linearGradient>
+        <clipPath id="hlhx"><path d="M46,2 L83,17.4 L85.5,20.7 L94.5,59 L93,63.5 L70.5,93.8 L66.5,95.6 L29,95.6 L25,93.8 L2.5,63.5 L1,59 L10,20.7 L12.5,17.4 Z"/></clipPath>
+        <filter id="hlgl"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      </defs>
+      <path class="hex-fill" d="M46,2 L83,17.4 L85.5,20.7 L94.5,59 L93,63.5 L70.5,93.8 L66.5,95.6 L29,95.6 L25,93.8 L2.5,63.5 L1,59 L10,20.7 L12.5,17.4 Z"/>
+      <polygon class="shd" fill="#000" opacity=".24" points="-7,60 24,27 57,64 19,100" clip-path="url(#hlhx)"/>
+      <path class="facet f1" fill="url(#hlfa)" d="M62,44 C61.4,45.8 60.2,47.5 59,48.2 L50,53.4 C48.2,54.5 45.2,54.5 43.4,53.4 L34.4,48.2 C32.6,46.9 31.2,44.4 31.2,42.4 L31.2,31 C31.2,30.1 31.5,29.1 32,28.2 Z"/>
+      <path class="facet f2" fill="url(#hlfb)" d="M61.2,28.4 C61.7,29.2 61.9,30.2 61.9,31 L61.9,42.8 C61.9,44.8 60.4,47.3 58.7,48.4 L49.7,53.6 C47.9,54.7 44.9,54.7 43.1,53.6 L34.1,48.4 C33.2,47.8 32.3,46.7 31.8,45.8 Z"/>
+      <path class="facet f3" fill="url(#hlfc)" d="M71,65 C70.3,66.5 69.2,67.8 68.1,68.5 L52.8,77.2 C50.8,78.3 47.4,78.3 45.4,77.2 L30.1,68.5 C28.1,67.4 26.7,64.8 26.7,62.8 L26.7,45.8 C26.7,44.8 27,43.6 27.6,42.6 Z"/>
+      <path class="facet f4" fill="url(#hlfd)" d="M70.9,42.8 C71.5,43.7 71.7,44.6 71.7,45.6 L71.7,63 C71.7,65 70.3,67.6 68.1,68.7 L52.8,77.4 C50.8,78.5 47.4,78.5 45.4,77.4 L30.1,68.7 C29.1,68.1 28.2,67.1 27.6,66.1 Z"/>
+      <g class="bolt-inner"><polygon fill="url(#hlbolt)" points="66,54 56,72 63,72 59,89 74,67 65,67" filter="url(#hlgl)"/></g>
+    </svg>
+  </div>
+  <div class="hero-brand" data-stagger style="--s:1">etcd-druid<span class="dim">-skills</span></div>
+  <div class="hero-eyebrow" data-stagger style="--s:2">The agentic workflow for etcd-druid.</div>
+  <p class="hero-sub" data-stagger style="--s:3">It doesn't just write code. It analyzes issues, researches past PRs, proposes options, and waits for your approval — before touching a single file.</p>
+  <div class="hero-cta" data-stagger style="--s:4">
+    <a class="btn btn-fill" href="#install">Get started</a>
+    <a class="btn btn-line" href="https://github.com/seshachalam-yv/etcd-druid-skills">View source</a>
+  </div>
+  <div class="hero-scroll" data-stagger style="--s:5">Scroll to explore ↓</div>
+</section>
+
+</div>
+
+<div class="wrap">
+
+<!-- ═══ INTERACTIVE TERMINAL DEMO ═══ -->
+<section class="code-sec" id="install">
+  <div class="sec-eyebrow" data-stagger style="--s:0">See it in action</div>
+  <div class="sec-h" data-stagger style="--s:1;text-align:center">Three commands.<br>Then watch it work.</div>
+  <div class="iterm" data-stagger style="--s:2" id="iterm">
+    <div class="iterm-bar">
+      <div class="claude-icon">✦</div>
+      <span>Claude Code v2.1</span>
+      <div class="bar-right"><span class="status-dot"></span> claude-sonnet-latest · etcd-druid</div>
+    </div>
+    <div class="iterm-tabs">
+      <div class="iterm-tab active" data-scene="0" onclick="switchScene(0)">Install</div>
+      <div class="iterm-tab" data-scene="1" onclick="switchScene(1)">Plan — issue #1230</div>
+      <div class="iterm-tab" data-scene="2" onclick="switchScene(2)">Plan output</div>
+    </div>
+    <div class="iterm-body" id="iterm-body">
+
+      <!-- Scene 0: Install -->
+      <div class="iterm-scene active" id="scene-0">
+        <div class="iterm-line"><span class="prompt">❯ </span><span class="cmd">/plugin marketplace add</span> <span class="arg">seshachalam-yv/etcd-druid-skills</span></div>
+        <div class="iterm-line"><span class="out">  Successfully added marketplace: seshachalam-yv-etcd-druid-skills</span></div>
+        <div class="iterm-line"><br></div>
+        <div class="iterm-line"><span class="prompt">❯ </span><span class="cmd">/plugin install</span> <span class="arg">etcd-druid-skills@seshachalam-yv-etcd-druid-skills</span></div>
+        <div class="iterm-line"><span class="ok">  ✓ Installed etcd-druid. Run /reload-plugins to apply.</span></div>
+        <div class="iterm-line"><br></div>
+        <div class="iterm-line"><span class="prompt">❯ </span><span class="cmd">/reload-plugins</span></div>
+        <div class="iterm-line"><span class="out">  Reloaded: 3 plugins · 3 skills · 5 agents · 11 hooks · 1 plugin LSP server</span></div>
+        <div class="iterm-line"><br></div>
+        <div class="iterm-line"><span class="dim">  (kind-etcd-druid-e2e|default) → etcd-druid claude-sonnet-latest</span></div>
+      </div>
+
+      <!-- Scene 1: Plan -->
+      <div class="iterm-scene" id="scene-1">
+        <div class="iterm-line"><span class="prompt">❯ </span><span class="cmd">/etcd-druid:plan</span> <span class="arg">https://github.com/gardener/etcd-druid/issues/1230</span></div>
+        <div class="iterm-line"><br></div>
+        <div class="iterm-line"><span class="hl">● I'll start by reading the issue and exploring the codebase to create a solid plan.</span></div>
+        <div class="iterm-line"><span class="out">● Creating planning tasks and reading the issue simultaneously.</span></div>
+        <div class="iterm-line"><span class="dim">  Ran 1 shell command</span></div>
+        <div class="iterm-line"><br></div>
+        <div class="iterm-line"><span class="out">● Now let me explore the codebase and look at comparable PRs in parallel.</span></div>
+        <div class="iterm-line"><span class="dim">  Searched for 16 patterns, read 18 files, listed 4 directories, ran 7 shell commands</span></div>
+        <div class="iterm-line"><br></div>
+        <div class="iterm-line"><span class="out">● Now I have a thorough understanding. Let me look at a few more details.</span></div>
+        <div class="iterm-line"><span class="dim">  Searched for 2 patterns, read 2 files, listed 2 directories, ran 1 shell command</span></div>
+        <div class="iterm-line"><br></div>
+        <div class="iterm-line"><span class="hl">● Now let me write the plan file.</span></div>
+        <div class="iterm-line"><span class="ok">● Write(docs/plans/2026-04-23-issue-1230-quorum-loss-recovery-task.md)</span></div>
+        <div class="iterm-line"><span class="dim">  Wrote 157 lines to docs/plans/...</span></div>
+        <div class="iterm-line"><br></div>
+        <div class="iterm-line"><span class="hl">## Plan Summary — 5 tasks:</span></div>
+        <div class="iterm-line"><span class="out">  1. Add QuorumLossRecovery API field + CRD</span></div>
+        <div class="iterm-line"><span class="out">  2. Implement handler + register it</span></div>
+        <div class="iterm-line"><span class="out">  3. Integration test for full lifecycle</span></div>
+        <div class="iterm-line"><span class="out">  4. Usage docs + example</span></div>
+        <div class="iterm-line"><span class="out">  5. RBAC markers for new k8s operations</span></div>
+        <div class="iterm-line"><br></div>
+        <div class="iterm-line"><span class="warn">⛔ GATE 1 — Reply "approved" to proceed, or tell me what to change.</span></div>
+      </div>
+
+      <!-- Scene 2: Plan Output -->
+      <div class="iterm-scene" id="scene-2">
+        <div class="iterm-line"><span class="hl">## Assumptions (stated before proposing):</span></div>
+        <div class="iterm-line"><br></div>
+        <div class="iterm-line"><span class="out">  1. <span class="ok">No config fields needed</span> — .spec.config.quorumLossRecovery is empty struct</span></div>
+        <div class="iterm-line"><span class="out">  2. <span class="ok">Single-member etcds rejected</span> — backup-restore handles those</span></div>
+        <div class="iterm-line"><span class="out">  3. <span class="ok">"Quorum loss" = etcd not ready</span> — manual trigger, handler verifies</span></div>
+        <div class="iterm-line"><span class="out">  4. <span class="warn">E2e tests not required for initial PR</span> — follow-up like OnDemandSnapshot</span></div>
+        <div class="iterm-line"><span class="out">  5. <span class="ok">ConfigMap patch</span> writes single-member initial-cluster</span></div>
+        <div class="iterm-line"><br></div>
+        <div class="iterm-line"><span class="hl">## New RBAC the handler needs:</span></div>
+        <div class="iterm-line"><span class="out">  • apps/statefulsets: get, update, patch</span></div>
+        <div class="iterm-line"><span class="out">  • ""/persistentvolumeclaims: get, list, delete</span></div>
+        <div class="iterm-line"><span class="out">  • ""/configmaps: get, patch</span></div>
+        <div class="iterm-line"><span class="out">  • coordination.k8s.io/leases: get, list, delete</span></div>
+        <div class="iterm-line"><span class="out">  • druid.gardener.cloud/etcds: get, update, patch</span></div>
+        <div class="iterm-line"><br></div>
+        <div class="iterm-line"><span class="dim">  Code plan written to docs/plans/2026-04-23-issue-1230-quorum-loss-recovery-task.md</span></div>
+        <div class="iterm-line"><span class="warn">  Reply "approved" to proceed, or tell me what to change.</span></div>
+      </div>
+
+    </div>
+    <div class="iterm-footer">
+      <span>❯ <span class="iterm-cursor"></span></span>
+      <span><span class="ctx">(kind-etcd-druid-e2e|default)</span> → etcd-druid <span style="color:#d97706">claude-sonnet-latest</span></span>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ ANIMATED WORKFLOW DIAGRAM ═══ -->
+<section class="sec" id="workflow">
+  <div class="sec-eyebrow" data-stagger style="--s:0">How it works</div>
+  <div class="sec-h" data-stagger style="--s:1">Agentic workflow.<br>Not autocomplete.</div>
+  <p class="sec-sub" data-stagger style="--s:2">Every task follows a research-first approach. The plugin reads issues, studies past PRs, and builds a plan — then waits for you.</p>
+</section>
+
+<div class="aflow" id="aflow">
+<div class="wrap-wide">
+  <svg class="aflow-svg" viewBox="0 0 860 1020" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="gGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#00c896"/><stop offset="100%" stop-color="#009F76"/></linearGradient>
+      <linearGradient id="aGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ffb300"/><stop offset="100%" stop-color="#e67e00"/></linearGradient>
+      <linearGradient id="bGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#2997ff"/><stop offset="100%" stop-color="#1a6dd4"/></linearGradient>
+      <linearGradient id="pGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#30d158"/><stop offset="100%" stop-color="#22a344"/></linearGradient>
+      <linearGradient id="connGrad1" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#00c896" stop-opacity=".8"/><stop offset="100%" stop-color="#00c896" stop-opacity=".2"/></linearGradient>
+      <linearGradient id="connGrad2" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#ffb300" stop-opacity=".8"/><stop offset="100%" stop-color="#ffb300" stop-opacity=".2"/></linearGradient>
+      <filter id="gl1"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      <filter id="gl2"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      <filter id="gl3"><feGaussianBlur stdDeviation="8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      <marker id="arrG" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#00c896" opacity=".7"/></marker>
+      <marker id="arrA" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#ffb300" opacity=".7"/></marker>
+      <marker id="arrB" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#2997ff" opacity=".7"/></marker>
+    </defs>
+
+    <!-- ══ BACKGROUND GLOW CIRCLES ══ -->
+    <circle cx="430" cy="160" r="200" fill="url(#gGrad)" opacity=".015"/>
+    <circle cx="430" cy="550" r="250" fill="url(#bGrad)" opacity=".012"/>
+    <circle cx="430" cy="830" r="180" fill="url(#aGrad)" opacity=".015"/>
+
+    <!-- ══ CONNECTIONS (animated draw-in lines) ══ -->
+    <line class="fconn" data-delay="300" x1="430" y1="65" x2="430" y2="108" stroke="url(#connGrad1)" stroke-width="2.5" marker-end="url(#arrG)"/>
+    <line class="fconn" data-delay="1600" x1="430" y1="232" x2="430" y2="278" stroke="url(#connGrad1)" stroke-width="2.5" marker-end="url(#arrG)"/>
+    <line class="fconn" data-delay="2800" x1="430" y1="368" x2="430" y2="418" stroke="url(#connGrad2)" stroke-width="2.5" marker-end="url(#arrA)"/>
+    <line class="fconn" data-delay="5400" x1="430" y1="740" x2="430" y2="790" stroke="url(#connGrad1)" stroke-width="2.5" marker-end="url(#arrG)"/>
+    <line class="fconn" data-delay="7000" x1="430" y1="908" x2="430" y2="955" stroke="url(#pGrad)" stroke-width="2.5"/>
+
+    <!-- ══ NODE 1: Issue / Bug Report ══ -->
+    <g class="fn fn-box" data-delay="0">
+      <rect x="290" y="16" width="280" height="50" rx="25" fill="#0a0a0a" stroke="url(#gGrad)" stroke-width="2"/>
+      <rect x="290" y="16" width="280" height="50" rx="25" fill="url(#gGrad)" opacity=".06"/>
+      <text x="430" y="46" text-anchor="middle" font-family="Inter,sans-serif" font-size="15" font-weight="700" fill="#f5f5f7">📋  Issue / Bug Report</text>
+      <!-- Hover tooltip -->
+      <g class="fn-tip"><rect x="305" y="72" width="250" height="28" rx="6" fill="#1a1a1a" stroke="#333" stroke-width="1"/><text x="430" y="91" text-anchor="middle" font-family="Inter" font-size="9" fill="#86868b">GitHub issue or bug report triggers the workflow</text></g>
+    </g>
+
+    <!-- ══ NODE 2: /etcd-druid:plan ══ -->
+    <g class="fn fn-box" data-delay="700">
+      <rect x="80" y="108" width="700" height="125" rx="16" fill="#0a0a0a" stroke="url(#gGrad)" stroke-width="1.5"/>
+      <rect x="80" y="108" width="700" height="125" rx="16" fill="url(#gGrad)" opacity=".03"/>
+      <!-- Header bar -->
+      <rect x="80" y="108" width="700" height="1" fill="url(#gGrad)" opacity=".5"/>
+      <text x="430" y="138" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="14" font-weight="700" fill="#00c896">/etcd-druid:plan</text>
+      <text x="430" y="160" text-anchor="middle" font-family="Inter,sans-serif" font-size="11.5" fill="#86868b">Analyze → Research → Propose Options → Write Plan</text>
+      <text x="430" y="180" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="#48484a">WHEN/THEN criteria · files · test scope · approach trade-offs</text>
+      <!-- Animated phase dots -->
+      <g transform="translate(180,200)">
+        <circle class="phase-dot" cx="0" cy="0" r="4" fill="#00c896"/><text x="14" y="4" font-family="Inter" font-size="8.5" font-weight="500" fill="#86868b">Analyze</text>
+        <line x1="8" y1="0" x2="72" y2="0" stroke="#00c896" stroke-width="1" opacity=".25"/>
+        <circle class="phase-dot" cx="80" cy="0" r="4" fill="#00c896" style="animation-delay:.3s"/><text x="94" y="4" font-family="Inter" font-size="8.5" font-weight="500" fill="#86868b">Research</text>
+        <line x1="88" y1="0" x2="160" y2="0" stroke="#00c896" stroke-width="1" opacity=".25"/>
+        <circle class="phase-dot" cx="168" cy="0" r="4" fill="#00c896" style="animation-delay:.6s"/><text x="182" y="4" font-family="Inter" font-size="8.5" font-weight="500" fill="#86868b">Propose</text>
+        <line x1="176" y1="0" x2="248" y2="0" stroke="#00c896" stroke-width="1" opacity=".25"/>
+        <circle class="phase-dot" cx="256" cy="0" r="4" fill="#00c896" style="animation-delay:.9s"/><text x="270" y="4" font-family="Inter" font-size="8.5" font-weight="500" fill="#86868b">Write Plan</text>
+        <!-- Animated progress line -->
+        <line x1="0" y1="0" x2="256" y2="0" stroke="#00c896" stroke-width="1.5" opacity=".15" stroke-dasharray="5 3"><animate attributeName="stroke-dashoffset" from="30" to="0" dur="2s" repeatCount="indefinite"/></line>
+      </g>
+      <!-- Hover tooltip -->
+      <g class="fn-tip"><rect x="180" y="218" width="500" height="28" rx="6" fill="#1a1a1a" stroke="#333" stroke-width="1"/><text x="430" y="237" text-anchor="middle" font-family="Inter" font-size="9" fill="#86868b">Reads merged PRs, docs/development/, commit history — proposes 2-3 approaches before writing code</text></g>
+    </g>
+
+    <!-- ══ NODE 3: GATE 1 ══ -->
+    <g class="fn fn-gate" data-delay="2000">
+      <rect x="280" y="278" width="300" height="90" rx="14" fill="#1a1400" stroke="url(#aGrad)" stroke-width="2.5" filter="url(#gl1)"/>
+      <!-- Pulsing border glow -->
+      <rect x="278" y="276" width="304" height="94" rx="16" fill="none" stroke="#ffb300" stroke-width="1" opacity=".2"><animate attributeName="opacity" values=".1;.3;.1" dur="2.5s" repeatCount="indefinite"/></rect>
+      <text x="340" y="312" font-family="Inter,sans-serif" font-size="20" font-weight="800" fill="#ffb300">⛔ GATE 1</text>
+      <text x="430" y="338" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" fill="#86868b">← you review the plan</text>
+      <text x="430" y="358" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9.5" fill="#ffb300" opacity=".8">"approved" to proceed</text>
+    </g>
+
+    <!-- ══ NODE 4: /etcd-druid:implement ══ -->
+    <g class="fn fn-box" data-delay="3200">
+      <rect x="80" y="418" width="700" height="322" rx="16" fill="#0a0a0a" stroke="url(#bGrad)" stroke-width="1.5"/>
+      <rect x="80" y="418" width="700" height="322" rx="16" fill="url(#bGrad)" opacity=".02"/>
+      <rect x="80" y="418" width="700" height="1" fill="url(#bGrad)" opacity=".5"/>
+      <text x="430" y="450" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="14" font-weight="700" fill="#2997ff">/etcd-druid:implement</text>
+
+      <!-- Step 1 -->
+      <circle cx="120" cy="480" r="3" fill="#2997ff"/><text x="136" y="484" font-family="Inter,sans-serif" font-size="11.5" font-weight="500" fill="#f5f5f7">Create worktree + verify baseline tests</text>
+
+      <!-- Step 2 -->
+      <circle cx="120" cy="510" r="3" fill="#2997ff"/><text x="136" y="514" font-family="Inter,sans-serif" font-size="11.5" font-weight="500" fill="#f5f5f7">Per-task loop:</text>
+
+      <!-- Subagent box -->
+      <rect x="140" y="528" width="580" height="150" rx="12" fill="#0c0c0c" stroke="#222" stroke-width="1"/>
+
+      <!-- Implementer -->
+      <g class="fn-sub">
+        <rect x="175" y="548" width="140" height="50" rx="10" fill="#0a1a10" stroke="#00c896" stroke-width="1.5"/>
+        <rect x="175" y="548" width="140" height="50" rx="10" fill="url(#gGrad)" opacity=".04"/>
+        <text x="245" y="570" text-anchor="middle" font-family="Inter" font-size="10.5" font-weight="700" fill="#00c896">🛠 Implementer</text>
+        <text x="245" y="588" text-anchor="middle" font-family="Inter" font-size="8.5" fill="#48484a">writes code (TDD)</text>
+      </g>
+
+      <!-- Arrow: Impl → Spec -->
+      <line class="sub-arrow fconn" data-delay="4000" x1="315" y1="573" x2="360" y2="573" stroke="#00c896" stroke-width="1.5" marker-end="url(#arrG)"/>
+
+      <!-- Spec Review -->
+      <g class="fn-sub">
+        <rect x="360" y="548" width="140" height="50" rx="10" fill="#0a0a1a" stroke="#2997ff" stroke-width="1.5"/>
+        <rect x="360" y="548" width="140" height="50" rx="10" fill="url(#bGrad)" opacity=".04"/>
+        <text x="430" y="570" text-anchor="middle" font-family="Inter" font-size="10.5" font-weight="700" fill="#2997ff">📋 Spec Review</text>
+        <text x="430" y="588" text-anchor="middle" font-family="Inter" font-size="8.5" fill="#48484a">checks plan match</text>
+      </g>
+
+      <!-- Arrow: Spec → Code -->
+      <line class="sub-arrow fconn" data-delay="4400" x1="500" y1="573" x2="545" y2="573" stroke="#2997ff" stroke-width="1.5" marker-end="url(#arrB)"/>
+
+      <!-- Code Review -->
+      <g class="fn-sub">
+        <rect x="545" y="548" width="140" height="50" rx="10" fill="#140a1a" stroke="#a78bfa" stroke-width="1.5"/>
+        <rect x="545" y="548" width="140" height="50" rx="10" fill="#a78bfa" opacity=".04"/>
+        <text x="615" y="570" text-anchor="middle" font-family="Inter" font-size="10.5" font-weight="700" fill="#a78bfa">🔍 Code Review</text>
+        <text x="615" y="588" text-anchor="middle" font-family="Inter" font-size="8.5" fill="#48484a">validates quality</text>
+      </g>
+
+      <!-- Fix loop -->
+      <path class="fconn" data-delay="4800" d="M615,602 Q640,645 430,645 Q220,645 245,602" fill="none" stroke="#48484a" stroke-width="1" stroke-dasharray="4 3"/>
+      <text x="430" y="660" text-anchor="middle" font-family="Inter" font-size="9" fill="#48484a">↑ fix issues and re-review</text>
+
+      <!-- Steps 3-4 -->
+      <circle cx="120" cy="700" r="3" fill="#2997ff"/><text x="136" y="704" font-family="Inter,sans-serif" font-size="11.5" font-weight="500" fill="#f5f5f7">Verify: <tspan font-family="JetBrains Mono" font-size="10.5" fill="#86868b">make ci-checks && make test-unit</tspan></text>
+      <circle cx="120" cy="725" r="3" fill="#2997ff"/><text x="136" y="729" font-family="Inter,sans-serif" font-size="11.5" font-weight="500" fill="#f5f5f7">Final review: <tspan font-family="JetBrains Mono" font-size="10.5" fill="#86868b">/etcd-druid:review</tspan> (whole diff)</text>
+    </g>
+
+    <!-- ══ NODE 5: GATE 2 ══ -->
+    <g class="fn fn-gate" data-delay="5800">
+      <rect x="240" y="790" width="380" height="118" rx="14" fill="#1a1400" stroke="url(#aGrad)" stroke-width="2.5" filter="url(#gl1)"/>
+      <rect x="238" y="788" width="384" height="122" rx="16" fill="none" stroke="#ffb300" stroke-width="1" opacity=".2"><animate attributeName="opacity" values=".1;.3;.1" dur="2.5s" repeatCount="indefinite"/></rect>
+      <text x="300" y="825" font-family="Inter,sans-serif" font-size="20" font-weight="800" fill="#ffb300">⛔ GATE 2</text>
+      <text x="430" y="852" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" fill="#86868b">← you review the diff</text>
+      <!-- Option buttons -->
+      <rect x="260" y="866" width="68" height="28" rx="6" fill="#0a1a10" stroke="#30d158" stroke-width="1.5"/><text x="294" y="885" text-anchor="middle" font-family="Inter" font-size="10" font-weight="600" fill="#30d158">A) PR</text>
+      <rect x="340" y="866" width="68" height="28" rx="6" fill="#0a0a0a" stroke="#48484a" stroke-width="1"/><text x="374" y="885" text-anchor="middle" font-family="Inter" font-size="10" fill="#48484a">B) Push</text>
+      <rect x="420" y="866" width="68" height="28" rx="6" fill="#0a0a0a" stroke="#48484a" stroke-width="1"/><text x="454" y="885" text-anchor="middle" font-family="Inter" font-size="10" fill="#48484a">C) Edit</text>
+      <rect x="500" y="866" width="68" height="28" rx="6" fill="#1a0a0a" stroke="#ff453a" stroke-width="1"/><text x="534" y="885" text-anchor="middle" font-family="Inter" font-size="10" fill="#ff453a">D) Drop</text>
+    </g>
+
+    <!-- ══ NODE 6: gh pr create ══ -->
+    <g class="fn fn-pr" data-delay="7500">
+      <rect x="280" y="955" width="300" height="52" rx="26" fill="url(#pGrad)" filter="url(#gl2)"/>
+      <rect x="278" y="953" width="304" height="56" rx="28" fill="none" stroke="#30d158" stroke-width="1" opacity=".3"><animate attributeName="opacity" values=".15;.4;.15" dur="2s" repeatCount="indefinite"/></rect>
+      <text x="430" y="987" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="14" font-weight="700" fill="#000">gh pr create ✓</text>
+    </g>
+
+    <!-- ══ ANIMATED DATA PARTICLES ══ -->
+    <circle class="fpulse fpart" data-delay="500" cx="430" cy="80" r="3" fill="#00c896" filter="url(#gl1)"><animate attributeName="cy" from="70" to="103" dur="1.8s" repeatCount="indefinite"/><animate attributeName="opacity" from=".9" to="0" dur="1.8s" repeatCount="indefinite"/></circle>
+    <circle class="fpulse fpart" data-delay="1800" cx="430" cy="248" r="3" fill="#00c896" filter="url(#gl1)"><animate attributeName="cy" from="237" to="273" dur="1.8s" repeatCount="indefinite"/><animate attributeName="opacity" from=".9" to="0" dur="1.8s" repeatCount="indefinite"/></circle>
+    <circle class="fpulse fpart" data-delay="3000" cx="430" cy="385" r="3" fill="#ffb300" filter="url(#gl1)"><animate attributeName="cy" from="373" to="413" dur="1.8s" repeatCount="indefinite"/><animate attributeName="opacity" from=".9" to="0" dur="1.8s" repeatCount="indefinite"/></circle>
+    <circle class="fpulse fpart" data-delay="5600" cx="430" cy="758" r="3" fill="#2997ff" filter="url(#gl1)"><animate attributeName="cy" from="745" to="785" dur="1.8s" repeatCount="indefinite"/><animate attributeName="opacity" from=".9" to="0" dur="1.8s" repeatCount="indefinite"/></circle>
+    <circle class="fpulse fpart" data-delay="7200" cx="430" cy="928" r="3" fill="#30d158" filter="url(#gl2)"><animate attributeName="cy" from="913" to="950" dur="1.8s" repeatCount="indefinite"/><animate attributeName="opacity" from=".9" to="0" dur="1.8s" repeatCount="indefinite"/></circle>
+
+    <!-- Second wave of particles (offset timing) -->
+    <circle class="fpulse fpart" data-delay="1000" cx="428" cy="80" r="2" fill="#00c896" opacity=".5"><animate attributeName="cy" from="70" to="103" dur="1.8s" begin=".9s" repeatCount="indefinite"/><animate attributeName="opacity" from=".6" to="0" dur="1.8s" begin=".9s" repeatCount="indefinite"/></circle>
+    <circle class="fpulse fpart" data-delay="3500" cx="428" cy="385" r="2" fill="#ffb300" opacity=".5"><animate attributeName="cy" from="373" to="413" dur="1.8s" begin=".9s" repeatCount="indefinite"/><animate attributeName="opacity" from=".6" to="0" dur="1.8s" begin=".9s" repeatCount="indefinite"/></circle>
+  </svg>
+</div>
+</div>
+
+<!-- ═══ KEY METRICS ═══ -->
+<section class="pipeline">
+  <div class="sec-eyebrow" data-stagger style="--s:0">By the numbers</div>
+  <div class="sec-h" data-stagger style="--s:1">What the plugin<br>brings to the table.</div>
+  <p class="sec-sub" data-stagger style="--s:2">Real data from the etcd-druid ecosystem — 2,072 commits, 222 releases, and growing.</p>
+
+  <div class="dash-grid" style="grid-template-columns:repeat(2,1fr)">
+
+    <!-- Left: Plugin capabilities -->
+    <div class="dash" data-stagger style="--s:0">
+      <div class="dash-header"><h4>Plugin Capabilities</h4><span class="dash-badge green">v0.2.0</span></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin:20px 0">
+        <div style="text-align:center"><div class="dash-big">11</div><div style="font-size:.68em;color:var(--dim);margin-top:4px">Skills</div></div>
+        <div style="text-align:center"><div class="dash-big">7</div><div style="font-size:.68em;color:var(--dim);margin-top:4px">Hooks</div></div>
+        <div style="text-align:center"><div class="dash-big">3</div><div style="font-size:.68em;color:var(--dim);margin-top:4px">Subagents</div></div>
+      </div>
+      <div class="mini-tl">
+        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">3 CRDs managed (Etcd, CopyBackups, OpsTask)</span></div>
+        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">5 reconcilers · 1 protection webhook</span></div>
+        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">8 backup providers (S3, GCS, ABS, Swift...)</span></div>
+      </div>
+    </div>
+
+    <!-- Right: Eval results donut -->
+    <div class="dash" data-stagger style="--s:1">
+      <div class="dash-header"><h4>Eval Results</h4><span class="dash-badge blue">5 Real PRs</span></div>
+      <div style="display:flex;align-items:center;gap:24px;margin-top:16px">
+        <div class="donut" id="donut1">
+          <svg viewBox="0 0 80 80"><circle class="track" cx="40" cy="40" r="34"/><circle class="fill" cx="40" cy="40" r="34" style="--pct:0.96"/></svg>
+          <div class="donut-center">96%</div>
+        </div>
+        <div>
+          <div style="font-size:1.4em;font-weight:800;color:var(--bright);font-family:var(--mono)">+44pp</div>
+          <div style="font-size:.82em;color:var(--dim);margin-top:2px">average lift over vanilla Claude</div>
+          <div style="margin-top:12px;font-size:.78em;color:var(--text);line-height:1.6">
+            <span style="color:var(--green)">●</span> Plugin: 96% convention compliance<br>
+            <span style="color:var(--dim)">●</span> Baseline: 52%
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom-left: Repo stats -->
+    <div class="dash" data-stagger style="--s:0">
+      <div class="dash-header"><h4>Ecosystem</h4><span class="dash-badge green">3 Repos</span></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:16px">
+        <div style="padding:12px;border-radius:10px;background:rgba(0,200,150,.04);border:1px solid rgba(0,200,150,.1);text-align:center">
+          <div style="font-family:var(--mono);font-size:.78em;color:var(--g);font-weight:700">etcd-druid</div>
+          <div style="font-size:.68em;color:var(--dim);margin-top:4px">v0.36.3 · 52 contrib</div>
+        </div>
+        <div style="padding:12px;border-radius:10px;background:rgba(41,151,255,.04);border:1px solid rgba(41,151,255,.1);text-align:center">
+          <div style="font-family:var(--mono);font-size:.78em;color:var(--blue);font-weight:700">backup-restore</div>
+          <div style="font-size:.68em;color:var(--dim);margin-top:4px">v0.41.2 · 61 contrib</div>
+        </div>
+        <div style="padding:12px;border-radius:10px;background:rgba(167,139,250,.04);border:1px solid rgba(167,139,250,.1);text-align:center">
+          <div style="font-family:var(--mono);font-size:.78em;color:#a78bfa;font-weight:700">wrapper</div>
+          <div style="font-size:.68em;color:var(--dim);margin-top:4px">v0.7.0 · 23 contrib</div>
+        </div>
+      </div>
+      <div style="margin-top:14px;font-size:.76em;color:var(--dim);text-align:center">2,072 commits · 222 releases · 136 contributors</div>
+    </div>
+
+    <!-- Bottom-right: CI Pipeline -->
+    <div class="dash" data-stagger style="--s:1">
+      <div class="dash-header"><h4>CI Pipeline</h4><span class="dash-badge green">Before Gate 2</span></div>
+      <div class="dash-sub" style="margin-bottom:12px">Every PR runs the full verification suite</div>
+      <div class="mini-tl">
+        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">make ci-checks</span></div>
+        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">make test-unit</span></div>
+        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">make test-integration</span></div>
+        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">make ci-e2e-kind</span></div>
+        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">Whole-diff code review</span></div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══ DATA — EVAL BARS ═══ -->
+<section class="sec" id="data">
+  <div class="sec-eyebrow" data-stagger style="--s:0">Measured results</div>
+  <div class="sec-h" data-stagger style="--s:1">+44pp average lift<br>over vanilla Claude.</div>
+  <p class="sec-sub" data-stagger style="--s:2">Tested against 5 real PR scenarios from gardener/etcd-druid and gardener/etcd-backup-restore. 5 iterations, zero variance.</p>
+
+  <div class="bars-grid" id="bars-grid">
+    <div>
+      <div class="bar-item"><div class="bar-label"><span>API change (etcd-druid#1280)</span><span>100%</span></div><div class="bar-track"><div class="bar-fill plugin" style="--w:100%"></div></div></div>
+      <div class="bar-item"><div class="bar-label"><span>Feature dev (etcd-druid#1300)</span><span>100%</span></div><div class="bar-track"><div class="bar-fill plugin" style="--w:100%"></div></div></div>
+      <div class="bar-item"><div class="bar-label"><span>Bug fix (etcd-druid#1308)</span><span>80%</span></div><div class="bar-track"><div class="bar-fill plugin" style="--w:80%"></div></div></div>
+      <div class="bar-item"><div class="bar-label"><span>Refactoring (ebr#1013)</span><span>100%</span></div><div class="bar-track"><div class="bar-fill plugin" style="--w:100%"></div></div></div>
+      <div class="bar-item"><div class="bar-label"><span>Enhancement (ebr#1001)</span><span>100%</span></div><div class="bar-track"><div class="bar-fill plugin" style="--w:100%"></div></div></div>
+    </div>
+    <div>
+      <div class="bar-item"><div class="bar-label"><span>Baseline</span><span>33%</span></div><div class="bar-track"><div class="bar-fill baseline" style="--w:33%"></div></div></div>
+      <div class="bar-item"><div class="bar-label"><span>Baseline</span><span>67%</span></div><div class="bar-track"><div class="bar-fill baseline" style="--w:67%"></div></div></div>
+      <div class="bar-item"><div class="bar-label"><span>Baseline</span><span>40%</span></div><div class="bar-track"><div class="bar-fill baseline" style="--w:40%"></div></div></div>
+      <div class="bar-item"><div class="bar-label"><span>Baseline</span><span>33%</span></div><div class="bar-track"><div class="bar-fill baseline" style="--w:33%"></div></div></div>
+      <div class="bar-item"><div class="bar-label"><span>Baseline</span><span>83%</span></div><div class="bar-track"><div class="bar-fill baseline" style="--w:83%"></div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SKILLS ═══ -->
+<section class="sec" id="skills">
+  <div class="sec-eyebrow" data-stagger style="--s:0">Capabilities</div>
+  <div class="sec-h" data-stagger style="--s:1">9 specialized skills.</div>
+  <p class="sec-sub" data-stagger style="--s:2">Each encodes deep domain knowledge. Click any card for details.</p>
+
+  <div class="sk-cat" data-stagger style="--s:0">Planning & Execution</div>
+  <div class="sk-grid">
+    <div class="sk" data-stagger style="--s:0" onclick="openSkill('plan')"><div class="nm">📋 plan</div><div class="ds">Reads the issue, explores codebase & past PRs, proposes 2-3 approaches, writes a structured plan. <strong>Gate 1</strong> blocks code until you approve.</div><div class="iv">/etcd-druid:plan</div></div>
+    <div class="sk" data-stagger style="--s:1" onclick="openSkill('implement')"><div class="nm">⚡ implement</div><div class="ds">Creates isolated worktree, runs per-task subagent loop with spec-review + code-review, verifies CI. <strong>Gate 2</strong> blocks push.</div><div class="iv">/etcd-druid:implement</div></div>
+  </div>
+  <div class="sk-cat" data-stagger style="--s:0">Domain-Specific</div>
+  <div class="sk-grid">
+    <div class="sk" data-stagger style="--s:0" onclick="openSkill('api-change')"><div class="nm">🔧 api-change</div><div class="ds">CEL validation (field + cross-field), kubebuilder markers, two-commit generate workflow, CRD integration tests.</div><div class="iv">/etcd-druid:api-change</div></div>
+    <div class="sk" data-stagger style="--s:1" onclick="openSkill('tdd')"><div class="nm">🧪 tdd</div><div class="ds">Red-Green-Refactor per repo. Correct framework: Go native for druid/wrapper, Ginkgo v2 for backup-restore.</div><div class="iv">/etcd-druid:tdd</div></div>
+    <div class="sk" data-stagger style="--s:2" onclick="openSkill('debug')"><div class="nm">🔍 debug</div><div class="ds">6-phase root cause analysis. Delve debugger, per-repo log analysis (logr/logrus/zap), build failure triage.</div><div class="iv">/etcd-druid:debug</div></div>
+    <div class="sk" data-stagger style="--s:3" onclick="openSkill('e2e')"><div class="nm">🌐 e2e</div><div class="ds">KIND cluster setup, custom sidecar image builds, IMAGEVECTOR_OVERWRITE, pre-PR CI validation.</div><div class="iv">/etcd-druid:e2e</div></div>
+  </div>
+  <div class="sk-cat" data-stagger style="--s:0">Quality & Reference</div>
+  <div class="sk-grid">
+    <div class="sk" data-stagger style="--s:0" onclick="openSkill('review')"><div class="nm">✅ review</div><div class="ds">10-step checklist with 15 known footguns. Prow label validation, release note format, correct merge method.</div><div class="iv">/etcd-druid:review</div></div>
+    <div class="sk" data-stagger style="--s:1" onclick="openSkill('reference')"><div class="nm">📖 reference</div><div class="ds">Quick lookup: make targets, file paths, feature gates, CLI flags, git workflow, cherry-pick process.</div><div class="iv">/etcd-druid:reference</div></div>
+    <div class="sk" data-stagger style="--s:2" onclick="openSkill('observations')"><div class="nm">💡 observations</div><div class="ds">Triage plugin self-improvement findings. Pre-verifies against current files. Raise PR, skip, or dismiss.</div><div class="iv">/etcd-druid:observations</div></div>
+  </div>
+</section>
+
+<!-- ═══ IRON LAWS ═══ -->
+<section class="sec">
+  <div class="sec-eyebrow" data-stagger style="--s:0">Discipline</div>
+  <div class="sec-h" data-stagger style="--s:1">Iron Laws.</div>
+  <p class="sec-sub" data-stagger style="--s:2">One unconditional rule per skill. Addresses the thought pattern, not the abstract principle.</p>
+  <div data-stagger style="--s:3">
+    <div class="law"><div class="law-n">plan</div><div class="law-t">NO CODE BEFORE GATE 1</div></div>
+    <div class="law"><div class="law-n">implement</div><div class="law-t">NO PUSH BEFORE GATE 2</div></div>
+    <div class="law"><div class="law-n">tdd</div><div class="law-t">NO IMPLEMENTATION CODE BEFORE A FAILING TEST</div></div>
+    <div class="law"><div class="law-n">debug</div><div class="law-t">NO FIX WITHOUT A REPRODUCIBLE FAILURE FIRST</div></div>
+    <div class="law"><div class="law-n">review</div><div class="law-t">NO VERDICT WITHOUT READING THE DIFF FIRST</div></div>
+    <div class="law"><div class="law-n">verification</div><div class="law-t">NO CLAIMS WITHOUT FRESH EVIDENCE</div></div>
+  </div>
+</section>
+
+<!-- ═══ SELF-IMPROVEMENT ═══ -->
+<section class="sec">
+  <div class="rv">
+    <div class="sec-eyebrow" data-stagger style="--s:0">Self-improving</div>
+    <div class="sec-h" data-stagger style="--s:1">The plugin gets<br>better every session.</div>
+    <p class="sec-sub" data-stagger style="--s:2">Every session is evaluated asynchronously. When a gap is found — a wrong claim, a missing footgun, a stale flag — it's captured as a structured observation. You decide what happens next.</p>
+  </div>
+  <div class="g2" style="margin-top:32px" data-stagger style="--s:3">
+    <div class="dash">
+      <div class="dash-header"><h4>How It Works</h4><span class="dash-badge amber">Auto-capture</span></div>
+      <div class="mini-tl" style="margin-top:16px">
+        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">Session ends → hook captures gaps automatically</span></div>
+        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">Next session → observations are pre-verified against current files</span></div>
+        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">Stale items auto-resolved (the fix is already in)</span></div>
+        <div class="mini-tl-row"><div class="mini-tl-dot active"></div><span class="bright">Verified gaps presented with evidence</span></div>
+        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">You choose: <strong style="color:var(--green)">R</strong> raise PR · <strong style="color:var(--amber)">S</strong> skip · <strong style="color:var(--red)">D</strong> dismiss</span></div>
+        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">PR raised only on explicit R choice</span></div>
+      </div>
+    </div>
+    <div class="dash">
+      <div class="dash-header"><h4>What Gets Captured</h4><span class="dash-badge green">Evidence-based</span></div>
+      <div style="margin-top:16px">
+        <div style="display:flex;gap:12px;margin-bottom:12px">
+          <div style="flex:1;padding:14px;border-radius:10px;background:rgba(255,69,58,.04);border:1px solid rgba(255,69,58,.1)">
+            <div style="font-size:.72em;color:var(--red);font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Wrong claim</div>
+            <div style="font-size:.78em;color:var(--text)">Plugin said "use make revendor" for etcd-druid — it's actually "make tidy"</div>
+          </div>
+          <div style="flex:1;padding:14px;border-radius:10px;background:rgba(255,179,0,.04);border:1px solid rgba(255,179,0,.1)">
+            <div style="font-size:.72em;color:var(--amber);font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Missing footgun</div>
+            <div style="font-size:.78em;color:var(--text)">New CEL validation gotcha not encoded in review skill</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:12px">
+          <div style="flex:1;padding:14px;border-radius:10px;background:rgba(41,151,255,.04);border:1px solid rgba(41,151,255,.1)">
+            <div style="font-size:.72em;color:var(--blue);font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Stale flag</div>
+            <div style="font-size:.78em;color:var(--text)">Feature gate was promoted from alpha to GA — skill still says alpha</div>
+          </div>
+          <div style="flex:1;padding:14px;border-radius:10px;background:rgba(0,200,150,.04);border:1px solid rgba(0,200,150,.1)">
+            <div style="font-size:.72em;color:var(--g);font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">User correction</div>
+            <div style="font-size:.78em;color:var(--text)">"No, the test should use Ginkgo v2 here, not Go native"</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ ECOSYSTEM ═══ -->
+<section class="sec">
+  <div class="sec-eyebrow" data-stagger style="--s:0">Ecosystem</div>
+  <div class="sec-h" data-stagger style="--s:1">Three repos.<br>One plugin.</div>
+  <p class="sec-sub" data-stagger style="--s:2">etcd-druid manages etcd clusters declaratively on Kubernetes — handling backup/restore across 8 cloud providers, snapshot compaction, defragmentation, and component protection. The plugin covers all three repos with 222 combined releases.</p>
+  <div data-stagger style="--s:3">
+    <table class="comp">
+      <tr><th></th><th>etcd-druid</th><th>etcd-backup-restore</th><th>etcd-wrapper</th></tr>
+      <tr><td><strong>Role</strong></td><td>K8s operator — Etcd CRD</td><td>Sidecar — snapshots, restore</td><td>Sidecar — embedded etcd</td></tr>
+      <tr><td><strong>Test</strong></td><td>Go native + Gomega</td><td>Ginkgo v2 + Gomega</td><td>Go native + Gomega</td></tr>
+      <tr><td><strong>Deps</strong></td><td><code>make tidy</code></td><td><code>make revendor</code></td><td><code>make revendor</code></td></tr>
+      <tr><td><strong>CI</strong></td><td><code>make ci-checks</code></td><td><code>make verify</code></td><td><code>make check && make test</code></td></tr>
+      <tr><td><strong>Log</strong></td><td>logr</td><td>logrus</td><td>zap</td></tr>
+    </table>
+  </div>
+</section>
+
+</div>
+
+<div class="wrap">
+
+<!-- ═══ CTA ═══ -->
+<section class="cta-sec">
+  <div class="cta-h" data-stagger style="--s:0">Ready to try it?</div>
+  <p class="cta-sub" data-stagger style="--s:1">Three commands. Start developing with a structured, agentic workflow.</p>
+  <div data-stagger style="--s:2">
+    <a class="btn btn-fill" href="#install" style="margin-right:12px">Get started</a>
+    <a class="btn btn-line" href="https://github.com/seshachalam-yv/etcd-druid-skills">View on GitHub</a>
+  </div>
+</section>
+
+<div class="ft">etcd-druid-skills · Apache-2.0 · Inspired by <a href="https://github.com/obra/superpowers">Superpowers</a></div>
+
+</div>
+
+<!-- MODAL -->
+<div class="overlay" id="ov" onclick="closePanel()"></div>
+<div class="modal" id="pn">
+  <div class="mh"><h2 id="p-nm"></h2><button onclick="closePanel()">✕</button></div>
+  <div class="mb">
+    <div class="pi" id="p-iv"></div>
+    <div class="pir" id="p-ir" style="display:none"></div>
+    <p class="pd" id="p-ds"></p>
+    <div class="pw" id="p-wh"></div>
+    <div class="ps"><h3>Workflow phases</h3><ol id="p-ph"></ol></div>
+    <div class="ps"><h3>Key capabilities</h3><ul id="p-ft"></ul></div>
+  </div>
+</div>
+
+<script>
+// Stagger reveal
+const sObs=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting){x.target.classList.add('vis');sObs.unobserve(x.target)}})},{threshold:.1});
+document.querySelectorAll('[data-stagger]').forEach(el=>sObs.observe(el));
+setTimeout(()=>document.querySelectorAll('[data-stagger]:not(.vis)').forEach(el=>el.classList.add('vis')),2000);
+
+// Interactive terminal
+let currentScene=0;
+let animating=false;
+
+function switchScene(idx){
+  if(animating)return;
+  currentScene=idx;
+  document.querySelectorAll('.iterm-tab').forEach(t=>t.classList.toggle('active',+t.dataset.scene===idx));
+  document.querySelectorAll('.iterm-scene').forEach(s=>s.classList.remove('active'));
+  const scene=document.getElementById('scene-'+idx);
+  scene.classList.add('active');
+  // Reset and animate lines
+  const lines=scene.querySelectorAll('.iterm-line');
+  lines.forEach(l=>l.classList.remove('vis'));
+  animating=true;
+  lines.forEach((l,i)=>{
+    setTimeout(()=>{
+      l.classList.add('vis');
+      if(i===lines.length-1)animating=false;
+    },i*120);
+  });
+}
+
+// Auto-play first scene on scroll
+const termObs=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting){switchScene(0);termObs.unobserve(x.target)}})},{threshold:.3});
+const itermEl=document.getElementById('iterm');
+if(itermEl)termObs.observe(itermEl);
+
+// Auto-cycle scenes
+let autoCycleTimer;
+function startAutoCycle(){
+  autoCycleTimer=setInterval(()=>{
+    if(!animating){
+      const next=(currentScene+1)%3;
+      switchScene(next);
+    }
+  },6000);
+}
+// Start auto-cycle when terminal is visible
+const cycleObs=new IntersectionObserver(e=>{e.forEach(x=>{
+  if(x.isIntersecting){startAutoCycle()}
+  else{clearInterval(autoCycleTimer)}
+})},{threshold:.2});
+if(itermEl)cycleObs.observe(itermEl);
+// Stop auto-cycle on manual tab click
+document.querySelectorAll('.iterm-tab').forEach(t=>{
+  t.addEventListener('click',()=>{clearInterval(autoCycleTimer);startAutoCycle()});
+});
+
+// Counter animation
+function animC(el){const t=+el.dataset.target,s=el.dataset.suffix||'',dur=1800,st=performance.now();(function tk(now){const p=Math.min((now-st)/dur,1),e=1-Math.pow(1-p,3);el.textContent=Math.floor(e*t).toLocaleString()+s;if(p<1)requestAnimationFrame(tk)})(st)}
+const cObs=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting){animC(x.target);cObs.unobserve(x.target)}})},{threshold:.5});
+document.querySelectorAll('[data-target]').forEach(el=>cObs.observe(el));
+
+// Bar animation
+const bObs=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting){x.target.querySelectorAll('.bar-fill').forEach(b=>b.style.width=b.style.getPropertyValue('--w'));bObs.unobserve(x.target)}})},{threshold:.2});
+document.querySelectorAll('#bars-grid').forEach(el=>bObs.observe(el));
+
+// Donut animation
+const dObs=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting){x.target.querySelectorAll('.fill').forEach(c=>c.classList.add('vis'));dObs.unobserve(x.target)}})},{threshold:.3});
+document.querySelectorAll('.donut').forEach(el=>dObs.observe(el));
+
+// Animated flow diagram
+const flowObs=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting){
+  // Animate nodes, connections, edges, pulses
+  x.target.querySelectorAll('.fn').forEach(n=>{const d=+(n.dataset.delay||0);setTimeout(()=>n.classList.add('vis'),d)});
+  x.target.querySelectorAll('.fconn').forEach(c=>{const d=+(c.dataset.delay||0);setTimeout(()=>c.classList.add('vis'),d)});
+  x.target.querySelectorAll('.fedge').forEach(e=>{const d=+(e.dataset.delay||0);setTimeout(()=>{e.style.opacity='1';e.classList.add('vis')},d)});
+  x.target.querySelectorAll('.fpulse').forEach(p=>{const d=+(p.dataset.delay||0);setTimeout(()=>p.classList.add('vis'),d)});
+  flowObs.unobserve(x.target);
+}})},{threshold:.1});
+document.querySelectorAll('#aflow').forEach(el=>flowObs.observe(el));
+
+// Nav removed
+
+// Skills data
+const sk={
+plan:{iv:'/etcd-druid:plan',ir:'NO CODE BEFORE GATE 1',ds:'Turns a GitHub issue into an approved, executable code plan. Classifies work type, explores the codebase, reads merged PRs to understand conventions, proposes 2-3 approaches, and writes a structured plan with WHEN/THEN acceptance criteria.',ph:['Classify work type','Read issue and explore codebase','State assumptions, ask clarifying questions','Propose 2-3 approaches with trade-offs','Write plan with API Delta section','Present plan and wait for Gate 1'],ft:['Classifies work as incremental or new sidecar','Reads merged PRs for conventions','WHEN/THEN acceptance criteria','API Delta table for field changes','Enforces written review before code'],wh:'Starting any development work.',nwh:'After code is written.'},
+implement:{iv:'/etcd-druid:implement',ir:'NO PUSH BEFORE GATE 2',ds:'Executes an approved plan from worktree setup to merged PR. Creates an isolated worktree, implements tasks with spec-review and code-review loops, runs CI, presents PR for Gate 2 approval.',ph:['Worktree setup: fetch, create, verify baseline','Per-task: spec-review + code-review subagents','Update plan checkboxes','Verification: ci-checks, tests, e2e','Final whole-diff review','Gate 2: present PR, wait for approval'],ft:['Per-task readiness matrix','Parallel wave execution (~60% speedup)','Multi-repo workflow','Cherry-pick / hotfix support','Subagent review loops'],wh:'After Gate 1 approval.',nwh:'Before Gate 1 or for planning.'},
+'api-change':{iv:'/etcd-druid:api-change',ir:'NO CEL RULE WITHOUT A TEST',ds:'Complete workflow for API field changes in api/core/v1alpha1/. CEL validation, kubebuilder markers, two-commit generate, CRD tests.',ph:['Choose file and struct from plan','Design field with markers','Add validation: CEL field-scoped + cross-field','Two-commit: hand-written then make generate','CRD validation tests','Update examples, run CI'],ft:['Field-scoped + cross-field CEL','has() guard on optionals','Two CRD variants','MaxItems for CEL cost','Immutability patterns'],wh:'API field changes in api/core/v1alpha1/.',nwh:'Controller or test-only work.'},
+tdd:{iv:'/etcd-druid:tdd',ir:'NO CODE BEFORE A FAILING TEST',ds:'TDD cycle for all three repos. Write failing test, implement minimal code, refactor, commit. Framework choice per repo.',ph:['Red: write failing test','Green: minimal code to pass','Refactor while green','Commit per test group'],ft:['Framework per repo','Eventually/Consistently for async','Fake client, no gomock','Table-driven + t.Parallel()','envtest with CRD install'],wh:'Writing tests or learning patterns.',nwh:'Debugging — use debug skill.'},
+debug:{iv:'/etcd-druid:debug',ir:'NO FIX WITHOUT REPRODUCING FIRST',ds:'Systematic debugging for failures across all three repos. Single hypothesis, reproduce, locate, minimal fix, verify.',ph:['Protect state: stash, debug branch','Read error: path, line, stack','Reproduce with single command','Locate: check docs first','Single hypothesis','Fix one thing, verify'],ft:['Failure location by region','Per-repo log analysis','Delve debugger','Build failure triage','envtest debugging'],wh:'Test failures, unexpected behavior.',nwh:'Feature design — use plan.'},
+e2e:{iv:'/etcd-druid:e2e',ir:'NO PR WITHOUT ci-e2e-kind PASSING',ds:'E2E testing: etcd-druid changes, custom backup-restore, custom wrapper. KIND, custom images, sidecar overrides.',ph:['Read e2e guide','Scenario A: druid + KIND','Scenario B: custom backup-restore','Scenario C: custom wrapper','Pre-PR CI checklist'],ft:['Per-repo workflows','KIND registry on :5001','Image vector override','Multi-sidecar testing','CI pipeline reference'],wh:'E2E before opening PRs.',nwh:'Unit tests — use tdd.'},
+review:{iv:'/etcd-druid:review',ir:'NO VERDICT WITHOUT READING THE DIFF',ds:'Pre-merge review checklist. Conventions, API completeness, error handling, RBAC, tests, 15 known footguns.',ph:['Read diff + docs/development/','Verify interfaces','Check error handling','Validate API changes','Verify RBAC, finalizers','Check test framework'],ft:['Framework enforcement','15 footguns checklist','Prow label validation','Release note format','Two-commit merge method'],wh:'Before opening or reviewing PRs.',nwh:'Implementation or debugging.'},
+reference:{iv:'/etcd-druid:reference',ir:null,ds:'Quick lookup: make targets, file paths, git workflow, feature gates, cross-container contracts, tooling versions.',ph:['Repo paths + structure','Key source locations','Dev guides per repo','Make targets','Test commands + git workflow','Feature gates + API additions'],ft:['Current git state','10 component paths','Multi-module structure','Feature gate reference','Cross-container contracts'],wh:'Quick lookups.',nwh:'Detailed conventions.'},
+observations:{iv:'/etcd-druid:observations',ir:'NO PR WITHOUT USER CHOICE',ds:'Triage plugin improvement observations. Pre-verify, present with evidence, apply only on explicit request.',ph:['Read open observations','Pre-verify against current files','Auto-resolve stale items','Present with evidence','Wait for R/S/D choice','Apply on R only'],ft:['Pre-verification','File content shown','Frequency-sorted','Evidence field','Auto-resolve option'],wh:'Reviewing plugin improvements.',nwh:'Code review or implementation.'}
+};
+function openSkill(n){const s=sk[n];if(!s)return;document.getElementById('p-nm').textContent=n;document.getElementById('p-iv').textContent=s.iv;const ir=document.getElementById('p-ir');if(s.ir){ir.textContent='⚡ '+s.ir;ir.style.display='block'}else ir.style.display='none';document.getElementById('p-ds').textContent=s.ds;document.getElementById('p-ph').innerHTML=s.ph.map(x=>'<li>'+x+'</li>').join('');document.getElementById('p-ft').innerHTML=s.ft.map(x=>'<li>'+x+'</li>').join('');document.getElementById('p-wh').innerHTML='<div class="pwc yes"><strong>✓ Use when</strong>'+s.wh+'</div><div class="pwc no"><strong>✗ Not for</strong>'+s.nwh+'</div>';document.getElementById('ov').classList.add('open');document.getElementById('pn').classList.add('open');document.body.style.overflow='hidden'}
+function closePanel(){document.getElementById('ov').classList.remove('open');document.getElementById('pn').classList.remove('open');document.body.style.overflow=''}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closePanel()});
+</script>
+</body>
+</html>

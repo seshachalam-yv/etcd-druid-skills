@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lightning Animation Sequences — Same Logo, Different Souls</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#050810;color:#f0f4ff;font-family:'Inter',-apple-system,sans-serif;padding:40px 20px}
+h1{text-align:center;font-size:1.4em;font-weight:800;margin-bottom:6px}
+.sub{text-align:center;color:#5a6480;font-size:.85em;margin-bottom:40px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;max-width:1100px;margin:0 auto}
+@media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.grid{grid-template-columns:1fr}}
+.card{background:#0a0f1a;border:1px solid rgba(136,146,176,.12);border-radius:16px;padding:28px 20px 20px;text-align:center;transition:all .3s}
+.card:hover{border-color:rgba(0,200,150,.3);transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,200,150,.08)}
+.card h3{color:#00c896;font-size:.82em;margin-top:16px;font-weight:700}
+.card p{color:#5a6480;font-size:.7em;margin-top:4px;line-height:1.5}
+.stage{position:relative;width:160px;height:200px;margin:0 auto;display:flex;align-items:center;justify-content:center}
+.stage svg.logo{width:110px;height:113px;position:relative;z-index:2}
+
+/* Shared classes */
+.hx{fill:#009F76}.sh{fill:#000;opacity:.24}
+.blt{filter:url(#gl)}
+
+/* ═══ A1: STRIKE FROM TOP (current) ═══ */
+.a1 .hx{opacity:.5;animation:a1hex 6s ease-in-out infinite}
+@keyframes a1hex{0%,30%{opacity:.5;filter:brightness(.8)}40%{opacity:1;filter:brightness(1.4)}50%,100%{opacity:1;filter:brightness(1)}}
+.a1 .fct{opacity:.4;animation:a1fct 6s ease-in-out infinite}
+@keyframes a1fct{0%,30%{opacity:.4;filter:brightness(.7)}38%{opacity:1;filter:brightness(1.6)}50%,100%{opacity:1;filter:brightness(1)}}
+.a1 .f2{animation-delay:.05s}.a1 .f3{animation-delay:.1s}.a1 .f4{animation-delay:.15s}
+.a1 .blt{opacity:0;animation:a1blt 6s ease-in-out infinite}
+@keyframes a1blt{0%,32%{opacity:0;transform:scale(.8)}36%{opacity:1;transform:scale(1.15)}42%,100%{opacity:.95;transform:scale(1)}}
+.a1 .strike{position:absolute;top:0;left:50%;transform:translateX(-50%);z-index:3;width:50px;height:110px}
+.a1 .sbolt{fill:none;stroke:#ffcc00;stroke-width:2.5;stroke-linecap:round;stroke-dasharray:250;stroke-dashoffset:250;animation:a1strike 6s ease-in-out infinite;filter:drop-shadow(0 0 6px rgba(255,200,0,.5))}
+@keyframes a1strike{0%,25%{stroke-dashoffset:250}32%{stroke-dashoffset:0}40%,100%{stroke-dashoffset:250;opacity:0}}
+.a1 .flash{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle,rgba(255,220,100,.7),rgba(0,200,150,.2),transparent 70%);animation:a1flash 6s ease-out infinite;pointer-events:none}
+@keyframes a1flash{0%,33%{width:0;height:0;opacity:0}36%{width:200px;height:200px;opacity:.7}45%{width:280px;height:280px;opacity:0}100%{opacity:0}}
+
+/* ═══ A2: PULSE WAVE (ripple from center) ═══ */
+.a2 .hx{animation:a2hex 4s ease-in-out infinite}
+@keyframes a2hex{0%,100%{filter:brightness(1)}50%{filter:brightness(1.15)}}
+.a2 .fct{animation:a2fct 4s ease-in-out infinite}
+.a2 .f1{animation-delay:0s}.a2 .f2{animation-delay:.15s}.a2 .f3{animation-delay:.3s}.a2 .f4{animation-delay:.45s}
+@keyframes a2fct{0%,100%{opacity:.85;filter:brightness(1)}50%{opacity:1;filter:brightness(1.4)}}
+.a2 .blt{animation:a2blt 4s ease-in-out infinite}
+@keyframes a2blt{0%,100%{filter:brightness(1) drop-shadow(0 0 3px rgba(255,179,0,.3))}50%{filter:brightness(1.4) drop-shadow(0 0 12px rgba(255,179,0,.6))}}
+.a2 .ring{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);border-radius:50%;border:1.5px solid rgba(0,200,150,.4);animation:a2ring 4s ease-out infinite;pointer-events:none}
+@keyframes a2ring{0%{width:20px;height:20px;opacity:.6}100%{width:200px;height:200px;opacity:0}}
+.a2 .ring2{animation-delay:.8s;border-color:rgba(255,179,0,.3)}
+.a2 .ring3{animation-delay:1.6s;border-color:rgba(0,200,150,.2)}
+
+/* ═══ A3: ENERGY BUILD (slow charge, burst) ═══ */
+.a3 .hx{animation:a3hex 5s ease-in-out infinite}
+@keyframes a3hex{0%{filter:brightness(.7)}70%{filter:brightness(.9)}80%{filter:brightness(1.5)}100%{filter:brightness(1)}}
+.a3 .fct{animation:a3fct 5s ease-in-out infinite}
+@keyframes a3fct{0%{opacity:.3;filter:brightness(.6)}70%{opacity:.7;filter:brightness(.9)}80%{opacity:1;filter:brightness(1.8)}100%{opacity:1;filter:brightness(1)}}
+.a3 .f2{animation-delay:.03s}.a3 .f3{animation-delay:.06s}.a3 .f4{animation-delay:.09s}
+.a3 .blt{animation:a3blt 5s ease-in-out infinite}
+@keyframes a3blt{0%{opacity:.2;transform:scale(.85)}70%{opacity:.5;transform:scale(.95)}80%{opacity:1;transform:scale(1.2);filter:brightness(1.5) drop-shadow(0 0 15px rgba(255,179,0,.7))}100%{opacity:.95;transform:scale(1);filter:brightness(1)}}
+.a3 .sparks{position:absolute;top:50%;left:50%;z-index:4;pointer-events:none}
+.a3 .spark{position:absolute;width:3px;height:3px;border-radius:50%;background:#ffcc00;animation:a3spark 5s ease-out infinite;opacity:0}
+@keyframes a3spark{0%,78%{transform:translate(0,0);opacity:0}82%{opacity:1;transform:translate(var(--sx),var(--sy))}95%{opacity:0;transform:translate(calc(var(--sx)*3),calc(var(--sy)*3))}100%{opacity:0}}
+
+/* ═══ A4: HEARTBEAT (double pulse) ═══ */
+.a4 .hx{animation:a4hex 2s ease-in-out infinite}
+@keyframes a4hex{0%,100%{transform:scale(1)}12%{transform:scale(1.03)}24%{transform:scale(1)}36%{transform:scale(1.02)}48%{transform:scale(1)}}
+.a4 .fct{animation:a4fct 2s ease-in-out infinite}
+@keyframes a4fct{0%,100%{filter:brightness(1)}12%{filter:brightness(1.3)}24%{filter:brightness(1)}36%{filter:brightness(1.2)}48%{filter:brightness(1)}}
+.a4 .blt{animation:a4blt 2s ease-in-out infinite}
+@keyframes a4blt{0%,100%{filter:brightness(1) drop-shadow(0 0 2px rgba(255,179,0,.2))}12%{filter:brightness(1.5) drop-shadow(0 0 10px rgba(255,179,0,.5))}24%{filter:brightness(1)}36%{filter:brightness(1.3) drop-shadow(0 0 8px rgba(255,179,0,.4))}48%{filter:brightness(1)}}
+
+/* ═══ A5: SPIN CHARGE (rotating energy) ═══ */
+.a5 .logo{animation:a5spin 8s linear infinite}
+@keyframes a5spin{0%{filter:drop-shadow(2px 0 8px rgba(0,200,150,.2))}25%{filter:drop-shadow(0 2px 8px rgba(255,179,0,.2))}50%{filter:drop-shadow(-2px 0 8px rgba(0,200,150,.2))}75%{filter:drop-shadow(0 -2px 8px rgba(255,179,0,.2))}100%{filter:drop-shadow(2px 0 8px rgba(0,200,150,.2))}}
+.a5 .blt{animation:a5blt 2s ease-in-out infinite}
+@keyframes a5blt{0%,100%{opacity:.8}50%{opacity:1;filter:brightness(1.3) drop-shadow(0 0 8px rgba(255,179,0,.5))}}
+.a5 .orbit{position:absolute;top:50%;left:50%;width:130px;height:130px;margin:-65px 0 0 -65px;border:1px dashed rgba(0,200,150,.1);border-radius:50%;animation:a5orbitSpin 8s linear infinite;pointer-events:none}
+@keyframes a5orbitSpin{to{transform:rotate(360deg)}}
+.a5 .orbit-dot{position:absolute;top:-4px;left:50%;margin-left:-4px;width:8px;height:8px;border-radius:50%;background:#00c896;filter:drop-shadow(0 0 4px rgba(0,200,150,.5))}
+
+/* ═══ A6: GLITCH (digital flicker) ═══ */
+.a6 .logo{animation:a6glitch 4s ease-in-out infinite}
+@keyframes a6glitch{0%,100%{transform:translate(0,0)}88%{transform:translate(0,0)}89%{transform:translate(-2px,1px)}90%{transform:translate(2px,-1px)}91%{transform:translate(-1px,-1px)}92%{transform:translate(1px,1px)}93%{transform:translate(0,0)}}
+.a6 .blt{animation:a6blt 4s ease-in-out infinite}
+@keyframes a6blt{0%,87%{opacity:.9;filter:brightness(1)}89%{opacity:0}90%{opacity:1;filter:brightness(2) drop-shadow(0 0 10px rgba(255,179,0,.8))}92%{opacity:.3}93%,100%{opacity:.9;filter:brightness(1)}}
+.a6 .fct{animation:a6fct 4s ease-in-out infinite}
+@keyframes a6fct{0%,87%{filter:brightness(1)}89%{filter:brightness(.5)}91%{filter:brightness(1.5)}93%,100%{filter:brightness(1)}}
+
+@media(prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+</head>
+<body>
+
+<svg style="position:absolute;width:0;height:0"><defs>
+  <linearGradient id="fa" x1="12%" y1="-18%" x2="88%" y2="84%"><stop offset="0%" stop-color="#fff" stop-opacity=".92"/><stop offset="100%" stop-color="#439246"/></linearGradient>
+  <linearGradient id="fb" x1="50%" y1="5%" x2="148%" y2="175%"><stop offset="0%" stop-color="#fff" stop-opacity=".80"/><stop offset="100%" stop-color="#439246"/></linearGradient>
+  <linearGradient id="fc" x1="19%" y1="-9%" x2="82%" y2="77%"><stop offset="0%" stop-color="#fff" stop-opacity=".92"/><stop offset="100%" stop-color="#439246"/></linearGradient>
+  <linearGradient id="fd" x1="57%" y1="26%" x2="137%" y2="158%"><stop offset="0%" stop-color="#fff" stop-opacity=".80"/><stop offset="100%" stop-color="#439246"/></linearGradient>
+  <linearGradient id="bl" x1="30%" y1="0%" x2="70%" y2="100%"><stop offset="0%" stop-color="#ffe680"/><stop offset="45%" stop-color="#ffb300"/><stop offset="100%" stop-color="#e67e00"/></linearGradient>
+  <clipPath id="hx"><path d="M46,2 L83,17.4 L85.5,20.7 L94.5,59 L93,63.5 L70.5,93.8 L66.5,95.6 L29,95.6 L25,93.8 L2.5,63.5 L1,59 L10,20.7 L12.5,17.4 Z"/></clipPath>
+  <filter id="gl"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs></svg>
+
+<h1>Animation Sequences — Same Logo #1</h1>
+<p class="sub">6 different animation souls for the amber bolt bottom-right Gardener hex</p>
+
+<div class="grid">
+
+<!-- A1: Strike From Top -->
+<div class="card a1">
+<div class="stage">
+  <svg class="strike" viewBox="0 0 50 110"><path class="sbolt" d="M25,0 L21,25 L29,28 L17,55 L27,58 L12,90 L23,92 L18,110"/></svg>
+  <div class="flash"></div>
+  <svg class="logo" viewBox="0 0 95 98">
+    <path class="hx" d="M46,2 L83,17.4 L85.5,20.7 L94.5,59 L93,63.5 L70.5,93.8 L66.5,95.6 L29,95.6 L25,93.8 L2.5,63.5 L1,59 L10,20.7 L12.5,17.4 Z"/><polygon class="sh" points="-7,60 24,27 57,64 19,100" clip-path="url(#hx)"/>
+    <path class="fct f1" fill="url(#fa)" d="M62,44 C61.4,45.8 60.2,47.5 59,48.2 L50,53.4 C48.2,54.5 45.2,54.5 43.4,53.4 L34.4,48.2 C32.6,46.9 31.2,44.4 31.2,42.4 L31.2,31 C31.2,30.1 31.5,29.1 32,28.2 Z"/><path class="fct f2" fill="url(#fb)" d="M61.2,28.4 C61.7,29.2 61.9,30.2 61.9,31 L61.9,42.8 C61.9,44.8 60.4,47.3 58.7,48.4 L49.7,53.6 C47.9,54.7 44.9,54.7 43.1,53.6 L34.1,48.4 C33.2,47.8 32.3,46.7 31.8,45.8 Z"/><path class="fct f3" fill="url(#fc)" d="M71,65 C70.3,66.5 69.2,67.8 68.1,68.5 L52.8,77.2 C50.8,78.3 47.4,78.3 45.4,77.2 L30.1,68.5 C28.1,67.4 26.7,64.8 26.7,62.8 L26.7,45.8 C26.7,44.8 27,43.6 27.6,42.6 Z"/><path class="fct f4" fill="url(#fd)" d="M70.9,42.8 C71.5,43.7 71.7,44.6 71.7,45.6 L71.7,63 C71.7,65 70.3,67.6 68.1,68.7 L52.8,77.4 C50.8,78.5 47.4,78.5 45.4,77.4 L30.1,68.7 C29.1,68.1 28.2,67.1 27.6,66.1 Z"/>
+    <polygon class="blt" fill="url(#bl)" points="66,54 56,72 63,72 59,89 74,67 65,67"/>
+  </svg>
+</div>
+<h3>A1. Lightning Strike</h3>
+<p>Bolt strikes from above → flash → hex charges → facets cascade → bolt appears</p>
+</div>
+
+<!-- A2: Pulse Wave -->
+<div class="card a2">
+<div class="stage">
+  <div class="ring"></div><div class="ring ring2"></div><div class="ring ring3"></div>
+  <svg class="logo" viewBox="0 0 95 98">
+    <path class="hx" d="M46,2 L83,17.4 L85.5,20.7 L94.5,59 L93,63.5 L70.5,93.8 L66.5,95.6 L29,95.6 L25,93.8 L2.5,63.5 L1,59 L10,20.7 L12.5,17.4 Z"/><polygon class="sh" points="-7,60 24,27 57,64 19,100" clip-path="url(#hx)"/>
+    <path class="fct f1" fill="url(#fa)" d="M62,44 C61.4,45.8 60.2,47.5 59,48.2 L50,53.4 C48.2,54.5 45.2,54.5 43.4,53.4 L34.4,48.2 C32.6,46.9 31.2,44.4 31.2,42.4 L31.2,31 C31.2,30.1 31.5,29.1 32,28.2 Z"/><path class="fct f2" fill="url(#fb)" d="M61.2,28.4 C61.7,29.2 61.9,30.2 61.9,31 L61.9,42.8 C61.9,44.8 60.4,47.3 58.7,48.4 L49.7,53.6 C47.9,54.7 44.9,54.7 43.1,53.6 L34.1,48.4 C33.2,47.8 32.3,46.7 31.8,45.8 Z"/><path class="fct f3" fill="url(#fc)" d="M71,65 C70.3,66.5 69.2,67.8 68.1,68.5 L52.8,77.2 C50.8,78.3 47.4,78.3 45.4,77.2 L30.1,68.5 C28.1,67.4 26.7,64.8 26.7,62.8 L26.7,45.8 C26.7,44.8 27,43.6 27.6,42.6 Z"/><path class="fct f4" fill="url(#fd)" d="M70.9,42.8 C71.5,43.7 71.7,44.6 71.7,45.6 L71.7,63 C71.7,65 70.3,67.6 68.1,68.7 L52.8,77.4 C50.8,78.5 47.4,78.5 45.4,77.4 L30.1,68.7 C29.1,68.1 28.2,67.1 27.6,66.1 Z"/>
+    <polygon class="blt" fill="url(#bl)" points="66,54 56,72 63,72 59,89 74,67 65,67"/>
+  </svg>
+</div>
+<h3>A2. Pulse Wave</h3>
+<p>Continuous ripple rings expand outward. Facets pulse in staggered cascade. Bolt throbs.</p>
+</div>
+
+<!-- A3: Energy Build -->
+<div class="card a3">
+<div class="stage">
+  <div class="sparks">
+    <div class="spark" style="--sx:-35px;--sy:-25px"></div>
+    <div class="spark" style="--sx:30px;--sy:-30px;animation-delay:.03s"></div>
+    <div class="spark" style="--sx:-25px;--sy:20px;animation-delay:.06s"></div>
+    <div class="spark" style="--sx:35px;--sy:15px;animation-delay:.02s"></div>
+    <div class="spark" style="--sx:-10px;--sy:-40px;animation-delay:.05s"></div>
+    <div class="spark" style="--sx:15px;--sy:35px;animation-delay:.08s"></div>
+  </div>
+  <svg class="logo" viewBox="0 0 95 98">
+    <path class="hx" d="M46,2 L83,17.4 L85.5,20.7 L94.5,59 L93,63.5 L70.5,93.8 L66.5,95.6 L29,95.6 L25,93.8 L2.5,63.5 L1,59 L10,20.7 L12.5,17.4 Z"/><polygon class="sh" points="-7,60 24,27 57,64 19,100" clip-path="url(#hx)"/>
+    <path class="fct f1" fill="url(#fa)" d="M62,44 C61.4,45.8 60.2,47.5 59,48.2 L50,53.4 C48.2,54.5 45.2,54.5 43.4,53.4 L34.4,48.2 C32.6,46.9 31.2,44.4 31.2,42.4 L31.2,31 C31.2,30.1 31.5,29.1 32,28.2 Z"/><path class="fct f2" fill="url(#fb)" d="M61.2,28.4 C61.7,29.2 61.9,30.2 61.9,31 L61.9,42.8 C61.9,44.8 60.4,47.3 58.7,48.4 L49.7,53.6 C47.9,54.7 44.9,54.7 43.1,53.6 L34.1,48.4 C33.2,47.8 32.3,46.7 31.8,45.8 Z"/><path class="fct f3" fill="url(#fc)" d="M71,65 C70.3,66.5 69.2,67.8 68.1,68.5 L52.8,77.2 C50.8,78.3 47.4,78.3 45.4,77.2 L30.1,68.5 C28.1,67.4 26.7,64.8 26.7,62.8 L26.7,45.8 C26.7,44.8 27,43.6 27.6,42.6 Z"/><path class="fct f4" fill="url(#fd)" d="M70.9,42.8 C71.5,43.7 71.7,44.6 71.7,45.6 L71.7,63 C71.7,65 70.3,67.6 68.1,68.7 L52.8,77.4 C50.8,78.5 47.4,78.5 45.4,77.4 L30.1,68.7 C29.1,68.1 28.2,67.1 27.6,66.1 Z"/>
+    <polygon class="blt" fill="url(#bl)" points="66,54 56,72 63,72 59,89 74,67 65,67"/>
+  </svg>
+</div>
+<h3>A3. Slow Charge → Burst</h3>
+<p>Dim for 70%, slowly builds, then BURST — facets flash, bolt explodes, sparks scatter.</p>
+</div>
+
+<!-- A4: Heartbeat -->
+<div class="card a4">
+<div class="stage">
+  <svg class="logo" viewBox="0 0 95 98">
+    <g class="hx-g"><path class="hx" d="M46,2 L83,17.4 L85.5,20.7 L94.5,59 L93,63.5 L70.5,93.8 L66.5,95.6 L29,95.6 L25,93.8 L2.5,63.5 L1,59 L10,20.7 L12.5,17.4 Z"/></g><polygon class="sh" points="-7,60 24,27 57,64 19,100" clip-path="url(#hx)"/>
+    <path class="fct f1" fill="url(#fa)" d="M62,44 C61.4,45.8 60.2,47.5 59,48.2 L50,53.4 C48.2,54.5 45.2,54.5 43.4,53.4 L34.4,48.2 C32.6,46.9 31.2,44.4 31.2,42.4 L31.2,31 C31.2,30.1 31.5,29.1 32,28.2 Z"/><path class="fct f2" fill="url(#fb)" d="M61.2,28.4 C61.7,29.2 61.9,30.2 61.9,31 L61.9,42.8 C61.9,44.8 60.4,47.3 58.7,48.4 L49.7,53.6 C47.9,54.7 44.9,54.7 43.1,53.6 L34.1,48.4 C33.2,47.8 32.3,46.7 31.8,45.8 Z"/><path class="fct f3" fill="url(#fc)" d="M71,65 C70.3,66.5 69.2,67.8 68.1,68.5 L52.8,77.2 C50.8,78.3 47.4,78.3 45.4,77.2 L30.1,68.5 C28.1,67.4 26.7,64.8 26.7,62.8 L26.7,45.8 C26.7,44.8 27,43.6 27.6,42.6 Z"/><path class="fct f4" fill="url(#fd)" d="M70.9,42.8 C71.5,43.7 71.7,44.6 71.7,45.6 L71.7,63 C71.7,65 70.3,67.6 68.1,68.7 L52.8,77.4 C50.8,78.5 47.4,78.5 45.4,77.4 L30.1,68.7 C29.1,68.1 28.2,67.1 27.6,66.1 Z"/>
+    <polygon class="blt" fill="url(#bl)" points="66,54 56,72 63,72 59,89 74,67 65,67"/>
+  </svg>
+</div>
+<h3>A4. Heartbeat</h3>
+<p>Double-pulse like a heart: thump-thump, pause. Hex scales, bolt glows, repeat. Alive.</p>
+</div>
+
+<!-- A5: Orbit Spin -->
+<div class="card a5">
+<div class="stage">
+  <div class="orbit"><div class="orbit-dot"></div></div>
+  <svg class="logo" viewBox="0 0 95 98">
+    <path class="hx" d="M46,2 L83,17.4 L85.5,20.7 L94.5,59 L93,63.5 L70.5,93.8 L66.5,95.6 L29,95.6 L25,93.8 L2.5,63.5 L1,59 L10,20.7 L12.5,17.4 Z"/><polygon class="sh" points="-7,60 24,27 57,64 19,100" clip-path="url(#hx)"/>
+    <path class="fct f1" fill="url(#fa)" d="M62,44 C61.4,45.8 60.2,47.5 59,48.2 L50,53.4 C48.2,54.5 45.2,54.5 43.4,53.4 L34.4,48.2 C32.6,46.9 31.2,44.4 31.2,42.4 L31.2,31 C31.2,30.1 31.5,29.1 32,28.2 Z"/><path class="fct f2" fill="url(#fb)" d="M61.2,28.4 C61.7,29.2 61.9,30.2 61.9,31 L61.9,42.8 C61.9,44.8 60.4,47.3 58.7,48.4 L49.7,53.6 C47.9,54.7 44.9,54.7 43.1,53.6 L34.1,48.4 C33.2,47.8 32.3,46.7 31.8,45.8 Z"/><path class="fct f3" fill="url(#fc)" d="M71,65 C70.3,66.5 69.2,67.8 68.1,68.5 L52.8,77.2 C50.8,78.3 47.4,78.3 45.4,77.2 L30.1,68.5 C28.1,67.4 26.7,64.8 26.7,62.8 L26.7,45.8 C26.7,44.8 27,43.6 27.6,42.6 Z"/><path class="fct f4" fill="url(#fd)" d="M70.9,42.8 C71.5,43.7 71.7,44.6 71.7,45.6 L71.7,63 C71.7,65 70.3,67.6 68.1,68.7 L52.8,77.4 C50.8,78.5 47.4,78.5 45.4,77.4 L30.1,68.7 C29.1,68.1 28.2,67.1 27.6,66.1 Z"/>
+    <polygon class="blt" fill="url(#bl)" points="66,54 56,72 63,72 59,89 74,67 65,67"/>
+  </svg>
+</div>
+<h3>A5. Orbital Energy</h3>
+<p>Green dot orbits the hex. Rotating glow shadow. Bolt throbs. Feels like a reactor.</p>
+</div>
+
+<!-- A6: Glitch -->
+<div class="card a6">
+<div class="stage">
+  <svg class="logo" viewBox="0 0 95 98">
+    <path class="hx" d="M46,2 L83,17.4 L85.5,20.7 L94.5,59 L93,63.5 L70.5,93.8 L66.5,95.6 L29,95.6 L25,93.8 L2.5,63.5 L1,59 L10,20.7 L12.5,17.4 Z"/><polygon class="sh" points="-7,60 24,27 57,64 19,100" clip-path="url(#hx)"/>
+    <path class="fct f1" fill="url(#fa)" d="M62,44 C61.4,45.8 60.2,47.5 59,48.2 L50,53.4 C48.2,54.5 45.2,54.5 43.4,53.4 L34.4,48.2 C32.6,46.9 31.2,44.4 31.2,42.4 L31.2,31 C31.2,30.1 31.5,29.1 32,28.2 Z"/><path class="fct f2" fill="url(#fb)" d="M61.2,28.4 C61.7,29.2 61.9,30.2 61.9,31 L61.9,42.8 C61.9,44.8 60.4,47.3 58.7,48.4 L49.7,53.6 C47.9,54.7 44.9,54.7 43.1,53.6 L34.1,48.4 C33.2,47.8 32.3,46.7 31.8,45.8 Z"/><path class="fct f3" fill="url(#fc)" d="M71,65 C70.3,66.5 69.2,67.8 68.1,68.5 L52.8,77.2 C50.8,78.3 47.4,78.3 45.4,77.2 L30.1,68.5 C28.1,67.4 26.7,64.8 26.7,62.8 L26.7,45.8 C26.7,44.8 27,43.6 27.6,42.6 Z"/><path class="fct f4" fill="url(#fd)" d="M70.9,42.8 C71.5,43.7 71.7,44.6 71.7,45.6 L71.7,63 C71.7,65 70.3,67.6 68.1,68.7 L52.8,77.4 C50.8,78.5 47.4,78.5 45.4,77.4 L30.1,68.7 C29.1,68.1 28.2,67.1 27.6,66.1 Z"/>
+    <polygon class="blt" fill="url(#bl)" points="66,54 56,72 63,72 59,89 74,67 65,67"/>
+  </svg>
+</div>
+<h3>A6. Digital Glitch</h3>
+<p>Calm for 88%, then rapid glitch — logo jitters, bolt flashes bright, facets flicker.</p>
+</div>
+
+</div>
+</body>
+</html>
