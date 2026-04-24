@@ -382,24 +382,6 @@ code{font-family:var(--mono);background:rgba(0,200,150,.06);padding:2px 7px;bord
 .eco-label{color:var(--dim);font-weight:600;font-size:.78em;text-transform:uppercase;letter-spacing:.05em;min-width:40px}
 .eco-row span:last-child{color:var(--text);text-align:right}
 
-/* ═══ FEEDBACK LOOP ═══ */
-.loop-wrap{display:flex;flex-direction:column;align-items:center;margin-top:32px}
-.loop-svg{width:100%;max-width:520px;height:300px;display:block}
-/* Orbiting dot */
-@keyframes orbitDot{0%{offset-distance:0%}100%{offset-distance:100%}}
-.orbit-dot{offset-path:path('M260,40 C370,40 430,90 430,150 C430,210 370,260 260,260 C150,260 90,210 90,150 C90,90 150,40 260,40');offset-rotate:0deg;animation:orbitDot 6s linear infinite;will-change:offset-distance}
-/* Node glow pulse */
-@keyframes nodeGlow{0%,100%{filter:drop-shadow(0 0 4px var(--ng))}50%{filter:drop-shadow(0 0 12px var(--ng))}}
-.loop-node{animation:nodeGlow 3s ease-in-out infinite}
-/* Evidence cards */
-.ev-row{display:flex;gap:12px;margin-top:32px;max-width:520px;width:100%}
-@media(max-width:600px){.ev-row{flex-direction:column}}
-.ev-card{flex:1;padding:14px 16px;border-radius:10px;font-size:.78em;line-height:1.5}
-.ev-card .ev-label{font-size:.7em;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px}
-.ev-card.ev-red{background:rgba(255,69,58,.04);border:1px solid rgba(255,69,58,.12);color:var(--text)}.ev-card.ev-red .ev-label{color:var(--red)}
-.ev-card.ev-amber{background:rgba(255,179,0,.04);border:1px solid rgba(255,179,0,.12);color:var(--text)}.ev-card.ev-amber .ev-label{color:var(--amber)}
-.ev-card.ev-blue{background:rgba(88,166,255,.04);border:1px solid rgba(88,166,255,.12);color:var(--text)}.ev-card.ev-blue .ev-label{color:var(--blue)}
-
 /* FAQ */
 .faq-grid{display:grid;gap:8px;margin-top:32px;max-width:700px}
 .faq{background:rgba(10,15,26,.65);backdrop-filter:blur(12px);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:border-color .2s}
@@ -768,131 +750,46 @@ code{font-family:var(--mono);background:rgba(0,200,150,.06);padding:2px 7px;bord
 
 <!-- ═══ SELF-IMPROVEMENT ═══ -->
 <section class="sec">
-  <div class="sec-eyebrow" data-stagger style="--s:0">Self-improving</div>
-  <div class="sec-h" data-stagger style="--s:1">The plugin gets<br>better every session.</div>
-  <p class="sec-sub" data-stagger style="--s:2">Every session is evaluated asynchronously. When a gap is found -- a wrong claim, a missing footgun, a stale flag -- it's captured as a structured observation. You decide what happens next.</p>
-
-  <div class="loop-wrap" data-stagger style="--s:3">
-    <!-- Animated feedback loop SVG -->
-    <svg class="loop-svg" viewBox="0 0 520 300" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <!-- Elliptical orbit path (invisible, used for motion) -->
-        <path id="loopPath" d="M260,48 C382,48 440,100 440,150 C440,200 382,252 260,252 C138,252 80,200 80,150 C80,100 138,48 260,48"/>
-        <!-- Node glows -->
-        <filter id="glowG"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-        <filter id="glowA"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-        <filter id="glowB"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-        <!-- Track gradient -->
-        <linearGradient id="trackGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stop-color="#00c896" stop-opacity=".25"/>
-          <stop offset="30%" stop-color="#ffb300" stop-opacity=".25"/>
-          <stop offset="60%" stop-color="#58a6ff" stop-opacity=".25"/>
-          <stop offset="100%" stop-color="#30d158" stop-opacity=".25"/>
-        </linearGradient>
-        <!-- Orbiting dot gradient -->
-        <radialGradient id="dotGrad">
-          <stop offset="0%" stop-color="#fff"/>
-          <stop offset="50%" stop-color="#00c896"/>
-          <stop offset="100%" stop-color="#00c896" stop-opacity="0"/>
-        </radialGradient>
-      </defs>
-
-      <!-- Orbit track (subtle ellipse) -->
-      <use href="#loopPath" stroke="url(#trackGrad)" stroke-width="1.5" fill="none" opacity=".6"/>
-      <!-- Dashed flow overlay -->
-      <use href="#loopPath" stroke="rgba(136,146,176,.08)" stroke-width="18" fill="none" stroke-linecap="round"/>
-
-      <!-- ── NODE 1: Session (top center, green) ── -->
-      <g class="loop-node" style="--ng:rgba(0,200,150,.5)" filter="url(#glowG)">
-        <circle cx="260" cy="48" r="22" fill="#0a0f1a" stroke="#00c896" stroke-width="1.5"/>
-        <text x="260" y="44" text-anchor="middle" fill="#00c896" font-family="'JetBrains Mono',monospace" font-size="8" font-weight="700" letter-spacing=".5">SESSION</text>
-        <text x="260" y="56" text-anchor="middle" fill="#8892b0" font-family="'JetBrains Mono',monospace" font-size="7">run</text>
-      </g>
-
-      <!-- ── NODE 2: Gap Detected (right, amber) ── -->
-      <g class="loop-node" style="--ng:rgba(255,179,0,.5)" filter="url(#glowA)">
-        <circle cx="440" cy="120" r="22" fill="#0a0f1a" stroke="#ffb300" stroke-width="1.5"/>
-        <text x="440" y="116" text-anchor="middle" fill="#ffb300" font-family="'JetBrains Mono',monospace" font-size="7" font-weight="700" letter-spacing=".5">GAP</text>
-        <text x="440" y="128" text-anchor="middle" fill="#8892b0" font-family="'JetBrains Mono',monospace" font-size="7">detected</text>
-      </g>
-
-      <!-- ── NODE 3: Observation Captured (bottom-right, amber) ── -->
-      <g class="loop-node" style="--ng:rgba(255,179,0,.4)" filter="url(#glowA)">
-        <circle cx="390" cy="240" r="22" fill="#0a0f1a" stroke="#ffb300" stroke-width="1.5"/>
-        <text x="390" y="236" text-anchor="middle" fill="#ffb300" font-family="'JetBrains Mono',monospace" font-size="6.5" font-weight="700" letter-spacing=".3">CAPTURE</text>
-        <text x="390" y="248" text-anchor="middle" fill="#8892b0" font-family="'JetBrains Mono',monospace" font-size="7">observe</text>
-      </g>
-
-      <!-- ── NODE 4: Next Session (bottom-left, green) ── -->
-      <g class="loop-node" style="--ng:rgba(0,200,150,.4)" filter="url(#glowG)">
-        <circle cx="130" cy="240" r="22" fill="#0a0f1a" stroke="#00c896" stroke-width="1.5"/>
-        <text x="130" y="236" text-anchor="middle" fill="#00c896" font-family="'JetBrains Mono',monospace" font-size="6.5" font-weight="700" letter-spacing=".3">NEXT</text>
-        <text x="130" y="248" text-anchor="middle" fill="#8892b0" font-family="'JetBrains Mono',monospace" font-size="7">session</text>
-      </g>
-
-      <!-- ── NODE 5: User Triages (left, blue) ── -->
-      <g class="loop-node" style="--ng:rgba(88,166,255,.5)" filter="url(#glowB)">
-        <circle cx="80" cy="150" r="22" fill="#0a0f1a" stroke="#58a6ff" stroke-width="1.5"/>
-        <text x="80" y="146" text-anchor="middle" fill="#58a6ff" font-family="'JetBrains Mono',monospace" font-size="7" font-weight="700" letter-spacing=".5">TRIAGE</text>
-        <text x="80" y="158" text-anchor="middle" fill="#8892b0" font-family="'JetBrains Mono',monospace" font-size="7">R / S / D</text>
-      </g>
-
-      <!-- ── NODE 6: Plugin Improves (top-left, green) ── -->
-      <g class="loop-node" style="--ng:rgba(48,209,88,.5)" filter="url(#glowG)">
-        <circle cx="130" cy="68" r="22" fill="#0a0f1a" stroke="#30d158" stroke-width="1.5"/>
-        <text x="130" y="64" text-anchor="middle" fill="#30d158" font-family="'JetBrains Mono',monospace" font-size="6.5" font-weight="700" letter-spacing=".3">IMPROVE</text>
-        <text x="130" y="76" text-anchor="middle" fill="#8892b0" font-family="'JetBrains Mono',monospace" font-size="7">PR merged</text>
-      </g>
-
-      <!-- ── Directional arrows along the track ── -->
-      <!-- Arrow: Session -> Gap Detected -->
-      <polygon points="425,95 430,88 435,95" fill="#ffb300" opacity=".6"/>
-      <!-- Arrow: Gap -> Capture -->
-      <polygon points="418,225 424,220 420,230" fill="#ffb300" opacity=".5"/>
-      <!-- Arrow: Capture -> Next Session -->
-      <polygon points="170,252 163,247 163,257" fill="#00c896" opacity=".5"/>
-      <!-- Arrow: Next Session -> Triage -->
-      <polygon points="95,195 90,188 100,190" fill="#58a6ff" opacity=".5"/>
-      <!-- Arrow: Triage -> Improve -->
-      <polygon points="100,90 96,84 106,86" fill="#30d158" opacity=".5"/>
-      <!-- Arrow: Improve -> Session -->
-      <polygon points="235,48 228,43 228,53" fill="#00c896" opacity=".5"/>
-
-      <!-- ── Triage outcome labels ── -->
-      <g font-family="'JetBrains Mono',monospace" font-size="8" font-weight="600">
-        <text x="38" y="120" fill="#30d158" text-anchor="middle">R</text>
-        <text x="38" y="133" fill="#8892b0" font-size="6" font-weight="400" text-anchor="middle">raise PR</text>
-        <text x="38" y="155" fill="#ffb300" text-anchor="middle">S</text>
-        <text x="38" y="168" fill="#8892b0" font-size="6" font-weight="400" text-anchor="middle">skip</text>
-        <text x="38" y="188" fill="#ff453a" text-anchor="middle">D</text>
-        <text x="38" y="201" fill="#8892b0" font-size="6" font-weight="400" text-anchor="middle">dismiss</text>
-      </g>
-
-      <!-- ── Center label ── -->
-      <text x="260" y="147" text-anchor="middle" fill="#5a6480" font-family="Inter,sans-serif" font-size="9" font-weight="600" letter-spacing=".06em">FEEDBACK LOOP</text>
-      <text x="260" y="162" text-anchor="middle" fill="#3a3f52" font-family="'JetBrains Mono',monospace" font-size="7">async evaluation</text>
-
-      <!-- ── Orbiting dot ── -->
-      <circle class="orbit-dot" r="5" fill="url(#dotGrad)">
-        <animate attributeName="opacity" values=".9;1;.9" dur="1s" repeatCount="indefinite"/>
-      </circle>
-      <!-- Trailing glow for orbiting dot -->
-      <circle class="orbit-dot" r="10" fill="#00c896" opacity=".15" style="animation-delay:-.15s"/>
-    </svg>
-
-    <!-- Evidence cards row -->
-    <div class="ev-row" data-stagger style="--s:4">
-      <div class="ev-card ev-red">
-        <div class="ev-label">Wrong claim</div>
-        Plugin said "use make revendor" for etcd-druid -- it's actually "make tidy"
+  <div class="rv">
+    <div class="sec-eyebrow" data-stagger style="--s:0">Self-improving</div>
+    <div class="sec-h" data-stagger style="--s:1">The plugin gets<br>better every session.</div>
+    <p class="sec-sub" data-stagger style="--s:2">Every session is evaluated asynchronously. When a gap is found — a wrong claim, a missing footgun, a stale flag — it's captured as a structured observation. You decide what happens next.</p>
+  </div>
+  <div class="g2" style="margin-top:32px" data-stagger style="--s:3">
+    <div class="dash">
+      <div class="dash-header"><h4>How It Works</h4><span class="dash-badge amber">Auto-capture</span></div>
+      <div class="mini-tl" style="margin-top:16px">
+        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">Session ends → hook captures gaps automatically</span></div>
+        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">Next session → observations are pre-verified against current files</span></div>
+        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">Stale items auto-resolved (the fix is already in)</span></div>
+        <div class="mini-tl-row"><div class="mini-tl-dot active"></div><span class="bright">Verified gaps presented with evidence</span></div>
+        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">You choose: <strong style="color:var(--green)">R</strong> raise PR · <strong style="color:var(--amber)">S</strong> skip · <strong style="color:var(--red)">D</strong> dismiss</span></div>
+        <div class="mini-tl-row"><div class="mini-tl-dot done"></div><span class="bright">PR raised only on explicit R choice</span></div>
       </div>
-      <div class="ev-card ev-amber">
-        <div class="ev-label">Missing footgun</div>
-        New CEL validation gotcha not encoded in review skill
-      </div>
-      <div class="ev-card ev-blue">
-        <div class="ev-label">Stale flag</div>
-        Feature gate promoted from alpha to GA -- skill still says alpha
+    </div>
+    <div class="dash">
+      <div class="dash-header"><h4>What Gets Captured</h4><span class="dash-badge green">Evidence-based</span></div>
+      <div style="margin-top:16px">
+        <div style="display:flex;gap:12px;margin-bottom:12px">
+          <div style="flex:1;padding:14px;border-radius:10px;background:rgba(255,69,58,.04);border:1px solid rgba(255,69,58,.1)">
+            <div style="font-size:.72em;color:var(--red);font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Wrong claim</div>
+            <div style="font-size:.78em;color:var(--text)">Plugin said "use make revendor" for etcd-druid — it's actually "make tidy"</div>
+          </div>
+          <div style="flex:1;padding:14px;border-radius:10px;background:rgba(255,179,0,.04);border:1px solid rgba(255,179,0,.1)">
+            <div style="font-size:.72em;color:var(--amber);font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Missing footgun</div>
+            <div style="font-size:.78em;color:var(--text)">New CEL validation gotcha not encoded in review skill</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:12px">
+          <div style="flex:1;padding:14px;border-radius:10px;background:rgba(41,151,255,.04);border:1px solid rgba(41,151,255,.1)">
+            <div style="font-size:.72em;color:var(--blue);font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Stale flag</div>
+            <div style="font-size:.78em;color:var(--text)">Feature gate was promoted from alpha to GA — skill still says alpha</div>
+          </div>
+          <div style="flex:1;padding:14px;border-radius:10px;background:rgba(0,200,150,.04);border:1px solid rgba(0,200,150,.1)">
+            <div style="font-size:.72em;color:var(--g);font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">User correction</div>
+            <div style="font-size:.78em;color:var(--text)">"No, the test should use Ginkgo v2 here, not Go native"</div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
