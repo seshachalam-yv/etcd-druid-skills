@@ -22,8 +22,8 @@ code{font-family:var(--mono);background:rgba(0,200,150,.06);padding:2px 7px;bord
 /* NEBULA */
 .aurora{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
 .ab{position:absolute;border-radius:50%;filter:blur(120px);will-change:transform}
-.ab.a{width:800px;height:800px;top:-300px;left:-200px;background:radial-gradient(circle,rgba(0,200,150,.1),transparent 70%);animation:da 30s ease-in-out infinite alternate}
-.ab.b{width:600px;height:600px;bottom:-200px;right:-150px;background:radial-gradient(circle,rgba(255,179,0,.06),transparent 70%);animation:db 25s ease-in-out infinite alternate}
+.ab.a{width:800px;height:800px;top:-300px;left:-200px;background:radial-gradient(circle,rgba(0,200,150,.18),transparent 70%);animation:da 30s ease-in-out infinite alternate}
+.ab.b{width:600px;height:600px;bottom:-200px;right:-150px;background:radial-gradient(circle,rgba(255,179,0,.10),transparent 70%);animation:db 25s ease-in-out infinite alternate}
 @keyframes da{to{transform:translate(120px,80px) scale(1.2)}}
 @keyframes db{to{transform:translate(-80px,-60px) scale(1.1)}}
 
@@ -37,19 +37,19 @@ code{font-family:var(--mono);background:rgba(0,200,150,.06);padding:2px 7px;bord
 @media(max-width:768px){.wrap,.wrap-wide{padding:0 22px}}
 
 /* Hero logo and brand */
-.hero{text-align:center;padding:80px 0 40px;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative}
-.hero-logo{margin:0 auto 20px;position:relative;width:180px;height:220px;display:flex;align-items:center;justify-content:center}
+.hero{text-align:center;padding:60px 0 20px;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative}
+.hero-logo{margin:0 auto 10px;position:relative;width:160px;height:180px;display:flex;align-items:center;justify-content:center}
 /* Glow halo behind logo */
-.hero-logo::before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:200px;height:200px;background:radial-gradient(circle,rgba(0,200,150,.15),rgba(0,200,150,.05) 50%,transparent 70%);border-radius:50%;z-index:0;pointer-events:none}
-.hero-brand{font-size:clamp(42px,7vw,68px);font-weight:800;color:var(--bright);letter-spacing:-.03em;margin-bottom:12px;font-style:italic}
+.hero-logo::before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:280px;height:280px;background:radial-gradient(circle,rgba(0,200,150,.22) 0%,rgba(0,200,150,.08) 40%,transparent 70%);border-radius:50%;z-index:0;pointer-events:none}
+.hero-brand{font-size:clamp(42px,7vw,68px);font-weight:800;color:var(--bright);letter-spacing:-.03em;margin-bottom:6px;font-style:italic}
 .hero-brand .dim{color:var(--g);font-style:italic}
-.hero-eyebrow{font-size:clamp(10px,1.1vw,14px);font-weight:600;text-transform:uppercase;letter-spacing:.15em;color:var(--g);margin-bottom:32px}
+.hero-eyebrow{font-size:clamp(10px,1.1vw,14px);font-weight:600;text-transform:uppercase;letter-spacing:.15em;color:var(--g);margin-bottom:20px}
 .hero-sub{font-size:clamp(16px,1.9vw,20px);font-weight:300;line-height:1.75;color:#9ca3af;max-width:620px;margin:0 auto;text-align:center}
-.hero-cta{margin-top:44px;display:flex;gap:16px;flex-wrap:wrap;justify-content:center}
+.hero-cta{margin-top:28px;display:flex;gap:16px;flex-wrap:wrap;justify-content:center}
 .btn{display:inline-block;padding:15px 32px;border-radius:980px;font-weight:600;font-size:.9em;transition:all .25s}
 .btn-fill{background:linear-gradient(135deg,var(--g),var(--gd));color:#fff;border:none;box-shadow:0 4px 20px rgba(0,200,150,.2)}.btn-fill:hover{background:linear-gradient(135deg,#33dba8,var(--g));transform:scale(1.03);text-decoration:none;color:#fff;box-shadow:0 8px 30px rgba(0,200,150,.3)}
 .btn-line{color:var(--g);border:1px solid rgba(0,200,150,.25)}.btn-line:hover{border-color:var(--g);text-decoration:none;box-shadow:0 4px 20px rgba(0,200,150,.1)}
-.hero-scroll{margin-top:48px;color:var(--dim);font-size:.75em;letter-spacing:.1em;text-transform:uppercase;animation:bob 2s ease-in-out infinite}
+.hero-scroll{margin-top:28px;color:var(--dim);font-size:.75em;letter-spacing:.1em;text-transform:uppercase;animation:bob 2s ease-in-out infinite}
 @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(6px)}}
 .hero-logo .hex-fill{fill:#009F76;opacity:.5;animation:hexChg 6s ease-in-out infinite}
 @keyframes hexChg{0%,30%{opacity:.5;filter:brightness(.8)}40%{opacity:1;filter:brightness(1.4)}50%,100%{opacity:1;filter:brightness(1)}}
@@ -121,6 +121,7 @@ code{font-family:var(--mono);background:rgba(0,200,150,.06);padding:2px 7px;bord
 
 /* ═══ INSTALL CODE ═══ */
 .code-sec{padding:100px 0}
+.code-sec{padding-top:60px}
 .code-sec .sec-h{text-align:center}
 .code-sec .sec-sub{text-align:center;margin-left:auto;margin-right:auto}
 .term{background:rgba(10,15,26,.8);backdrop-filter:blur(12px);border:1px solid var(--border);border-radius:16px;overflow:hidden;max-width:680px;margin:40px auto 0;position:relative}
