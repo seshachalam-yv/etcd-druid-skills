@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://seshachalam-yv.github.io/etcd-druid-skills/sitemap.xml
