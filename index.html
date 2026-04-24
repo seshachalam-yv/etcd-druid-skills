@@ -1136,14 +1136,6 @@ document.querySelectorAll('.iterm-tab').forEach(t=>{
   t.addEventListener('click',()=>{clearInterval(autoCycleTimer);startAutoCycle()});
 });
 
-// Counter animation
-function animC(el){const t=+el.dataset.target,s=el.dataset.suffix||'',dur=1800,st=performance.now();(function tk(now){const p=Math.min((now-st)/dur,1),e=1-Math.pow(1-p,3);el.textContent=Math.floor(e*t).toLocaleString()+s;if(p<1)requestAnimationFrame(tk)})(st)}
-const cObs=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting){animC(x.target);cObs.unobserve(x.target)}})},{threshold:.5});
-document.querySelectorAll('[data-target]').forEach(el=>cObs.observe(el));
-
-// Bar animation
-const bObs=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting){x.target.querySelectorAll('.bar-fill').forEach(b=>b.style.width=b.style.getPropertyValue('--w'));bObs.unobserve(x.target)}})},{threshold:.2});
-document.querySelectorAll('#bars-grid').forEach(el=>bObs.observe(el));
 
 // Donut animation
 const dObs=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting){x.target.querySelectorAll('.fill').forEach(c=>c.classList.add('vis'));dObs.unobserve(x.target)}})},{threshold:.3});
