@@ -894,7 +894,7 @@ code{font-family:var(--mono);background:rgba(0,200,150,.06);padding:2px 7px;bord
 <section class="sec">
   <div class="sec-eyebrow" data-stagger style="--s:0">Ecosystem</div>
   <div class="sec-h" data-stagger style="--s:1">Three repos.<br>One plugin.</div>
-  <p class="sec-sub" data-stagger style="--s:2">etcd-druid manages etcd clusters declaratively on Kubernetes — handling backup/restore across 8 cloud providers, snapshot compaction, defragmentation, and component protection. The plugin covers all three repos with 222 combined releases.</p>
+  <p class="sec-sub" data-stagger style="--s:2">etcd-druid is a Kubernetes operator that provisions, manages, monitors and deletes etcd clusters declaratively. Each etcd member runs two containers: etcd-wrapper (lifecycle) and etcd-backup-restore (snapshots, defrag, restore). The plugin covers all three repos.</p>
   <div data-stagger style="--s:3">
     <div class="eco-grid">
       <div class="eco-card">
@@ -903,7 +903,7 @@ code{font-family:var(--mono);background:rgba(0,200,150,.06);padding:2px 7px;bord
           <div style="font-size:.72em;color:var(--dim);margin-top:2px">Kubernetes operator</div>
         </div>
         <div class="eco-body">
-          <div class="eco-row"><span class="eco-label">Role</span><span>Owns Etcd CRD, reconciles cluster resources</span></div>
+          <div class="eco-row"><span class="eco-label">Role</span><span>Provisions, manages and monitors etcd clusters</span></div>
           <div class="eco-row"><span class="eco-label">Test</span><span>Go native + Gomega</span></div>
           <div class="eco-row"><span class="eco-label">Deps</span><span><code>make tidy</code></span></div>
           <div class="eco-row"><span class="eco-label">CI</span><span><code>make ci-checks</code></span></div>
@@ -916,7 +916,7 @@ code{font-family:var(--mono);background:rgba(0,200,150,.06);padding:2px 7px;bord
           <div style="font-size:.72em;color:var(--dim);margin-top:2px">Sidecar</div>
         </div>
         <div class="eco-body">
-          <div class="eco-row"><span class="eco-label">Role</span><span>Snapshots, restore, initialization</span></div>
+          <div class="eco-row"><span class="eco-label">Role</span><span>DB validation, snapshots, defrag, restore</span></div>
           <div class="eco-row"><span class="eco-label">Test</span><span>Ginkgo v2 + Gomega</span></div>
           <div class="eco-row"><span class="eco-label">Deps</span><span><code>make revendor</code></span></div>
           <div class="eco-row"><span class="eco-label">CI</span><span><code>make verify</code></span></div>
@@ -929,7 +929,7 @@ code{font-family:var(--mono);background:rgba(0,200,150,.06);padding:2px 7px;bord
           <div style="font-size:.72em;color:var(--dim);margin-top:2px">Sidecar</div>
         </div>
         <div class="eco-body">
-          <div class="eco-row"><span class="eco-label">Role</span><span>Starts embedded etcd via HTTP API</span></div>
+          <div class="eco-row"><span class="eco-label">Role</span><span>etcd lifecycle — validation and initialization</span></div>
           <div class="eco-row"><span class="eco-label">Test</span><span>Go native + Gomega</span></div>
           <div class="eco-row"><span class="eco-label">Deps</span><span><code>make revendor</code></span></div>
           <div class="eco-row"><span class="eco-label">CI</span><span><code>make check && make test</code></span></div>
