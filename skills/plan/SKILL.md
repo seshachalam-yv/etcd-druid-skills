@@ -47,7 +47,7 @@ Right-size plans to avoid filling the context window during implementation. Over
 **When to split:** If the plan exceeds ~150 lines or covers more than one independent subsystem, break it into separate plan files — one per subsystem. Each plan goes through its own Gate 1 → implement cycle.
 
 **Granularity rules:**
-- Each task should be completable in 2–5 minutes — one action, independently verifiable
+- Each task should be one logical change (1–3 file edits) with one verification step — independently completable by a single subagent
 - No placeholders: no TBD, TODO, "similar to Task N", or "add appropriate handling"
 - Exact file paths with line ranges where possible — prevents wrong-file edits
 - Exact verification commands with expected output — prevents guessing
@@ -58,7 +58,7 @@ Right-size plans to avoid filling the context window during implementation. Over
 |-------------|---------|-----|
 | One plan for entire feature | Fills context, loses detail late in execution | Split into task-level plans |
 | Plan lives only in conversation | Lost on `/compact` or context compression | Always save plan to disk file |
-| Exploring >3 minutes before planning | Leads to wrong approaches and wasted context | Time-box exploration, then write plan |
+| Unbounded exploration before planning | Leads to wrong approaches and wasted context | Explore only enough to classify the change, then write plan |
 | No verification commands in tasks | Leads to untested code and late failures | Include exact `make test` / `go vet` commands per task |
 | Placeholders in plan steps | Agent interprets freely, produces wrong code | Write concrete requirements in every step |
 

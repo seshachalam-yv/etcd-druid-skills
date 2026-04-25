@@ -58,24 +58,18 @@ digraph implement {
 
 Large plans and long implementation sessions fill the context window, causing lost requirements and wrong approaches. Use these patterns to stay within limits.
 
-**Plan-on-disk pattern (default):** The plan file lives on disk, not in conversation. Subagents read it on-demand — the orchestrator never carries the full plan text in context.
+**Plan-on-disk pattern (default):** The plan file lives on disk (`docs/plans/`), not in conversation context. The orchestrator reads only the current task from the plan file before dispatching each subagent — never load the full plan into context.
 
-```
-Session 1: Research → write plan → save to docs/plans/ → /clear
-Session 2: Read plan file → implement task 1 → commit → /clear
-Session 3: Read plan file → implement task 2 → commit
-```
+**Subagent isolation:** Each implementer subagent gets a clean context window. It reads ~6,000 tokens of task-relevant files but returns a ~400-token summary — 93% context savings for the orchestrator. Always prefer dispatching a fresh subagent over accumulating context in the orchestrator.
 
-**Subagent isolation:** Each implementer subagent gets a clean context window. It reads ~6,000 tokens of task-relevant files but returns a ~400-token summary — 93% context savings for the orchestrator.
-
-**Proactive compaction:** Run `/compact` with focus instructions before context gets heavy, not after:
+**Proactive compaction:** After each task completes and before dispatching the next subagent, evaluate whether the orchestrator context is growing heavy. If it is, compact with focus instructions:
 ```
 /compact Focus on current task requirements and recent test results
 ```
 
-**The two-corrections rule:** If you have corrected a subagent twice on the same issue, the context is cluttered with failed approaches. Dispatch a fresh subagent with a better prompt that incorporates what you learned. Do not keep retrying in the same context.
+**The two-corrections rule:** If a subagent has been corrected twice on the same issue, do not retry in the same context. Dispatch a fresh subagent with a better prompt that incorporates what was learned from the failures.
 
-**Session boundaries:** For multi-task plans, commit after each task and consider `/clear` between tasks. Marathon sessions show diminishing returns — fresh context produces better code.
+**Commit often:** Commit after each completed task. This creates restore points and keeps the working state clean for the next subagent.
 
 ---
 
