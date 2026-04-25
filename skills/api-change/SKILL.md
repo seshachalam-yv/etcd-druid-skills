@@ -23,6 +23,15 @@ Complete workflow for adding or modifying fields in `api/core/v1alpha1/`. Covers
 
 ---
 
+## Worktree Gate
+
+Before modifying any API types or running generation, apply the worktree gate (`skills/worktree-gate/SKILL.md`).
+
+If already in a worktree (e.g., dispatched from `implement`): use it.
+If standalone: the gate creates a worktree branched from `upstream/master`.
+
+All API changes, `cd api && make generate`, and CRD validation tests happen inside the worktree. Use `git diff upstream/master...HEAD` to verify exactly what changed before committing.
+
 ## Step 1: Choose the Right File and Struct
 
 **Before writing any code:** Read the `## API Delta` section of the plan file for this task.

@@ -21,6 +21,15 @@ Three repos, two test frameworks. Follow Red-Green-Refactor strictly.
 | "The framework is awkward here" | That's a signal to read `docs/development/testing.md`, not to skip |
 | "It's a one-liner / generated code" | Generated files are never tested directly. One-liners break too. |
 
+## Worktree Gate
+
+Before writing any test code, apply the worktree gate (`skills/worktree-gate/SKILL.md`).
+
+If already in a worktree (e.g., dispatched from `implement`): use it.
+If standalone: the gate creates a worktree branched from `upstream/master`.
+
+All test files are created inside the worktree. Use `git show upstream/master:path/to/file` to read the original implementation when writing tests against new behavior.
+
 ## Framework by Repo
 
 | Repo | Framework | Run command |

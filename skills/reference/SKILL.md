@@ -498,4 +498,5 @@ All must be updated together. Check the upstream Gardener Go version policy befo
 - `review` — code review checklist
 - `observations` — triage captured plugin improvement observations; invoke when session-start flags pending observations
 - `e2e` — manual e2e testing: KIND setup, custom image builds, sidecar overrides, pre-PR CI
+- `worktree-gate` — shared gate enforcing worktree isolation before any code modification; referenced by all code-modifying skills
 - `reference` — this card

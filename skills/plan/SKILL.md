@@ -33,6 +33,37 @@ When in doubt: if the task touches >5 packages or creates a new binary, it's a n
 
 ---
 
+## Plan Sizing & Granularity
+
+Right-size plans to avoid filling the context window during implementation. Oversized plans cause lost requirements, wrong-file edits, and wasted correction loops.
+
+| Scope | Max plan lines | Strategy |
+|-------|---------------|----------|
+| Single-file, one-sentence diff | Skip plan | Direct implementation |
+| 1–3 files | ~30 lines | Inline checklist |
+| 4–10 files | ~100 lines | Task-level plan on disk |
+| 10+ files | Split | One plan per subsystem, implement sequentially |
+
+**When to split:** If the plan exceeds ~150 lines or covers more than one independent subsystem, break it into separate plan files — one per subsystem. Each plan goes through its own Gate 1 → implement cycle.
+
+**Granularity rules:**
+- Each task should be one logical change (1–3 file edits) with one verification step — independently completable by a single subagent
+- No placeholders: no TBD, TODO, "similar to Task N", or "add appropriate handling"
+- Exact file paths with line ranges where possible — prevents wrong-file edits
+- Exact verification commands with expected output — prevents guessing
+
+**Anti-patterns:**
+
+| Anti-pattern | Problem | Fix |
+|-------------|---------|-----|
+| One plan for entire feature | Fills context, loses detail late in execution | Split into task-level plans |
+| Plan lives only in conversation | Lost on `/compact` or context compression | Always save plan to disk file |
+| Unbounded exploration before planning | Leads to wrong approaches and wasted context | Explore only enough to classify the change, then write plan |
+| No verification commands in tasks | Leads to untested code and late failures | Include exact `make test` / `go vet` commands per task |
+| Placeholders in plan steps | Agent interprets freely, produces wrong code | Write concrete requirements in every step |
+
+---
+
 ## Phase 1: Design
 
 1. Create tasks for all workflow phases with TaskCreate

@@ -17,6 +17,10 @@ user-invocable: false
 | "Nothing changed since the last run" | You cannot know that without running it. |
 | "It's obviously fine" | "Obviously" precedes most verification failures. |
 
+## Worktree Context
+
+Verification commands must run in the active worktree, not the fork root. If a worktree is active (from `implement`, `debug`, `tdd`, or any code-modifying skill), `cd` into it before running any verification command. Use `git diff upstream/master...HEAD` to confirm you are verifying the right changes.
+
 ## The 5-Step Gate
 
 BEFORE claiming work is complete, a test passes, or a check is clean:
