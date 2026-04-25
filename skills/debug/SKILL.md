@@ -21,21 +21,20 @@ Use this skill when you hit: test failures, unexpected reconciliation behavior, 
 | "It's obviously X" | "Obviously" precedes most debugging rabbit holes |
 | "Reproducing it takes too long" | Fixing without reproduction takes longer |
 
-## Before You Start: Protect Your Working State
+## Before You Start: Worktree Gate
 
+Before modifying any code, apply the worktree gate (`skills/worktree-gate/SKILL.md`).
+
+If already in a worktree (e.g., dispatched from `implement`): use it.
+If standalone: the gate creates a worktree branched from `upstream/master` with a `debug/<description>` branch.
+
+Once in the worktree, you can always compare against master:
 ```bash
-# If you have uncommitted changes, stash them before investigating
-git stash push -m "WIP: stashing before debug investigation"
-
-# Work on a separate branch to avoid polluting main/master
-git checkout -b debug/investigate-<short-description>
-
-# To restore after investigation:
-git stash pop
+git diff upstream/master...HEAD              # what you changed
+git show upstream/master:path/to/file        # read the original version
 ```
 
-Never apply speculative fixes directly to your main working branch.
-Investigation often requires trying multiple approaches — do it on a throwaway branch.
+Never apply speculative fixes directly to your main working branch or fork root.
 
 ## Phase 1: Read the Error Carefully
 

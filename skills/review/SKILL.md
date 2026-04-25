@@ -31,6 +31,10 @@ Standalone checklist for reviewing etcd-druid, etcd-backup-restore, and etcd-wra
 
 ---
 
+## Worktree Context
+
+If invoked during implementation, you should be reviewing a worktree's changes against `upstream/master`. Apply the worktree gate (`skills/worktree-gate/SKILL.md`) to confirm you are operating in the correct worktree. Use `git diff upstream/master...HEAD` for the complete diff — this is the authoritative view of what changed.
+
 ## Step 1: Read the Diff, the Docs, and Similar Merged PRs
 
 ```bash

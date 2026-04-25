@@ -17,6 +17,12 @@ user-invocable: false
 | "I don't want to push back" | Implementing wrong suggestions wastes more time than clarifying. |
 | "They probably mean X" | Probably is not a basis for changing code. Ask if unclear. |
 
+## Worktree Gate
+
+Before implementing any review feedback, apply the worktree gate (`skills/worktree-gate/SKILL.md`).
+
+You should already be in a worktree from `implement`. If not (e.g., applying feedback to an existing PR), the gate ensures you're in one before modifying code. Use `git diff upstream/master...HEAD` to see the full change set when reasoning about feedback.
+
 ## Process
 
 ### Step 1: Receive — Read every comment fully

@@ -34,6 +34,15 @@ Each repo has its own e2e testing guide. Read the relevant guide before running 
 
 The CI pipeline file (`.github/workflows/`) for each repo is the authoritative list of what runs on a PR. Read it before raising a PR to know exactly which jobs must pass.
 
+## Worktree Gate
+
+Before building custom images or running e2e tests for your changes, apply the worktree gate (`skills/worktree-gate/SKILL.md`).
+
+If already in a worktree (e.g., dispatched from `implement`): use it — build and test from the worktree path.
+If standalone: the gate ensures you're in a worktree branched from `upstream/master`.
+
+All `make docker-build`, `make ci-e2e-kind`, and image override commands run from within the worktree. Use `git diff upstream/master...HEAD` to verify what changes are being tested.
+
 ## Prerequisites
 
 Before starting, verify you have the tools:
