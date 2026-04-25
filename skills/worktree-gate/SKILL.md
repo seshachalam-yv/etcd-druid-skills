@@ -150,7 +150,7 @@ Never use `ai-`, `claude-`, or similar prefixes. Branches must look human-author
 
 After work is complete, the invoking skill decides cleanup:
 
-- **From `implement`** → `finishing-a-development-branch` skill handles it
+- **From `implement`** → Phase 4 (PR Creation) or Gate 2 option D handles it
 - **From standalone `debug`/`tdd`** → ask the user: keep the worktree (for a PR) or remove it (`git worktree remove`)
 - **Never auto-delete** a worktree with commits
 
