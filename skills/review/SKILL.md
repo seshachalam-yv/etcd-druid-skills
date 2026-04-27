@@ -151,116 +151,17 @@ Example: `feature operator` for a new operator-facing field.
 
 ## Step 10: Known Footguns
 
-- `UseEtcdWrapper` feature gate is **GA, locked true** — it cannot be disabled. Any code that checks `Enabled(UseEtcdWrapper)` is dead code.
-- `--enable-etcd-member-gc` AND `--k8s-member-gc-duration` flags in etcd-backup-restore were **both removed** in v0.42 — do not reference either.
-- `PreferClose` in `ClientService.TrafficDistribution` is **deprecated** — use `PreferSameZone` or `PreferSameNode` instead.
-- `StoreSpec` secret-based endpoint configuration is **deprecated** — use `spec.backup.store.endpointOverride` (etcd-druid) / `--store-endpoint-override` (etcd-backup-restore) instead.
-- EtcdOpsTask controller lives in `internal/controller/etcdopstask/` — review task state machine transitions if touched. `OnDemandSnapshot` is also auto-triggered during hibernation (replicas=0) and `UpgradeEtcdVersion` flow.
-- `UpgradeEtcdVersion` feature gate is alpha — if touched, gating code must check `featureGates.Enabled(features.UpgradeEtcdVersion)`. Feature gates defined in `api/config/v1alpha1/features.go`.
-- Snapshot compression is **enabled by default** in etcd-backup-restore v0.40+ — do not add explicit `--compress-snapshots=true` unless overriding the default policy.
-- etcd-backup-restore and etcd-wrapper use **vendored dependencies** — any dependency change requires `make revendor`, not just `go mod tidy`.
-- **Container lookup must use name, not index** — when finding a container in a StatefulSet PodSpec, always `findContainerByName("etcd")` or iterate and match `.Name`. Never assume `containers[0]` is the etcd container — init containers, sidecars, or reordering break index-based lookups.
-- **Error codes use `Err` prefix (Go identifier) / `ERR_` prefix (string code)** — etcd-druid-specific error types in `internal/errors/` use Go's `Err` camelCase prefix for the identifier (e.g., `ErrCreateStatefulSet`) and an `ERR_` underscore-separated string for the error code value. Do not invent new error code styles or use bare `errors.New()` in component files.
-- **Use `*int32` / `*bool` for optional fields, not sentinels** — optional numeric fields in the API use pointer types (`*int32`, `*bool`) with `omitempty`, not sentinel values like `-1` or `0`. Sentinel values leak into CEL validation logic and cause confusing rules.
-- **CEL rules: check for redundancy between field-scoped and cross-field** — a field-scoped rule on `EtcdConfig` and a cross-field rule on `Etcd` root may enforce the same constraint. Reviewers should verify no overlap exists — redundant rules cause double-rejection error messages that confuse operators.
-- **Operator-visible names must be descriptive** — names that appear in `kubectl get` output, events, or conditions (e.g., container names, condition types) should be human-readable and descriptive. Do not use internal code identifiers or abbreviations as operator-facing names.
-- **Feature gate changes require `docs/deployment/feature-gates.md` update** — when adding, graduating, or removing a feature gate in `api/config/v1alpha1/features.go`, the documentation at `docs/deployment/feature-gates.md` must be updated in the same PR.
-- **Test assertions must exercise all test table fields** — in table-driven tests, every field in the test struct must be asserted somewhere in the test body. A field like `expectedRequeue` that exists in the table but is never checked in assertions is dead code that gives false confidence.
-
----
-
-## Red Flags — Stop Before Issuing Verdict
-
-| Observation | What it means |
-|---|---|
-| Diff is >500 lines or touches >5 packages | Too large for a single review — flag this to the author before proceeding |
-| API type changed but no generated files in diff | Two-commit rule violated — `cd api && make generate` was not run |
-| Test file uses `import . "github.com/onsi/ginkgo/v2"` in etcd-druid | Wrong framework — etcd-druid uses `testing.T`, not Ginkgo |
-| `time.Sleep()` in any test | Async anti-pattern — should use `Eventually`/`Consistently` |
-| `CHANGES REQUESTED` verdict without reading `docs/development/` | Iron Law violation — read the docs first |
-| New function, type, or parameter with no caller in this PR | YAGNI violation — flag it |
+See [FOOTGUNS.md](FOOTGUNS.md) for the full list of known footguns.
 
 ---
 
 ## Verdict
 
-**LGTM** — all items pass, ready for PR.
-
-**Changes required** — list each issue:
-```
-- <file>:<line>  What's wrong: ...  Should be: ...
-```
-
-If you are the author receiving this verdict, follow `skills/receiving-review/SKILL.md` to handle the feedback.
-
-**Documentation gaps** — conventions in code not yet in docs/development/, OR mistakes found in this plugin's skills:
-
-For gaps in **repo docs** (`docs/development/`): list them inline as before.
-
-For gaps or mistakes in **this plugin's skills**: write each one directly to `plugin-observations.md` using the Bash tool:
-
-```bash
-PLUGIN_OBS="${CLAUDE_PLUGIN_ROOT}/plugin-observations.md"
-NEXT_NUM=$(grep -oE '^## OBS-[0-9]+' "$PLUGIN_OBS" 2>/dev/null | grep -oE '[0-9]+' | sort -n | tail -1 || echo "0")
-NEXT_NUM=$(printf '%03d' $((NEXT_NUM + 1)))
-
-# Create file with header if needed
-if [ ! -f "$PLUGIN_OBS" ]; then
-  printf '# Plugin Observations\n\nAuto-captured. Run `/etcd-druid:observations` to triage.\n\n---\n\n## Resolved\n\n_(none yet)_\n' > "$PLUGIN_OBS"
-fi
-
-# Insert before Resolved section
-TMPFILE=$(mktemp)
-awk -v entry="
-## OBS-${NEXT_NUM} — <type> in <plugin_file>
-
-**Date:** $(date +%Y-%m-%d)
-**Source:** review-skill
-**Type:** <wrong_claim|missing_convention|missing_footgun|unclear_workflow|stale_path_or_flag>
-**Confidence:** high
-**Count:** 1
-**File:** \`<skills/name/SKILL.md>\`
-**Section:** <section heading>
-
-**Wrong / Missing:**
-> <exact wrong text, or MISSING>
-
-**Proposed fix:**
-<what it should say — specific enough to write without investigation>
-
-**Apply:** MULTILINE — apply manually
-
-**Evidence:**
-> <what in the diff or docs revealed this>
-
-**Status:** open
-
----
-" '/^## Resolved/{print entry} {print}' "$PLUGIN_OBS" > "$TMPFILE" && mv "$TMPFILE" "$PLUGIN_OBS"
-```
-
-Fill in `<type>`, `<plugin_file>`, `<section>`, `<wrong_text>`, `<proposed_fix>`, and `<evidence>` from what you found. Run the bash block once per plugin gap found. The user will triage these via `/etcd-druid:observations`.
-
----
-
-## Repo Differences
-
-| | etcd-druid | etcd-backup-restore | etcd-wrapper |
-|---|---|---|---|
-| Test framework | Go native + Gomega | Ginkgo v2 + Gomega | Go native + Gomega |
-| Error wrapping | `druiderr.WrapError` | repo-specific patterns | standard wraps |
-| Operator interface | Required | N/A | N/A |
-| CLI framework | cobra (main), stdlib flag (druidctl) | cobra | stdlib `flag` |
-| Dependency management | `make tidy` | `make revendor` (vendor/) | `make revendor` (vendor/) |
-| Logging | logr (structured) | logrus (field-based) | zap (structured JSON) |
-| CI pipeline | `.github/workflows/base.yaml` | `.github/workflows/build.yaml` | `.github/workflows/build.yaml` |
-| Lint config | golangci-lint v2 | golangci-lint v2 | golangci-lint v2 |
-| Generated files | deepcopy, CRDs, client/, api-ref | none | none |
-| Commit convention | imperative, `(#NNNN)` suffix | imperative, `(#NNNN)` suffix | imperative, `(#NNNN)` suffix |
+For verdict format, red flags, and repo differences, see [REVIEW-CHECKLIST.md](REVIEW-CHECKLIST.md).
 
 ## Handoff
 
 - Review verdict is LGTM and invoked from `/etcd-druid:implement` Phase 3 → return there for Gate 2
 - Review verdict is LGTM and invoked standalone (from `tdd` or `debug`) → work is ready to open a PR
 - Review verdict is CHANGES REQUESTED and you are the author → follow `skills/receiving-review/SKILL.md`
-- Review finds a pattern not in Known Footguns → add it to this skill's Known Footguns section
+- Review finds a pattern not in Known Footguns → add it to [FOOTGUNS.md](FOOTGUNS.md)
