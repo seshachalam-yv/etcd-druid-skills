@@ -1,8 +1,10 @@
 <img src="docs/logo.svg" alt="etcd-druid-skills" width="520">
 
 **Ecosystem:** [etcd-druid](https://github.com/gardener/etcd-druid) · [etcd-backup-restore](https://github.com/gardener/etcd-backup-restore) · [etcd-wrapper](https://github.com/gardener/etcd-wrapper)
+<br>**Website:** [seshachalam-yv.github.io/etcd-druid-skills](https://seshachalam-yv.github.io/etcd-druid-skills/)
 
 <p>
+  <a href="https://seshachalam-yv.github.io/etcd-druid-skills/"><img src="https://img.shields.io/badge/website-GitHub%20Pages-blue.svg" alt="Website"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-blue.svg" alt="License"></a>
   <a href=".claude-plugin/plugin.json"><img src="https://img.shields.io/badge/version-0.2.0-green.svg" alt="Version"></a>
   <a href="docs/evaluation.md"><img src="https://img.shields.io/badge/eval%20pass%20rate-96%25-brightgreen.svg" alt="Eval Pass Rate"></a>
