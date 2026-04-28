@@ -1,0 +1,19 @@
+# Known Footguns
+
+Referenced by `review/SKILL.md`. When you find a new footgun during review, add it here.
+
+- `UseEtcdWrapper` feature gate is **GA, locked true** — it cannot be disabled. Any code that checks `Enabled(UseEtcdWrapper)` is dead code.
+- `--enable-etcd-member-gc` AND `--k8s-member-gc-duration` flags in etcd-backup-restore were **both removed** in v0.42 — do not reference either.
+- `PreferClose` in `ClientService.TrafficDistribution` is **deprecated** — use `PreferSameZone` or `PreferSameNode` instead.
+- `StoreSpec` secret-based endpoint configuration is **deprecated** — use `spec.backup.store.endpointOverride` (etcd-druid) / `--store-endpoint-override` (etcd-backup-restore) instead.
+- EtcdOpsTask controller lives in `internal/controller/etcdopstask/` — review task state machine transitions if touched. `OnDemandSnapshot` is also auto-triggered during hibernation (replicas=0) and `UpgradeEtcdVersion` flow.
+- `UpgradeEtcdVersion` feature gate is alpha — if touched, gating code must check `featureGates.Enabled(features.UpgradeEtcdVersion)`. Feature gates defined in `api/config/v1alpha1/features.go`.
+- Snapshot compression is **enabled by default** in etcd-backup-restore v0.40+ — do not add explicit `--compress-snapshots=true` unless overriding the default policy.
+- etcd-backup-restore and etcd-wrapper use **vendored dependencies** — any dependency change requires `make revendor`, not just `go mod tidy`.
+- **Container lookup must use name, not index** — when finding a container in a StatefulSet PodSpec, always `findContainerByName("etcd")` or iterate and match `.Name`. Never assume `containers[0]` is the etcd container — init containers, sidecars, or reordering break index-based lookups.
+- **Error codes use `Err` prefix (Go identifier) / `ERR_` prefix (string code)** — etcd-druid-specific error types in `internal/errors/` use Go's `Err` camelCase prefix for the identifier (e.g., `ErrCreateStatefulSet`) and an `ERR_` underscore-separated string for the error code value. Do not invent new error code styles or use bare `errors.New()` in component files.
+- **Use `*int32` / `*bool` for optional fields, not sentinels** — optional numeric fields in the API use pointer types (`*int32`, `*bool`) with `omitempty`, not sentinel values like `-1` or `0`. Sentinel values leak into CEL validation logic and cause confusing rules.
+- **CEL rules: check for redundancy between field-scoped and cross-field** — a field-scoped rule on `EtcdConfig` and a cross-field rule on `Etcd` root may enforce the same constraint. Reviewers should verify no overlap exists — redundant rules cause double-rejection error messages that confuse operators.
+- **Operator-visible names must be descriptive** — names that appear in `kubectl get` output, events, or conditions (e.g., container names, condition types) should be human-readable and descriptive. Do not use internal code identifiers or abbreviations as operator-facing names.
+- **Feature gate changes require `docs/deployment/feature-gates.md` update** — when adding, graduating, or removing a feature gate in `api/config/v1alpha1/features.go`, the documentation at `docs/deployment/feature-gates.md` must be updated in the same PR.
+- **Test assertions must exercise all test table fields** — in table-driven tests, every field in the test struct must be asserted somewhere in the test body. A field like `expectedRequeue` that exists in the table but is never checked in assertions is dead code that gives false confidence.

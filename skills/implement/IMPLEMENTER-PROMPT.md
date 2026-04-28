@@ -71,7 +71,7 @@ Agent tool (general-purpose):
 
     Follow `skills/tdd/SKILL.md` when writing tests: write the failing test first,
     confirm it fails, then implement the minimal code to make it pass.
-    Read `skills/tdd/testing-anti-patterns.md` before writing any test in this repo.
+    Read `skills/tdd/TESTING-ANTI-PATTERNS.md` before writing any test in this repo.
 
     If the relevant repo is etcd-backup-restore or etcd-wrapper, read their
     `docs/development/` directories instead.

@@ -87,7 +87,7 @@ Commit message style: `Add unit tests for <component> (#<issue>)` — no trailin
 - If API types in `api/core/v1alpha1/` change, run `cd api && make generate` and commit
   the hand-written API change first, then the generated output separately. NEVER manually
   edit generated files.
-- See `testing-anti-patterns.md` in this directory for domain-specific anti-patterns to avoid.
+- See `TESTING-ANTI-PATTERNS.md` in this directory for domain-specific anti-patterns to avoid.
 
 ## Red Flags — Stop and re-read the Iron Law
 
