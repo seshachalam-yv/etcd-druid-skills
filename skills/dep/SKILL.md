@@ -153,8 +153,3 @@ Format:
 | Involving API changes | `/etcd-druid:api-change` for CEL/two-commit details |
 | Ready for implementation | `/etcd-druid:implement` with the plan |
 
-## Context
-
-This is the main skill file for the `dep` skill. It defines the two modes (Guide and Review), the workflow for each, and integrates with the supplementary files (DEP-TEMPLATE.md, BEST-PRACTICES.md, DIAGRAM-GUIDE.md). The YAML frontmatter between the --- markers at the top is critical — it's how the Claude Code plugin discovers and triggers the skill.
-
-IMPORTANT: The file MUST start with the YAML frontmatter block (the --- delimited section with name, description, user-invocable, effort fields). This is not markdown content — it is actual YAML frontmatter that the plugin system parses.

@@ -244,6 +244,3 @@ In BOTH Guide and Review modes, always evaluate from these three perspectives:
 - Do TLS certificates need new SANs?
 - Does the member initialization flow change?
 
-## Context
-
-This is the best practices rubric for the `dep` skill in the etcd-druid-skills plugin. It encodes quality patterns learned from real GEPs (0037, 0038, 0039) and DEPs (04, 05, 06).
