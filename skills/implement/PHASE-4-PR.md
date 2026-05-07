@@ -136,6 +136,34 @@ Some changes span multiple repos (e.g., a new API field in etcd-druid + a new fl
 
 ---
 
+## POC / Prototype Workflow
+
+For exploratory work or DEP validation that spans multiple repos without formal PRs:
+
+### When to use POC mode
+- Validating a DEP design end-to-end before writing the formal implementation
+- Testing cross-repo integration (druid + backup-restore + wrapper)
+- Exploring approaches where the design may change significantly
+
+### POC workflow differences
+| Aspect | Formal | POC |
+|--------|--------|-----|
+| Branch | feat/issue-{id}/... | poc/{dep-id}/{description} |
+| Reviews | Spec + code per task | Self-review only |
+| CI gates | Full make ci-checks | Compile + targeted tests |
+| E2e | make ci-e2e-kind | Manual KIND + kubectl verification |
+| Commits | Atomic, reviewed | WIP allowed, squash later |
+| Multi-repo | Separate PRs | Single worktree per repo, test together |
+
+### Cross-repo POC testing
+1. Build custom sidecar images with unique tags
+2. Push to local KIND registry (localhost:5001)
+3. Deploy druid with IMAGEVECTOR_OVERWRITE pointing to custom images
+4. Verify flow manually with kubectl
+5. Document findings for formal implementation plan
+
+---
+
 ## Cherry-Pick / Hotfix Workflow
 
 When a fix needs to be backported to a maintenance release branch (e.g., `hotfix-v0.35`, `hotfix-v0.36`):

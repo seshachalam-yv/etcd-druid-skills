@@ -29,6 +29,14 @@ docker tag europe-docker.pkg.dev/gardener-project/snapshots/gardener/etcdbrctl:<
            localhost:5001/etcdbrctl:dev
 ```
 
+> **Cache warning:** If rebuilding after source changes, Docker may serve a cached binary
+> from a previous build layer. Use `--no-cache` to force a full rebuild:
+> ```bash
+> docker build --no-cache -t localhost:5001/etcdbrctl:dev .
+> ```
+> Alternatively, use a unique tag per build (e.g., `dev-$(git rev-parse --short HEAD)`)
+> to avoid cache confusion entirely.
+
 ### B2. Push image to local KIND registry
 
 Use Option A (push to local registry) — it is faster than loading directly and works for both `kind load` and the registry pull path. `localhost:5001` was created by `make kind-up` in B0.
