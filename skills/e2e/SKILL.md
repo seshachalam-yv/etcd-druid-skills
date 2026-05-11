@@ -20,6 +20,15 @@ Covers three scenarios: (A) test etcd-druid changes, (B) test custom etcd-backup
 | "The CI will catch it" | CI runs after the PR is open — you block reviewers with a broken PR |
 | "It works on my machine with kubectl apply" | Manual apply skips the reconciliation loop that `make ci-e2e-kind` exercises |
 
+## Red Flags — Stop and Re-read
+
+| Thought | Why it fails |
+|---|---|
+| "Unit tests pass, so e2e will too" | Unit tests mock everything. E2e catches integration failures unit tests cannot |
+| "I'll run e2e after the PR is open" | Broken e2e blocks the entire merge queue |
+| "The KIND cluster is slow to set up" | 5 minutes of setup prevents 2 hours of debugging production failures |
+| "I only changed one component" | Components interact. E2e tests the interaction, not the component |
+
 ---
 
 ## Read the Docs First

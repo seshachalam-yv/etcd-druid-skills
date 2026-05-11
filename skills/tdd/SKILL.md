@@ -1,6 +1,6 @@
 ---
 name: tdd
-description: Use when writing new tests or learning test patterns for etcd-druid, etcd-backup-restore, or etcd-wrapper — TDD cycle, framework choice, table-driven tests, async assertions. Do not use for debugging failing tests.
+description: Use when writing new tests or adding test coverage — TDD cycle, table-driven tests, framework choice, async assertions. Do not use for debugging failing tests (use debug) or reviewing existing tests.
 user-invocable: true
 effort: medium
 paths: "**/*.go"
