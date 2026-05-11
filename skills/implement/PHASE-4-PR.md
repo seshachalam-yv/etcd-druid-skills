@@ -43,7 +43,43 @@ Handle:
 - **A** → Phase 4 PR Creation (below)
 - **B** → `git push origin <branch>`; print compare URL; stop
 - **C** → fix → re-verify → Gate 2 again
-- **D** → confirm "Are you sure? This deletes the worktree and branch." → on second confirmation: `git worktree remove` + `git branch -d`
+- **D** → Discard (provenance-based cleanup below)
+
+### Option D: Discard with Provenance-Based Cleanup
+
+Say: "Are you sure? This will delete the branch and (if we own it) the worktree."
+
+Wait for exact confirmation.
+
+If confirmed:
+
+```bash
+# Determine worktree ownership (provenance check)
+WORKTREE_PATH=$(git rev-parse --show-toplevel)
+MAIN_ROOT=$(git -C "$(git rev-parse --git-common-dir)/.." rev-parse --show-toplevel)
+
+# CWD safety: must leave worktree before removing it
+cd "$MAIN_ROOT"
+```
+
+**Provenance-based cleanup:**
+
+If the worktree path is under `.worktrees/` or `~/.config/superpowers/worktrees/`:
+we created this worktree — proceed with removal.
+
+```bash
+git worktree remove "$WORKTREE_PATH"
+git worktree prune    # clean up stale registrations
+git branch -D <feature-branch>
+```
+
+If the worktree path is NOT under those directories:
+the host environment (harness) owns this workspace — do NOT remove it.
+Report: "Workspace is externally managed — not removing. Branch `<feature-branch>` force-deleted."
+
+```bash
+git branch -D <feature-branch>
+```
 
 ---
 

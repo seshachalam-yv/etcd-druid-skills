@@ -34,14 +34,31 @@ GIT_DIR=$(git rev-parse --git-dir 2>/dev/null)
 
 # If GIT_DIR != COMMON_DIR, we are in a worktree (not the main working tree)
 if [ "$GIT_DIR" != "$COMMON_DIR" ]; then
-  echo "IN_WORKTREE=true"
-  echo "WORKTREE_PATH=$WORKTREE_ROOT"
+  # Submodule guard: GIT_DIR != GIT_COMMON is also true in submodules
+  SUPERPROJECT=$(git rev-parse --show-superproject-working-tree 2>/dev/null)
+  if [ -n "$SUPERPROJECT" ]; then
+    echo "IN_SUBMODULE=true — treat as normal repo"
+    IN_WORKTREE=false
+  else
+    echo "IN_WORKTREE=true"
+    echo "WORKTREE_PATH=$WORKTREE_ROOT"
+  fi
 else
   echo "IN_WORKTREE=false"
 fi
 ```
 
-### Step 2: Act on the result
+**Already isolated:** If `IN_WORKTREE=true`, the gate skips worktree creation and reports
+"Already in isolated workspace at `<WORKTREE_PATH>`". Proceed directly to Step 3.
+
+### Step 2a: Prefer native worktree tools
+
+Before using `git worktree add`, check if your platform provides a native worktree tool
+(e.g., `EnterWorktree`, `WorktreeCreate`, a `/worktree` command, or a `--worktree` flag).
+If available, use it — native tools handle directory placement, branch creation, and cleanup
+automatically. Only proceed to Step 2b (git worktree add) if no native tool exists.
+
+### Step 2b: Act on the result
 
 ```dot
 digraph worktree_gate {
@@ -87,6 +104,10 @@ git worktree add ".worktrees/<worktree-name>" -b "$BRANCH_NAME" upstream/master
 cd ".worktrees/<worktree-name>"
 go mod download
 ```
+
+**Sandbox fallback:** If `git worktree add` fails with a permission error (sandbox denial),
+report to the user that the sandbox blocked worktree creation and proceed with work in the
+current directory. Run setup and baseline tests in place.
 
 ### Step 3: Set master as reference baseline
 
