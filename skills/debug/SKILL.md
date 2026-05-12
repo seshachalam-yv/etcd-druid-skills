@@ -44,6 +44,8 @@ Never scroll past error output.
 - Read the full stack trace — the root cause is rarely the last line
 - Distinguish compile errors from test failures
 
+> **Building the feedback loop IS the skill.** See [FEEDBACK-LOOP.md](FEEDBACK-LOOP.md) for 10 progressively creative ways to construct a pass/fail signal.
+
 ## Phase 2: Reproduce Consistently
 
 Can it be triggered with a single command?
