@@ -149,6 +149,7 @@ Derive branch name from the invoking context:
 | `implement` (plan exists) | `feat/issue-{id}/{desc}` or `fix/issue-{id}/{desc}` | `feat/issue-1350/add-configmap-ttl` |
 | `debug` (standalone) | `debug/{desc}` | `debug/fix-statefulset-nil-pointer` |
 | `tdd` (standalone) | `test/{desc}` | `test/add-configmap-ttl-tests` |
+| `e2e` (POC/prototype) | `poc/{dep-id}/{desc}` | `poc/dep-07/scale-down-validation` |
 | `receiving-review` | Use existing branch | (already in worktree from implement) |
 
 Never use `ai-`, `claude-`, or similar prefixes. Branches must look human-authored.

@@ -15,6 +15,11 @@ Controllers:         internal/controller/etcd/reconciler.go
                      internal/controller/etcdopstask/
                      internal/controller/secret/
 Controller register: internal/controller/register.go
+Reconcile triggers:  internal/controller/etcd/reconcile_spec.go
+                     - shouldReconcileSpec(): requires annotation OR EnableEtcdSpecAutoReconcile
+                     - Annotation: gardener.cloud/operation=reconcile (consumed after use)
+                     - Config: OperatorConfiguration.EnableEtcdSpecAutoReconcile=true
+                     - Without either, spec changes are NOT reconciled
 Error types:         internal/errors/
 Health checks:       internal/health/
 Image vector:        internal/images/
