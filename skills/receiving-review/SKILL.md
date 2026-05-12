@@ -17,6 +17,15 @@ user-invocable: false
 | "I don't want to push back" | Implementing wrong suggestions wastes more time than clarifying. |
 | "They probably mean X" | Probably is not a basis for changing code. Ask if unclear. |
 
+## Red Flags — Stop and Re-read
+
+| Thought | Why it fails |
+|---|---|
+| "The reviewer is wrong" | They may be. But understand their perspective before dismissing |
+| "This would take too long to fix" | The reviewer sees what future maintainers will see. Fix it now |
+| "I'll address it in a follow-up" | Follow-ups are forgotten. Address it in this PR |
+| "It's just a style nit" | Style consistency reduces cognitive load for the entire team |
+
 ## Worktree Gate
 
 Before implementing any review feedback, apply the worktree gate (`skills/worktree-gate/SKILL.md`).

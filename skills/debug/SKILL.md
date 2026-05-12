@@ -132,6 +132,15 @@ go test ./...           # etcd-wrapper
 
 Apply the verification gate (`skills/verification/SKILL.md`) before claiming the fix is confirmed.
 
+**Integration test check (controller/component fixes only):**
+If your fix is in `internal/controller/` or `internal/component/`, check whether an integration
+test in `test/it/` covers the behavior you fixed. If yes, run it:
+```bash
+go test ./test/it/controller/<name>/... -v -run TestRelevantCase
+```
+If no integration test covers this behavior, either add one or note the gap in your report
+for follow-up. Skip this step for test-only or non-controller fixes.
+
 If the fix reveals an undocumented pattern or gotcha, add it to `docs/development/`.
 
 ## Phase 6: If 3+ Fixes Have Failed

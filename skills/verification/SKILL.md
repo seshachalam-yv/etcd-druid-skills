@@ -17,6 +17,15 @@ user-invocable: false
 | "Nothing changed since the last run" | You cannot know that without running it. |
 | "It's obviously fine" | "Obviously" precedes most verification failures. |
 
+## Red Flags — Stop and Re-read
+
+| Thought | Why it fails |
+|---|---|
+| "It passed last time I ran it" | Last time is not this time. Run it now |
+| "I only changed a comment" | Comments in Go can break generated code. Verify |
+| "The CI will verify" | CI runs after push. Broken pushes block reviewers |
+| "I can see it's correct from the code" | Reading is not running. Run the command |
+
 ## Worktree Context
 
 Verification commands must run in the active worktree, not the fork root. If a worktree is active (from `implement`, `debug`, `tdd`, or any code-modifying skill), `cd` into it before running any verification command. Use `git diff upstream/master...HEAD` to confirm you are verifying the right changes.

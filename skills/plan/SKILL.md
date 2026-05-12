@@ -62,6 +62,14 @@ Right-size plans to avoid filling the context window during implementation. Over
 | No verification commands in tasks | Leads to untested code and late failures | Include exact `make test` / `go vet` commands per task |
 | Placeholders in plan steps | Agent interprets freely, produces wrong code | Write concrete requirements in every step |
 
+**No Placeholders — these are plan failures:**
+- "TBD", "TODO", "implement later", "fill in details"
+- "Add appropriate error handling" / "add validation" / "handle edge cases"
+- "Write tests for the above" (without specifying which tests)
+- "Similar to Task N" (repeat the content — tasks may be read independently)
+- Steps that describe what to do without showing verification commands
+- References to types, functions, or methods not defined in any task
+
 ---
 
 ## Phase 1: Design
@@ -104,6 +112,21 @@ mkdir -p <fork-root>/docs/plans
 Path: `<fork-root>/docs/plans/YYYY-MM-DD-issue-{id}-{short-description}.md`
 
 For the plan file format and template, see [PLAN-TEMPLATE.md](PLAN-TEMPLATE.md).
+
+---
+
+## Phase 2b: Self-Review
+
+After writing the plan file, review it with fresh eyes before presenting Gate 1. This is an inline checklist — not a subagent dispatch.
+
+**1. Issue/spec coverage:** Re-read the GitHub issue or requirement. Can you point to a task that implements each acceptance criterion? List any gaps.
+
+**2. Placeholder scan:** Search the plan for every pattern listed in the "No Placeholders" section above — any found is a plan failure that must be fixed before Gate 1.
+
+**3. Type/name consistency:** Do the function names, struct names, file paths, and method signatures used in later tasks match what was defined in earlier tasks? A function called `getSnapshots()` in Task 2 but `fetchSnapshots()` in Task 4 is a plan bug.
+
+If you find issues, fix them in the plan file. No re-review needed — just fix and move on.
+If you find a requirement with no task, add the task.
 
 ---
 

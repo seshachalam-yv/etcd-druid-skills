@@ -23,6 +23,15 @@ Standalone checklist for reviewing etcd-druid, etcd-backup-restore, and etcd-wra
 | "It's a small change" | Small changes in API types and generated files are highest risk |
 | "I know the conventions" | `docs/development/` may have been updated since you last read it |
 
+## Red Flags — Stop and Re-read
+
+| Thought | Why it fails |
+|---|---|
+| "The code works, that's enough" | Working code with poor patterns creates maintenance debt |
+| "I'll clean up in a follow-up" | Follow-ups become tech debt tickets. Fix now |
+| "This pattern is used elsewhere" | Existing patterns may be wrong. Validate against docs/development/ |
+| "The reviewer will catch issues" | Self-review catches 80% of what reviewers flag. Respect their time |
+
 ## When to Use
 
 - Before creating a PR (self-review gate)
