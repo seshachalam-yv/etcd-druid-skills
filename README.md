@@ -168,6 +168,8 @@ brainstorm ──► plan ──► implement ──┬──► api-change*  �
                   └──► Gate 1                 debug* ──► tdd ──► finish ──► PR
                                               finish ──► Gate 2 (standalone path)
 
+dep ──► plan (after DEP is approved, creates implementation plan)
+
    * = auto-activates on .go edits
 ```
 
@@ -198,6 +200,7 @@ The core loop is **brainstorm → plan → Gate 1 → implement → Gate 2 → P
 | Skill | Invoke | Auto-activates | Description |
 |-------|--------|----------------|-------------|
 | [review](skills/review/SKILL.md) | `/etcd-druid:review` | `*.go` edits | 10-step checklist, 15 known footguns, Prow labels, release notes; runs as an isolated read-only subagent |
+| [dep](skills/dep/SKILL.md) | `/etcd-druid:dep` | — | Guide writing or review Druid Enhancement Proposals; 20-dimension rubric covering cross-repo impact, feature gates, breaking changes, CEL validations, Mermaid diagrams |
 | [reference](skills/reference/SKILL.md) | `/etcd-druid:reference` | — | Make targets, file paths, feature gates, CLI flags, dependency management, cherry-pick workflow |
 | [observations](skills/observations/SKILL.md) | `/etcd-druid:observations` | — | Triage plugin self-improvement findings: raise PR, skip, or dismiss |
 
@@ -226,6 +229,7 @@ The core loop is **brainstorm → plan → Gate 1 → implement → Gate 2 → P
 | plan | NO CODE BEFORE GATE 1 |
 | implement | NO PUSH BEFORE GATE 2 |
 | finish | NO PR WITHOUT PASSING TESTS |
+| dep | EVERY DEP IS REVIEWED FROM THREE REPO PERSPECTIVES |
 | tdd | NO IMPLEMENTATION CODE BEFORE A FAILING TEST |
 | debug | NO FIX ATTEMPT WITHOUT A REPRODUCIBLE FAILURE FIRST |
 | review | NO VERDICT WITHOUT READING THE DIFF AND docs/development/ FIRST |

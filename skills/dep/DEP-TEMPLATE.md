@@ -44,7 +44,7 @@ Minimum 3 goals. Each should be verifiable.
 ### Non-Goals
 
 <!--
-Minimum 5 non-goals. Draw boundaries to prevent scope creep.
+Minimum 3 non-goals. Draw boundaries to prevent scope creep.
 Each non-goal should explain WHY it's excluded.
 -->
 
@@ -114,6 +114,21 @@ Required if the change introduces a toggleable capability.
 <!--
 Optional but encouraged for observable changes.
 Define Prometheus metrics: name, type (counter/histogram/gauge), labels.
+-->
+
+## Testing Strategy
+
+<!--
+How will this feature be validated? For each repo affected:
+- Unit tests: key scenarios, which packages
+- Integration tests: envtest-based, what controllers/components
+- E2e tests: KIND cluster scenarios, which providers
+- Manual verification: kubectl commands to confirm behavior
+
+Include the expected test commands:
+  etcd-druid: make test-unit, make test-integration, make ci-e2e-kind
+  etcd-backup-restore: make test-unit, make test-integration
+  etcd-wrapper: make test
 -->
 
 ## Alternatives

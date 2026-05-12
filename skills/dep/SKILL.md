@@ -1,13 +1,13 @@
 ---
 name: dep
-description: Use when writing a new Druid Enhancement Proposal or reviewing an existing DEP draft for quality and completeness. Guides section-by-section authoring with best-practice heuristics, or scores existing drafts against a 20-point rubric covering cross-repo impact (etcd-druid, etcd-backup-restore, etcd-wrapper), feature gates, breaking changes, CEL validations, and Mermaid diagrams.
+description: Use when writing a new Druid Enhancement Proposal or reviewing an existing DEP draft for quality and completeness. Guides section-by-section authoring with best-practice heuristics, or scores existing drafts against a 20-dimension rubric covering cross-repo impact (etcd-druid, etcd-backup-restore, etcd-wrapper), feature gates, breaking changes, CEL validations, and Mermaid diagrams.
 user-invocable: true
 effort: high
 ---
 
 # Druid Enhancement Proposal (DEP) — Guide & Review
 
-## ⛔ Iron Law
+## Iron Law
 
 **EVERY DEP IS REVIEWED FROM THREE REPO PERSPECTIVES.**
 
@@ -46,7 +46,7 @@ Walk the author through writing a DEP section-by-section.
    - Is there a behavioral change? (triggers sidecar contract check)
 3. Determine next DEP number:
    ```bash
-   ls /path/to/gardener/etcd-druid/docs/proposals/*.md | tail -1
+   ls docs/proposals/*.md | tail -1
    ```
 4. Create the DEP file from [DEP-TEMPLATE.md](DEP-TEMPLATE.md)
 
@@ -82,7 +82,7 @@ After the main sections, suggest diagrams based on content:
 
 ### Phase 4: Self-Review
 
-Run the 20-point rubric from [BEST-PRACTICES.md](BEST-PRACTICES.md) against the draft:
+Run the 20-dimension rubric from [BEST-PRACTICES.md](BEST-PRACTICES.md) against the draft:
 - Score each dimension
 - Present gaps with specific fix suggestions
 - Iterate until score ≥ 26 (Good)
@@ -152,4 +152,13 @@ Format:
 | Approved by maintainers | `/etcd-druid:plan` to create implementation plan |
 | Involving API changes | `/etcd-druid:api-change` for CEL/two-commit details |
 | Ready for implementation | `/etcd-druid:implement` with the plan |
+
+## Red Flags — Stop and Re-read
+
+| Thought | Why it fails |
+|---|---|
+| "I'll write the code first, DEP later" | DEP exists to validate design before wasting implementation time |
+| "Only etcd-druid is affected" | API changes flow to sidecars. Always check all three repos |
+| "The DEP is good enough at 18/40" | Below 26 = Needs Work. Gaps in design surface as bugs in code |
+| "Diagrams are optional" | They're not. One Mermaid diagram minimum is a hard requirement |
 
