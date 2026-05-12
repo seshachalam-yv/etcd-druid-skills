@@ -27,9 +27,9 @@ kubectl get etcd etcd-main -n <test-ns> -o jsonpath='{.status.lastFullBackup}'
 etcd-backup-restore uses a distroless image — no shell, no etcdctl. To interact with etcd directly:
 
 ```bash
-# Run a temporary etcdctl client pod
+# Run a temporary etcdctl client pod (use etcd version matching your cluster)
 kubectl run etcd-client --rm -i --restart=Never \
-  --image=registry.k8s.io/etcd:3.5.27-0 -n <ns> -- \
+  --image=registry.k8s.io/etcd:3.5.x-0 -n <ns> -- \
   etcdctl --endpoints=http://<etcd-name>-client.<ns>.svc:2379 \
   get /test/key
 
