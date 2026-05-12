@@ -108,12 +108,17 @@ If the reference card appears with your current git state, you're set.
 ## 🔄 Workflow
 
 ```
- Issue / Bug Report
+ Issue / Bug Report / Feature Request
        │
        ▼
+ ┌───────────────── /etcd-druid:brainstorm ──────────────────┐
+ │  Understand intent → explore → clarify → confirm approach │
+ └────────────────────────────┬──────────────────────────────┘
+                              │
+                              ▼
  ┌─────────────────────── /etcd-druid:plan ───────────────────────┐
  │  Read issue → explore upstream → design approach → write plan  │
- │  Plan includes: tasks, WHEN/THEN criteria, files, test scope   │
+ │  Self-review: spec coverage, placeholders, type consistency    │
  └────────────────────────────┬───────────────────────────────────┘
                               │
                     ┌─────────▼─────────┐
@@ -145,23 +150,28 @@ If the reference card appears with your current git state, you're set.
                     └─────────┬─────────┘
                               │
                          gh pr create
+
+ ─── Standalone path (debug/tdd → finish) ───
+
+ debug / tdd ──→ /etcd-druid:finish ──→ PR / push / keep / discard
 ```
 
 ### 🔗 Skill Interactions
 
 ```
-plan ──► implement ──┬──► api-change*  ──► CEL, two-commit, CRD tests
-   │                 ├──► tdd*         ──► Red-Green-Refactor per repo
-   │                 ├──► review*      ──► 15 footguns, Prow labels
-   │                 ├──► e2e          ──► KIND, custom images, CI
-   │                 └──► verification ──► run → read → then claim
-   │
-   └──► Gate 1                 debug* ──► tdd ──► review ──► Gate 2
+brainstorm ──► plan ──► implement ──┬──► api-change*  ──► CEL, two-commit, CRD tests
+                  │                 ├──► tdd*         ──► Red-Green-Refactor per repo
+                  │                 ├──► review*      ──► 15 footguns, Prow labels
+                  │                 ├──► e2e          ──► KIND, custom images, CI
+                  │                 └──► verification ──► run → read → then claim
+                  │
+                  └──► Gate 1                 debug* ──► tdd ──► finish ──► PR
+                                              finish ──► Gate 2 (standalone path)
 
    * = auto-activates on .go edits
 ```
 
-The core loop is **plan → Gate 1 → implement → Gate 2 → PR**. Every skill supports a phase of this loop.
+The core loop is **brainstorm → plan → Gate 1 → implement → Gate 2 → PR**. The standalone path is **debug/tdd → finish → PR**.
 
 ### 🛠 Skills
 
@@ -169,8 +179,10 @@ The core loop is **plan → Gate 1 → implement → Gate 2 → PR**. Every skil
 
 | Skill | Invoke | Description |
 |-------|--------|-------------|
-| [plan](skills/plan/SKILL.md) | `/etcd-druid:plan` | Issue intake → approach selection → code plan with WHEN/THEN acceptance criteria. Outputs an approved plan file. **Gate 1** blocks all code until you approve. |
+| [brainstorm](skills/brainstorm/SKILL.md) | `/etcd-druid:brainstorm` | Explores intent, requirements, and constraints before planning. Surfaces assumptions, confirms approach. Use before `plan` for ambiguous or multi-repo changes. |
+| [plan](skills/plan/SKILL.md) | `/etcd-druid:plan` | Issue intake → approach selection → code plan with WHEN/THEN acceptance criteria. Inline self-review catches placeholders and consistency bugs. Outputs an approved plan file. **Gate 1** blocks all code until you approve. |
 | [implement](skills/implement/SKILL.md) | `/etcd-druid:implement` | Worktree setup → per-task subagent loop (implementer → spec-reviewer → code-reviewer) → CI verify → PR draft. **Gate 2** blocks push until you approve. |
+| [finish](skills/finish/SKILL.md) | `/etcd-druid:finish` | Completes a development branch after standalone debug/tdd sessions. Verifies tests, presents 4 options (PR/push/keep/discard), provenance-based cleanup. |
 
 **Domain-Specific**
 
@@ -210,8 +222,10 @@ The core loop is **plan → Gate 1 → implement → Gate 2 → PR**. Every skil
 
 | Skill | Law |
 |-------|-----|
+| brainstorm | NO PLAN WITHOUT CONFIRMED INTENT |
 | plan | NO CODE BEFORE GATE 1 |
 | implement | NO PUSH BEFORE GATE 2 |
+| finish | NO PR WITHOUT PASSING TESTS |
 | tdd | NO IMPLEMENTATION CODE BEFORE A FAILING TEST |
 | debug | NO FIX ATTEMPT WITHOUT A REPRODUCIBLE FAILURE FIRST |
 | review | NO VERDICT WITHOUT READING THE DIFF AND docs/development/ FIRST |
