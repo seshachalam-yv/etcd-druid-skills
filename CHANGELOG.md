@@ -2,6 +2,31 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.0] - 2026-05-12
+
+### Documentation
+- Add GitHub Pages documentation badge to README (#23) ([5900449](https://github.com/seshachalam-yv/etcd-druid-skills/commit/590044910fff5c462c0e5666392fad4ed06f7086))
+- Integrate plan best practices into skill files (#22) ([f708a3d](https://github.com/seshachalam-yv/etcd-druid-skills/commit/f708a3d302615a347a513dd7f7419bb8d8f75156))
+- *(site)* Diagonal lightning logo + OpenClaw-style OG image (#21) ([a2aff22](https://github.com/seshachalam-yv/etcd-druid-skills/commit/a2aff2222ad5e774ec31eef87eca23c78c22139a))
+- *(website)* OG preview fix, faster animations, self-improvement redesign (#18) ([5408d9f](https://github.com/seshachalam-yv/etcd-druid-skills/commit/5408d9ff87b3e9b7e496f7e3ffd40d8c3364d103))
+- *(website)* Self-improvement racetrack loop, OG image, cache busting (#17) ([d95f990](https://github.com/seshachalam-yv/etcd-druid-skills/commit/d95f990ecf229a0c42dfc49246e4480f89f465e7))
+- *(website)* Add GitHub Pages best practices + page improvements (#16) ([dc2c0a0](https://github.com/seshachalam-yv/etcd-druid-skills/commit/dc2c0a0e51a1ef804d3dec80b326b74be3f17fcf))
+- Add GitHub Pages landing page (#15) ([7b5e5f6](https://github.com/seshachalam-yv/etcd-druid-skills/commit/7b5e5f653437beee79cd3251929071583acd2f70))
+- *(logo)* Replace ⚡kills with plain "skills" to fix misread as "kills" (#11) ([26e8fb3](https://github.com/seshachalam-yv/etcd-druid-skills/commit/26e8fb3d755ab5c64b07628c7635b5abe54bc64d))
+- *(readme)* Add emoji prefixes to section headings for visual scanning (#10) ([f3a4530](https://github.com/seshachalam-yv/etcd-druid-skills/commit/f3a45306053afa68cda6d84b559162ce66577bbc))
+
+
+### Features
+- Add DEP skill for Druid Enhancement Proposals (#26) ([0fbcc73](https://github.com/seshachalam-yv/etcd-druid-skills/commit/0fbcc739e244745c1330810ac4001cafc367ccc3))
+- Adopt superpowers v5.1.0 patterns for skill quality and resilience (#27) ([51c5eb6](https://github.com/seshachalam-yv/etcd-druid-skills/commit/51c5eb64f11c575ab4ff1a0c3c59fdc5395e5ee5))
+- Progressive disclosure for skill files (#24) ([33692c9](https://github.com/seshachalam-yv/etcd-druid-skills/commit/33692c9f1151263bb705e6cf7d80eb7a78c0ed6b))
+
+
+### Fixes
+- *(site)* Diagonal lightning strike with faster animation (#20) ([7398a24](https://github.com/seshachalam-yv/etcd-druid-skills/commit/7398a24567472115f660799e6c2db1461c794dce))
+- *(site)* 7 landing page bug fixes (#19) ([fa62c2e](https://github.com/seshachalam-yv/etcd-druid-skills/commit/fa62c2e9b4f7699a7270e12b384118f27d4d09bd))
+
+
 ## [0.2.0] - 2026-04-22
 
 ### Documentation
