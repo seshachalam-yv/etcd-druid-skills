@@ -123,6 +123,18 @@ make kind-down                  # destroys KIND cluster
 
 ---
 
+## Evidence Session (Manual Verification)
+
+When verifying a task or bug fix by manually deploying etcd-druid and applying an Etcd CR, use the **evidence session** protocol to capture structured proof at every state transition.
+
+**Invoke by saying:** "verify task X", "verify this fix", "run evidence session", or "e2e verify"
+
+The session covers the full arc: deploy operator → spawn per-pod monitors → apply CR → verify state transitions → generate report.
+
+See [EVIDENCE-SESSION.md](EVIDENCE-SESSION.md) for the full protocol and [MONITOR-AGENT.md](MONITOR-AGENT.md) for per-pod monitoring behavior.
+
+---
+
 ## Further Reading
 
 For custom sidecar builds (etcd-backup-restore, etcd-wrapper), see [SIDECAR-OVERRIDES.md](SIDECAR-OVERRIDES.md). For pre-PR pipeline checks, see [RUNNING-E2E.md](RUNNING-E2E.md). For cluster observation and handoff, see [MULTI-REPO-E2E.md](MULTI-REPO-E2E.md).
