@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.1] - 2026-05-14
+
+### Features
+- *(e2e)* Add evidence capture with per-pod monitoring (#29) ([6e7172d](https://github.com/seshachalam-yv/etcd-druid-skills/commit/6e7172db989c30a4cb10ff9cc2c46eb79c6cc4e5))
+
+
 ## [0.3.0] - 2026-05-12
 
 ### Documentation
