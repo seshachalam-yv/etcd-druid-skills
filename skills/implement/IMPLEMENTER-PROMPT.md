@@ -69,6 +69,16 @@ Agent tool (general-purpose):
     authoritative source for conventions, patterns, and make targets in this repo.
     Do this before writing a single line of code.
 
+    **Pattern mirroring:** Before implementing a new handler, controller, or component,
+    identify the CLOSEST EXISTING implementation in the codebase and read it end-to-end.
+    For EtcdOpsTask handlers: read `internal/controller/etcdopstask/handler/ondemandsnapshot/`.
+    Match its conventions exactly:
+    - Exported vs unexported method names (handler methods are unexported)
+    - Config struct pattern (embed the API config type, don't flatten fields into handler struct)
+    - Result/Description string style (concise, matches existing phrasing)
+    - Method signatures (implement the Handler interface directly, no wrapper methods)
+    Deviations from the closest prior art require explicit justification in your report.
+
     Follow `skills/tdd/SKILL.md` when writing tests: write the failing test first,
     confirm it fails, then implement the minimal code to make it pass.
     Read `skills/tdd/TESTING-ANTI-PATTERNS.md` before writing any test in this repo.
@@ -87,7 +97,7 @@ Agent tool (general-purpose):
 
     1. Implement exactly what the task specifies — nothing more, nothing less
     2. Check existing tests in the same package before writing new ones
-    3. Check existing helpers in `test/utils/` before creating new ones
+    3. Check existing helpers in BOTH `test/utils/` AND `internal/utils/` (especially `internal/utils/kubernetes/`) before creating new ones. The `internal/utils/kubernetes/` package encodes domain knowledge about K8s state semantics (e.g., pod phase, readiness conditions) — reimplementing these risks subtle incorrectness.
     4. Run tests per `docs/development/` instructions (or `make test-unit` / `make ci-checks`)
     5. Commit with correct message style (imperative, sentence case, issue number, no trailing period).
        **API change exception:** if `api/core/v1alpha1/*.go` was edited, two commits are required —

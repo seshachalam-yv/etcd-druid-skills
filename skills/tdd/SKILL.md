@@ -84,6 +84,8 @@ Commit message style: `Add unit tests for <component> (#<issue>)` — no trailin
 - NEVER use Ginkgo in etcd-druid or etcd-wrapper test files — new code uses Go native `testing.T` + Gomega (some legacy packages still use Ginkgo but new tests must not add to them)
 - ALWAYS run the test before writing implementation to confirm it fails
 - ALWAYS use `t.Parallel()` in table-driven tests unless the test mutates shared state
+- ALWAYS order test functions to match the sequence of the methods they test in the source file — aids navigation and review
+- ALWAYS use descriptive test names that state the subject and expected outcome: `TestScaleDown_ReturnsErrorWhenSTSNotFound` not `TestScaleDownError`; `TestServerAndClientPortDefaults` not `TestHelperMethods`
 - If API types in `api/core/v1alpha1/` change, run `cd api && make generate` and commit
   the hand-written API change first, then the generated output separately. NEVER manually
   edit generated files.

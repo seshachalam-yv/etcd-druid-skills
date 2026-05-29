@@ -55,6 +55,8 @@ Agent tool (general-purpose):
     - [ ] No existing comment or code unrelated to this task was silently modified or removed
     - [ ] No overbuilding — only what the task asked for
     - [ ] Existing helpers used, not reimplemented
+    - [ ] No unused variables or constants — every `var` and `const` introduced must have at least one non-trivial reference in this diff
+    - [ ] No trivial wrappers — if a new function's body is just `return existingFunc(sameArgs)` with no additional logic (no error wrapping, no logging, no field mapping), the caller should call the existing function directly
     - [ ] make ci-checks would pass
 
     #### Known footguns (check if the touched code is anywhere near these)
@@ -94,6 +96,10 @@ Agent tool (general-purpose):
     - [ ] Correct error wrapping used (see docs/development/ for pattern)
     - [ ] Error codes are typed string constants — not errors.New()
     - [ ] No silent swallowing (no `_ = err`, no empty if-err blocks)
+
+    #### Timeout enforcement
+    - [ ] If the API type defines timeout/duration fields and the handler accepts them in its constructor, verify they are actually used in the execution logic (requeue intervals, context deadlines, retry limits). An API timeout stored but never read is a bug — infinite retry with no deadline.
+    - [ ] Default value consistency: For every field with a documented default (in GoDoc or kubebuilder markers), verify that the handler/controller does NOT redefine the default with a different value. The API type is the single source of truth.
 
     ---
 
