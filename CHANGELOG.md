@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.2] - 2026-05-29
+
+### Features
+- *(dep)* Incorporate PR #879 review patterns into DEP skill rubric and template (#31) ([e2cc663](https://github.com/seshachalam-yv/etcd-druid-skills/commit/e2cc663a9ef838762d4a439b0bba80a86ef4d1d5))
+- Adopt mattpocock/skills patterns — glossary, grill, prototype, agent-brief, feedback-loop (#28) ([4253407](https://github.com/seshachalam-yv/etcd-druid-skills/commit/42534079215677c2397c33ea3e18e08306157ae7))
+
+
 ## [0.3.1] - 2026-05-14
 
 ### Features
