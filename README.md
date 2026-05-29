@@ -193,7 +193,7 @@ The core loop is **brainstorm → plan → Gate 1 → implement → Gate 2 → P
 | [api-change](skills/api-change/SKILL.md) | `/etcd-druid:api-change` | `api/**/*.go` edits | Field design, CEL validation (field-scoped + cross-field), kubebuilder markers, two-commit generate workflow, CRD integration tests |
 | [tdd](skills/tdd/SKILL.md) | `/etcd-druid:tdd` | `*.go` edits | Red-Green-Refactor per repo; correct framework (Go native for druid/wrapper, Ginkgo v2 for backup-restore); fake client patterns; testing anti-patterns |
 | [debug](skills/debug/SKILL.md) | `/etcd-druid:debug` | `*.go` edits | 6-phase root cause analysis, Delve, per-repo log analysis, build failure triage |
-| [e2e](skills/e2e/SKILL.md) | `/etcd-druid:e2e` | — | KIND cluster setup, custom sidecar image builds, IMAGEVECTOR_OVERWRITE, pre-PR CI |
+| [e2e](skills/e2e/SKILL.md) | `/etcd-druid:e2e` | — | KIND cluster setup, custom sidecar image builds, IMAGEVECTOR_OVERWRITE, pre-PR CI, evidence sessions with per-pod monitoring |
 
 **Quality & Reference**
 
@@ -210,6 +210,15 @@ The core loop is **brainstorm → plan → Gate 1 → implement → Gate 2 → P
 |-------|--------------|-------------|
 | [verification](skills/verification/SKILL.md) | tdd, debug, implement, review | 5-step evidence gate: run command → read output → then claim it passes. Prevents false completion claims. |
 | [receiving-review](skills/receiving-review/SKILL.md) | implement, review | Handle maintainer feedback without sycophancy: verify before implementing suggestions. |
+
+**Collaboration & Design**
+
+| Skill | Invoke | Description |
+|-------|--------|-------------|
+| [glossary](skills/glossary/SKILL.md) | `/etcd-druid:glossary` | Domain terminology and context for the etcd-druid ecosystem. Provides consistent definitions across all skill interactions. |
+| [grill](skills/grill/SKILL.md) | `/etcd-druid:grill` | Structured design interrogation — asks hard questions about your approach before you commit to implementation. |
+| [prototype](skills/prototype/SKILL.md) | `/etcd-druid:prototype` | Rapid proof-of-concept validation. Build the smallest thing that tests your riskiest assumption. |
+| [agent-brief](skills/agent-brief/SKILL.md) | `/etcd-druid:agent-brief` | Generate focused context briefs for sub-agents. Ensures dispatched agents have exactly the context they need. |
 
 ## 💡 Philosophy
 

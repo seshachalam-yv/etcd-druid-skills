@@ -1,6 +1,6 @@
 {
   "name": "etcd-druid",
-  "description": "Expert skills for etcd-druid development: plan/implement workflow with gated Gates, TDD, debugging, API change guidance, e2e testing, code review, and domain reference. Inspired by the Superpowers plugin system.",
+  "description": "Expert skills for etcd-druid development: plan/implement workflow with gated Gates, TDD, debugging, API change guidance, e2e testing, code review, domain glossary, agent briefs, and reference. Inspired by the Superpowers plugin system.",
   "version": "0.3.1",
   "author": {
     "name": "Seshachalam Yerasala Venkata"
