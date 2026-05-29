@@ -200,7 +200,7 @@ The core loop is **brainstorm → plan → Gate 1 → implement → Gate 2 → P
 | Skill | Invoke | Auto-activates | Description |
 |-------|--------|----------------|-------------|
 | [review](skills/review/SKILL.md) | `/etcd-druid:review` | `*.go` edits | 10-step checklist, 15 known footguns, Prow labels, release notes; runs as an isolated read-only subagent |
-| [dep](skills/dep/SKILL.md) | `/etcd-druid:dep` | — | Guide writing or review Druid Enhancement Proposals; 20-dimension rubric covering cross-repo impact, feature gates, breaking changes, CEL validations, Mermaid diagrams |
+| [dep](skills/dep/SKILL.md) | `/etcd-druid:dep` | — | Guide writing or review Druid Enhancement Proposals; 25-dimension / 50-point rubric covering cross-repo impact (incl. adjacent systems like VPA/CA/PDB), public-API discipline, terminology precision, controller boundaries, feature gates, breaking changes, CEL validations, metrics design, Mermaid diagrams |
 | [reference](skills/reference/SKILL.md) | `/etcd-druid:reference` | — | Make targets, file paths, feature gates, CLI flags, dependency management, cherry-pick workflow |
 | [observations](skills/observations/SKILL.md) | `/etcd-druid:observations` | — | Triage plugin self-improvement findings: raise PR, skip, or dismiss |
 

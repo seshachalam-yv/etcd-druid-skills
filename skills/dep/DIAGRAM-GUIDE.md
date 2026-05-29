@@ -2,6 +2,12 @@
 
 Every DEP MUST include at least one Mermaid diagram. Use the table below to choose the right type based on your proposal content.
 
+> **Anti-pattern: redundant diagrams.** A diagram earns its place by making
+> branching, ordering, or state visible at a glance. If your diagram only
+> restates two or three sentences of surrounding prose, remove it — reviewers
+> will ask "do we need this?" and they will be right. Diagrams should add
+> structure that the text alone cannot convey.
+
 ## When to Use Which Diagram
 
 | Proposal content | Diagram type | Mermaid syntax |
@@ -22,6 +28,30 @@ Every DEP MUST include at least one Mermaid diagram. Use the table below to choo
 5. Diagrams inline in proposal body (unless >30 lines, then separate file in `assets/`)
 6. Label all transitions with the triggering event or condition
 7. Include error/failure transitions, not just happy path
+
+## Quality Checklist
+
+Before committing a diagram, walk this list. These are the recurring nits
+reviewers raise on DEP diagrams:
+
+- [ ] **Every decision arrow has a label.** A diamond with one labelled arrow
+      and one unlabelled arrow is the #1 reviewer complaint. Both `Yes`/`No`
+      branches (or every named condition) must be on the arrow, not implied.
+- [ ] **Every node names the entity it refers to.** "Is etcd process dead?"
+      is ambiguous — which pod? Prefer "Is etcd process dead in selected
+      pod?" or scope the question with prior context in the diagram.
+- [ ] **Failure paths are present.** Not just the happy path — show what
+      happens when a step fails, retries, or escalates.
+- [ ] **The diagram earns its place.** If it only restates the surrounding
+      prose without adding branching, ordering, or state structure, remove
+      it (see anti-pattern at the top of this file).
+- [ ] **Source file is committed alongside the rendered image.** If you use
+      Excalidraw / draw.io / external tooling to produce a `.png` in
+      `docs/proposals/assets/`, also commit the source file (`.excalidraw`,
+      `.drawio`, or the Mermaid block) so future authors can edit it.
+- [ ] **Inline Mermaid for diagrams that fit.** Prefer inline Mermaid blocks
+      over external `.png` files when the diagram is under ~30 lines —
+      Mermaid renders in GitHub and stays diff-friendly.
 
 ## Patterns by Scenario
 
