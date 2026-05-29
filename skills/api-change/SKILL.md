@@ -95,8 +95,11 @@ type AdditionalPeerURL struct {
 | `+kubebuilder:validation:MinItems/MaxItems` | Slice cardinality |
 | `+kubebuilder:validation:MinProperties=1` | Must set at least one sub-field |
 | `+listType=atomic` | Slices where order matters or items aren't uniquely keyed |
+| `+kubebuilder:default=<value>` | Optional fields with a documented default — sets the value at admission time so the handler never sees nil. Do NOT hardcode defaults in handler/controller code when a kubebuilder marker can express the same default. Convention: `OnDemandSnapshotConfig` and other existing API fields use this pattern. |
 
 **MaxItems cost budget:** CEL validation cost scales with list length. Use `MaxItems=10` for lists that will be iterated in CEL rules — this keeps cost within the CRD admission webhook budget.
+
+**Default values:** When an optional field has a documented default, set it via `+kubebuilder:default=<value>` on the struct field. The API type is the single source of truth for defaults — never define defaults only in handler code. If using `metav1.Duration`, apply `+kubebuilder:validation:Pattern="^([0-9]+(\\.[0-9]+)?(ns|us|µs|ms|s|m|h))+$"` for format validation.
 
 ---
 

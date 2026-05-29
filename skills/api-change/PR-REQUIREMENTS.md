@@ -15,6 +15,13 @@
 - If new docs files added or docs structure modified: update `mkdocs.yml` and `docs/README.md` (Table of Contents). Follow `docs/development/updating-documentation.md` to test locally.
 - If changing the API behaviour: update `docs/development/changing-api.md` or relevant guide.
 
+**Example consistency:** Before writing a new example, read the other example files in the
+same directory. Match their style exactly:
+- If existing examples have no license headers → do not add one
+- If existing examples have no inline field descriptions → do not add them
+- If existing examples use minimal YAML with just the structure → match that
+The docs (not the examples) are where field semantics are explained.
+
 ---
 
 ## Step 7: CI Pipeline Verification (required — Gate 2 never presented with failing CI)

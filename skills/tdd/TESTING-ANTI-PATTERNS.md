@@ -147,3 +147,56 @@ for _, tc := range cases {
 
 Exception: omit `t.Parallel()` only when the subtest mutates shared state that cannot
 be isolated (e.g., a global registry). Document the reason with a comment.
+
+---
+
+## Anti-Pattern 7: Integration Flows in Unit Test Files
+
+**What it looks like:**
+```go
+func TestRecoverFromQuorumLoss_FullFlow(t *testing.T) {
+    // Calls Execute() in a loop, simulating the entire multi-step recovery
+    for !done {
+        result := handler.Execute(ctx, task, etcd)
+        // advance state...
+    }
+}
+```
+
+**Why it fails:** Unit tests should verify one function's behavior in isolation.
+Multi-step orchestration flows belong in `test/it/` (integration) or `test/e2e/`.
+Placing them in unit tests gives false confidence — they pass because you control
+the sequencing via fake client state, not because the controller orchestrates correctly
+with real API server semantics (watches, caches, conflicts).
+
+**Correct alternative:** Test each step function independently in unit tests.
+Test the full multi-step flow in integration tests where the controller loop and
+API server are real.
+
+---
+
+## Anti-Pattern 8: Missing State-Change Assertions for Critical Operations
+
+**What it looks like:**
+```go
+func TestDeletePVCs(t *testing.T) {
+    err := handler.deletePVCs(ctx, etcd)
+    g.Expect(err).NotTo(HaveOccurred())
+    // No assertion that the PVCs are actually gone
+}
+```
+
+**Why it fails:** The function might have a no-op code path (e.g., empty list,
+early return) that returns nil without performing the deletion. For critical
+destructive operations (delete PVCs, remove leases, scale to zero), always assert
+the post-condition — object gone, count is zero, field cleared.
+
+**Correct alternative:**
+```go
+err := handler.deletePVCs(ctx, etcd)
+g.Expect(err).NotTo(HaveOccurred())
+// Verify PVCs are actually deleted
+pvcList := &corev1.PersistentVolumeClaimList{}
+g.Expect(fakeClient.List(ctx, pvcList, client.InNamespace(ns))).To(Succeed())
+g.Expect(pvcList.Items).To(BeEmpty())
+```
